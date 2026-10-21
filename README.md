@@ -100,7 +100,7 @@ c74489950f6bb90e258d3d3912cd675f232e49fb472a415c1bab8396413a068d
 ## 第一次使用
 
 1. 在 [DeepSeek 开放平台](https://platform.deepseek.com/) 创建自己的 API Key。
-2. 打开网页版或 Windows 版，进入 **Profile / 个人**。
+2. 打开网页版、Android 版、Windows 版，或在鸿蒙 NEXT 的浏览器中打开网页版，进入 **Profile / 个人**。
 3. 粘贴 Key，点击保存与连接测试。
 4. 回到 **Dictionary / 词典**，输入单词、句子，或切换到“文件”读取本地文本、Markdown、字幕、HTML、DOCX、PDF。
 
@@ -136,7 +136,7 @@ Linguist 的“图谱”首先服务于学习者，而不是数据库展示。�
 - API Key、历史、星标、单词本和设置只保存在当前浏览器或当前设备中。
 - 网页版不会把 API Key 写入 Service Worker 缓存；Android 壳关闭系统自动备份；备份文件也不包含 API Key。
 - 查询内容会使用你自己的 Key 发送到 DeepSeek。除完成请求所需外，应用没有自己的中转服务器。
-- 网页版与 Windows 版数据彼此独立；需要迁移时，在 Profile 中导出 JSON，再到另一处导入。
+- 网页版、Android 版与 Windows 版数据彼此独立；鸿蒙 NEXT 使用网页版存储。需要迁移时，在 Profile 中导出 JSON，再到另一处导入。
 - 模型生成内容可能不完整或有误，词源结论尤其应作为线索而不是学术引证。
 
 ## 项目结构
