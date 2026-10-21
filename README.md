@@ -10,7 +10,7 @@
 
 <p align="center">
   <img alt="version" src="https://img.shields.io/badge/version-6.5.0-0071E3">
-  <img alt="platform" src="https://img.shields.io/badge/platform-Web%20%7C%20Android%20%7C%20Windows-1D1D1F">
+  <img alt="platform" src="https://img.shields.io/badge/platform-Web%20%7C%20Android%20%7C%20Windows%20%7C%20HarmonyOS-1D1D1F">
   <img alt="license" src="https://img.shields.io/badge/license-MIT-34A853">
 </p>
 
@@ -76,6 +76,15 @@ SHA-256：
 9706ba8fcd9dedb273ada09bb0efc7f5e3ff82fbbb1db24eee7f4f501e13436b
 ```
 
+### HarmonyOS / 鸿蒙
+
+鸿蒙设备按系统版本选择安装方式：
+
+- **HarmonyOS NEXT**：不直接运行 Android APK。请使用系统浏览器打开[网页版](https://pineapplezy.github.io/linguist/app/)，再从浏览器菜单中选择“添加到桌面”。安装后从桌面图标进入，数据保存在当前设备。
+- **HarmonyOS 4.x 及更早的安卓兼容版本**：可以使用上面的 Android APK。安装方法与普通 Android 设备相同，并需要在系统中允许当前文件管理器安装未知应用。
+
+当前没有发布原生 HarmonyOS HAP。网页版在鸿蒙 NEXT 上使用同一套功能和本地存储，但不享有 Android APK 的独立安装包入口。
+
 ### Windows 免安装版
 
 [下载 Linguist 6.5.0 for Windows x64](https://github.com/PineappleZY/linguist/releases/latest/download/Linguist-6.5.0-portable.exe)
@@ -134,7 +143,7 @@ Linguist 的“图谱”首先服务于学习者，而不是数据库展示。�
 
 ```text
 .
-├── docs/                  GitHub Pages 落地页与可安装 PWA
+├── docs/                  GitHub Pages 落地页与可安装 PWA（含鸿蒙 NEXT）
 │   ├── app/               当前网页应用成品
 │   └── feature-map/       交互式功能知识图谱
 ├── 6.0/                   Linguist 6.5 网页源码、测试、构建与设计文件
@@ -182,6 +191,7 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1
 - 查询与文件分析需要联网；安装后的 PWA 只有静态界面可以离线打开。
 - 文件图片、扫描版 PDF 和旧版 `.doc` 暂不支持。扫描版 PDF 没有文字层时无法抽取正文。
 - Android 版通过侧载安装，目前不通过 Google Play 发布；系统安全提示属于未上架应用的正常行为。
+- HarmonyOS NEXT 目前通过网页版使用，不提供原生 HAP；Android APK 仅适用于仍兼容 Android 应用的鸿蒙版本。
 - Windows 版目前为 x64 免安装包，不含自动更新、ARM64 或代码签名。
 - Electron 环境通常没有可用的系统语音合成音色，因此桌面版的朗读按钮可能隐藏。
 

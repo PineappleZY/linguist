@@ -30,6 +30,12 @@
 
 APK 使用本项目自签名证书签名，能够正常安装，但没有 Google Play 的分发背书。以后若用同一密钥签名，可直接覆盖升级；请保留 `keystore/`，不要公开它。
 
+## HarmonyOS / 鸿蒙
+
+- HarmonyOS 4.x 及更早的安卓兼容版本可以侧载这个 APK。
+- HarmonyOS NEXT 不直接运行 APK。请使用系统浏览器打开 Linguist 网页版，再选择“添加到桌面”。
+- 当前没有原生 HarmonyOS HAP 产物。
+
 ## 重新构建
 
 工具链和下载缓存都在本目录内：

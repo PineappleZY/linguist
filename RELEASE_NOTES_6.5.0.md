@@ -7,6 +7,7 @@
 - 提供可直接安装的网页版（PWA），支持 iPhone、Android 和桌面浏览器。
 - 提供 Android 6.0+ 通用 APK；正文与 PDF 工具内置，数据保存在本机。
 - 提供 Windows x64 免安装版。
+- 鸿蒙 NEXT 使用可安装到桌面的网页版；兼容 Android 的旧版鸿蒙可侧载 APK。
 - 保留英语、法语、德语、日语和中文的独立词条结构。
 - 支持文件分析：文本、Markdown、字幕、HTML、DOCX、带文字层的 PDF。
 - 支持词条卡片排序与显隐、单词本、星标、按语言练习、提示式拼写和导入导出。
@@ -30,6 +31,12 @@ SHA-256：
 ```text
 9706ba8fcd9dedb273ada09bb0efc7f5e3ff82fbbb1db24eee7f4f501e13436b
 ```
+
+## HarmonyOS / 鸿蒙
+
+HarmonyOS NEXT 请使用系统浏览器打开网页版，再选择“添加到桌面”。NEXT 不直接运行 Android APK。
+
+HarmonyOS 4.x 及更早的安卓兼容版本可以下载并侧载上面的 APK。当前没有发布原生 HAP。
 
 ## 使用说明
 
