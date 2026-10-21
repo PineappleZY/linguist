@@ -10,12 +10,14 @@
 
 <p align="center">
   <img alt="version" src="https://img.shields.io/badge/version-6.5.0-0071E3">
-  <img alt="platform" src="https://img.shields.io/badge/platform-Web%20%7C%20Windows-1D1D1F">
+  <img alt="platform" src="https://img.shields.io/badge/platform-Web%20%7C%20Android%20%7C%20Windows-1D1D1F">
   <img alt="license" src="https://img.shields.io/badge/license-MIT-34A853">
 </p>
 
 <p align="center">
   <a href="https://pineapplezy.github.io/linguist/"><strong>打开网页版</strong></a>
+  ·
+  <a href="https://github.com/PineappleZY/linguist/releases/latest/download/Linguist-6.5.0.apk"><strong>下载 Android APK</strong></a>
   ·
   <a href="https://github.com/PineappleZY/linguist/releases/latest/download/Linguist-6.5.0-portable.exe"><strong>下载 Windows 免安装版</strong></a>
   ·
@@ -55,6 +57,24 @@ flowchart LR
 - Android：在 Chrome 菜单中选择“添加到主屏幕”。
 - iPhone / iPad：在 Safari 中点“分享” → “添加到主屏幕”。
 - Windows / macOS：在浏览器地址栏右侧选择“安装”。安装后以独立窗口运行，并缓存应用外壳。
+
+### Android APK
+
+[下载 Linguist 6.5.0 for Android](https://github.com/PineappleZY/linguist/releases/latest/download/Linguist-6.5.0.apk)
+
+APK 是一个通用 Android WebView 包，支持 Android 6.0 及以上系统，体积约 616 KiB。应用正文、样式和 PDF 工具全部内置，不需要从网络加载界面；模型查询仍需要联网。
+
+1. 下载 `Linguist-6.5.0.apk`。
+2. 点击文件安装；如果系统拦截，允许当前文件管理器“安装未知应用”。
+3. 从桌面打开 Linguist，在 Profile 中填入自己的 DeepSeek API Key。
+
+APK 使用项目自签名证书，没有 Google Play 的分发背书。后续同签名版本可以直接覆盖升级。
+
+SHA-256：
+
+```text
+9706ba8fcd9dedb273ada09bb0efc7f5e3ff82fbbb1db24eee7f4f501e13436b
+```
 
 ### Windows 免安装版
 
@@ -105,7 +125,7 @@ Linguist 的“图谱”首先服务于学习者，而不是数据库展示。�
 ## 数据与隐私
 
 - API Key、历史、星标、单词本和设置只保存在当前浏览器或当前设备中。
-- 网页版不会把 API Key 写入 Service Worker 缓存；备份文件也不包含 API Key。
+- 网页版不会把 API Key 写入 Service Worker 缓存；Android 壳关闭系统自动备份；备份文件也不包含 API Key。
 - 查询内容会使用你自己的 Key 发送到 DeepSeek。除完成请求所需外，应用没有自己的中转服务器。
 - 网页版与 Windows 版数据彼此独立；需要迁移时，在 Profile 中导出 JSON，再到另一处导入。
 - 模型生成内容可能不完整或有误，词源结论尤其应作为线索而不是学术引证。
@@ -118,6 +138,7 @@ Linguist 的“图谱”首先服务于学习者，而不是数据库展示。�
 │   ├── app/               当前网页应用成品
 │   └── feature-map/       交互式功能知识图谱
 ├── 6.0/                   Linguist 6.5 网页源码、测试、构建与设计文件
+│   └── android/           Android WebView 壳与 APK 构建脚本
 ├── 落地/windows/          Electron 桌面壳与打包脚本
 ├── 1.0 … 5.0/             历史版本快照
 ├── LICENSE                MIT 开源许可证
@@ -149,10 +170,18 @@ node scripts/prepare.mjs
 npm run dist
 ```
 
+Android APK：
+
+```powershell
+cd 6.0/android
+powershell -ExecutionPolicy Bypass -File .\build.ps1
+```
+
 ## 已知限制
 
 - 查询与文件分析需要联网；安装后的 PWA 只有静态界面可以离线打开。
 - 文件图片、扫描版 PDF 和旧版 `.doc` 暂不支持。扫描版 PDF 没有文字层时无法抽取正文。
+- Android 版通过侧载安装，目前不通过 Google Play 发布；系统安全提示属于未上架应用的正常行为。
 - Windows 版目前为 x64 免安装包，不含自动更新、ARM64 或代码签名。
 - Electron 环境通常没有可用的系统语音合成音色，因此桌面版的朗读按钮可能隐藏。
 

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Linguist</string>
+    <string name="no_browser">No browser is available to open this link.</string>
+    <string name="no_file_picker">No file picker is available.</string>
+    <string name="save_done">Backup saved.</string>
+    <string name="save_failed">Could not save the backup.</string>
+</resources>

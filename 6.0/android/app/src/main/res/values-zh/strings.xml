@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Linguist</string>
+    <string name="no_browser">没有可打开此链接的浏览器。</string>
+    <string name="no_file_picker">没有可用的文件选择器。</string>
+    <string name="save_done">备份已保存。</string>
+    <string name="save_failed">备份保存失败。</string>
+</resources>

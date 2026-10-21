@@ -1,0 +1,5 @@
+.cache/
+toolchain/
+build/
+keystore/
+dist/*.idsig
