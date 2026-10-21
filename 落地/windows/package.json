@@ -1,0 +1,53 @@
+{
+  "name": "linguist",
+  "productName": "Linguist",
+  "version": "6.5.0",
+  "description": "Linguist — a word-root-first dictionary for five languages",
+  "main": "main.js",
+  "author": "PineappleZY",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "smoke": "electron . --smoke-test",
+    "clean-smoke": "electron . --smoke-clean",
+    "dist": "electron-builder --win portable --x64"
+  },
+  "devDependencies": {
+    "electron": "44.9.0",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "app.linguist.dictionary",
+    "productName": "Linguist",
+    "asar": true,
+    "compression": "maximum",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "app/**/*",
+      "build/icon.ico",
+      "package.json"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "Linguist-${version}-portable.${ext}"
+    },
+    "portable": {
+      "artifactName": "Linguist-${version}-portable.${ext}",
+      "unpackDirName": "Linguist-6.5.0",
+      "requestExecutionLevel": "user"
+    }
+  }
+}

@@ -1,0 +1,109 @@
+/* Radicle 5.0 — iOS / mobile layer.
+
+   This file is loaded by the iOS build *after* assets/app.css, so it only ever
+   overrides: the frozen 5.0 source under web/ is not edited. Every block below
+   says what breaks without it, because most of these are invisible on a
+   desktop browser — they are the things a phone does to a page, not the things
+   a page does to itself. */
+
+/* 1. iOS inflates text when a phone is turned sideways, and Safari zooms the
+      whole page whenever a focused field's text is smaller than 16px. Both are
+      the platform's decisions, so the sizes are pinned here: no inflating, and
+      every field — search box, API key, history search, the practice input —
+      sits at 16px so focusing one never moves the layout. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+textarea,
+select {
+  font-size: 16px;
+}
+
+/* 2. A tap should respond immediately and a quick double tap should not zoom
+      the page — on a phone, tapping a card header twice is a normal way to
+      fold it back. `manipulation` keeps panning and pinch-zoom, so this is not
+      the usual "zoom is disabled" accessibility trade. */
+html {
+  touch-action: manipulation;
+}
+
+/* 3. A tapped control keeps its :hover colour on a touch screen until you tap
+      somewhere else — the language picker left grey under the thumb that
+      chose from it is the one people notice. Touch devices get the resting
+      colour back; pointer devices keep their hover. */
+@media (hover: none) {
+  .btn:hover { background: var(--fill); }
+  .btn-primary:hover { background: var(--accent); }
+  .btn-quiet:hover { background: transparent; }
+  .icon-btn:hover { background: transparent; }
+  .group-toggle:hover { background: transparent; color: var(--text-3); }
+  .row:hover { background: transparent; }
+  .chip-button:hover { background: var(--fill); }
+  .form-toggle:hover .form-name { color: inherit; }
+  .card-toggle:hover .card-title { color: var(--text-3); }
+  .link-btn:hover { color: var(--accent); }
+  .picker:hover { background: var(--card); }
+  .picker.is-compact:hover { background: var(--fill); }
+  .sheet-option:hover { background: transparent; }
+  .spell-icon:hover,
+  .spell-exit:hover,
+  .spell-btn:hover,
+  .surprise-btn:hover { background: var(--fill); }
+  .spell-btn:disabled:hover { background: var(--fill); }
+  .surprise-btn.is-accent:hover { background: var(--accent); }
+  .search-go:hover { background: var(--accent); }
+}
+
+/* 4. The bottom action sheet. `touch-action: none` sits on the whole panel in
+      app.css, which is what the drag gesture wants — but it also stops the
+      list *inside* the panel from scrolling, and in landscape the sheet is
+      taller than the viewport, so the last options cannot be reached at all.
+      The drag only ever starts on the grip, so the grip keeps `none` and the
+      list is given its own height budget measured against the *dynamic*
+      viewport (dvh), which is the one that shrinks when the browser chrome
+      appears. The 420px ceiling from app.css still applies on a tall screen. */
+.sheet {
+  touch-action: pan-y;
+}
+
+.sheet-grip {
+  touch-action: none;
+}
+
+.sheet-list {
+  max-height: min(420px, calc(100dvh - 180px - env(safe-area-inset-bottom, 0px)));
+  overscroll-behavior: contain;
+}
+
+/* 5. Landscape on a notched iPhone: the rounded corners and the sensor housing
+      eat the left and right edges. The shell already respects the top and
+      bottom insets; these are the two it never used. */
+@media (orientation: landscape) {
+  .topbar-inner,
+  .screen,
+  .sheet {
+    padding-left: max(env(safe-area-inset-left, 0px), var(--space-4));
+    padding-right: max(env(safe-area-inset-right, 0px), var(--space-4));
+  }
+
+  .tabbar {
+    padding-left: max(env(safe-area-inset-left, 0px), var(--space-4));
+    padding-right: max(env(safe-area-inset-right, 0px), var(--space-4));
+  }
+}
+
+/* 6. The practice layer is a fixed, full-screen surface with the keyboard over
+      it. iOS does not resize the layout viewport for the keyboard, so a bottom
+      bar pinned to `bottom: 0` stays behind it — and the two buttons that end
+      the exercise live there. `--keyboard-inset` is written by ios.js from the
+      visual viewport; it is 0 whenever no keyboard is up. */
+.spell-layer {
+  padding-bottom: var(--keyboard-inset, 0px);
+}
+
+.spell-input {
+  font-size: 16px;
+}

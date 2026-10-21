@@ -1,0 +1,35 @@
+# Secrets and local machine state
+.deepseek-key.local
+*.local
+**/*.local
+.env
+.env.*
+
+# Dependencies
+**/node_modules/
+
+# Generated build output and duplicate archives
+**/dist/
+**/*.zip
+
+# Desktop prepared bundle can be regenerated from the 6.5 single-file build
+落地/windows/app/*.html
+落地/windows/app/SHA256.txt
+
+# Operating-system and editor noise
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+~$*
+
+# Keep the deployed PWA and the downloadable checksum source in Git
+!docs/app/
+!docs/app/**
+!落地/windows/dist/SHA256SUMS.txt

@@ -1,0 +1,4 @@
+node_modules/
+dist/
+app/*.html
+app/SHA256.txt
