@@ -32,6 +32,11 @@ window.LINGUIST = window.LINGUIST || {};
     var hash = hashArg || location.hash || '#/dictionary';
     var word = /^#\/word\/(.+)$/.exec(hash);
     if (word) return { name: 'word', tab: 'dictionary', params: { id: decodeURIComponent(word[1]) } };
+    var discovery = /^#\/discovery\/(.+)$/.exec(hash);
+    if (discovery) return { name: 'discovery', tab: 'favorites', params: { id: decodeURIComponent(discovery[1]) } };
+    var root = /^#\/root\/(.+)$/.exec(hash);
+    if (root) return { name: 'roots', tab: 'roots', params: { key: decodeURIComponent(root[1]) } };
+    if (hash.indexOf('#/roots') === 0) return { name: 'roots', tab: 'roots', params: {} };
     if (hash.indexOf('#/profile') === 0) return { name: 'profile', tab: 'profile', params: {} };
     if (hash.indexOf('#/favorites') === 0) return { name: 'favorites', tab: 'favorites', params: {} };
     return { name: 'dictionary', tab: 'dictionary', params: {} };
@@ -153,6 +158,7 @@ window.LINGUIST = window.LINGUIST || {};
      unreachable without any test noticing. */
   ns.router.tabs = [
     { id: 'dictionary', labelKey: 'nav.dictionary', icon: 'book', hash: '#/dictionary' },
+    { id: 'roots', labelKey: 'nav.roots', icon: 'branch', hash: '#/roots' },
     { id: 'favorites', labelKey: 'nav.starred', icon: 'star', hash: '#/favorites' },
     { id: 'profile', labelKey: 'nav.profile', icon: 'person', hash: '#/profile' }
   ];

@@ -1,0 +1,2 @@
+b60595d8459c5bda496707a7992e5fa1224b929ce21fba0af8bcfae2a9c0f447  linguist_7.0.0.html
+e1eaca6295bb1db9b4151eddb64876502d2d8954bfa3c9e22b402fd7bc4820ae  Linguist-7.0.0-web.zip

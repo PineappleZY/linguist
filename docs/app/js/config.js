@@ -500,10 +500,10 @@ window.LINGUIST = window.LINGUIST || {};
        below it IS translated — see strings.js. */
     taglineKey: 'app.tagline',
     descriptionKey: 'app.description',
-    version: '6.5.0',
+    version: '7.0.0',
 
     /* Bumped whenever the stored entry shape changes. */
-    schemaVersion: 5,
+    schemaVersion: 6,
 
     api: {
       endpoint: 'https://api.deepseek.com/chat/completions',
@@ -538,6 +538,8 @@ window.LINGUIST = window.LINGUIST || {};
       distinction: 2000,
       candidate: 900,
       surprise: 300,
+      surprisePool: 6000,
+      discovery: 900,
       /* One tiny question — "what language is this?" — asked once for a sentence
          or for an old entry that never recorded one. */
       detect: 60,
@@ -700,6 +702,8 @@ window.LINGUIST = window.LINGUIST || {};
       maxExpressionWords: 4,
       maxSentenceLength: 400,
       practiceRound: 5,
+      surprisePool: { batch: 100, target: 200, topUp: 100, lowWater: 20, seenMax: 20000 },
+      rootReviewRound: 5,
       maxWordbooks: 50,
       maxWordbookName: 40,
       /* A file is read in pieces. One piece is a single request, which keeps
@@ -719,22 +723,27 @@ window.LINGUIST = window.LINGUIST || {};
     }
   };
 
-  ns.STORAGE_PREFIX = 'dict6';
+  ns.STORAGE_PREFIX = 'dict7';
 
   ns.STORAGE = {
     settings: ns.STORAGE_PREFIX + '.settings',
     history: ns.STORAGE_PREFIX + '.history',
     entryPrefix: ns.STORAGE_PREFIX + '.entry.',
     wordbooks: ns.STORAGE_PREFIX + '.wordbooks',
+    rootIndex: ns.STORAGE_PREFIX + '.rootIndex',
+    rootProgress: ns.STORAGE_PREFIX + '.rootProgress',
+    surprisePool: ns.STORAGE_PREFIX + '.surprisePool',
+    surpriseSeen: ns.STORAGE_PREFIX + '.surpriseSeen',
     /* Set once an older version's data has been offered for import, so the prompt never
        comes back — even if the user declined. */
     imported: ns.STORAGE_PREFIX + '.imported'
   };
 
-  /* The version folders whose data can be imported, newest first. 6.0 starts on
+  /* The version folders whose data can be imported, newest first. 7.0 starts on
      a fresh prefix, so nothing is ever rewritten in place: this is a one-way
      read, and the first folder that actually holds data is the one offered. */
   ns.IMPORT_SOURCES = [
+    { prefix: 'dict6', label: '6.x' },
     { prefix: 'dict5', label: '5.x' },
     { prefix: 'dict4', label: '4.x' },
     { prefix: 'dict3', label: '3.x' }
@@ -789,6 +798,8 @@ window.LINGUIST = window.LINGUIST || {};
     /* Which card-preference groups are unfolded in Profile. Empty means all of
        them are closed, which is what keeps that screen from becoming a wall. */
     openPrefGroups: {},
+    surprisePoolStatus: '',
+    rootQuery: '',
     /* Which history days and which favourite groups are folded shut. Both are
        empty on load, so everything starts expanded. */
     collapsedDays: {},

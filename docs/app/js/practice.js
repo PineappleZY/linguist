@@ -600,11 +600,13 @@ window.LINGUIST = window.LINGUIST || {};
 
   function settle() {
     if (!current || current.status !== 'correct') return;
+    var outcome = current.firstWrong ? 'unknown' : 'known';
+    if (ns.roots && current.item) ns.roots.recordWordOutcome(current.item, outcome);
     if (current.practiceMode && typeof onAdvance === 'function') {
       /* Tell the round how it went. "unknown" means the first attempt was
          wrong, even though the word was eventually spelled right: it belongs
          in the next pass just as a skipped word does. */
-      var next = onAdvance({ outcome: current.firstWrong ? 'unknown' : 'known' });
+      var next = onAdvance({ outcome: outcome });
       if (next) { open(next); return; }
     }
     close();
@@ -683,6 +685,12 @@ window.LINGUIST = window.LINGUIST || {};
     } else if (current.status === 'wrong' && current.note === 'okurigana') {
       note = ui.t('practice.okurigana', { answer: current.expectedTail });
     }
+    if (!note && current.firstWrong && current.item && current.item.primaryRoot) {
+      note = ui.t('roots.spellNote', {
+        root: current.item.primaryRoot.display || '',
+        meaning: current.item.primaryRoot.meaning || ''
+      });
+    }
     refs.note.hidden = !note;
     refs.note.textContent = note;
 
@@ -706,6 +714,12 @@ window.LINGUIST = window.LINGUIST || {};
       var pos = current.item && current.item.pos ? String(current.item.pos) : '';
       var meaning = String(current.meaning || current.item.meaning || '');
       var promptHtml = '';
+      var langName = current.item && (current.item.languageName || current.item.language);
+      if (langName) {
+        var langCode = current.item.languageCode || current.item.language || '';
+        promptHtml += '<span class="spell-lang">' + ui.esc(langName) +
+          (langCode ? ' · ' + ui.esc(String(langCode).toUpperCase()) : '') + '</span>';
+      }
       if (pos) promptHtml += '<span class="spell-pos">' + ui.esc(pos) + '</span>';
       if (meaning) promptHtml += '<span class="spell-meaning">' + ui.esc(meaning) + '</span>';
       refs.prompt.innerHTML = promptHtml;

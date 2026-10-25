@@ -233,6 +233,11 @@ window.LINGUIST = window.LINGUIST || {};
       'document', language || 'en', model, outputLang].join('--');
   }
 
+  function discoveryId(word, language, model, outputLang) {
+    return [slug(word), fingerprint(String(word || '') + '#' + String(language || '')),
+      'discovery', model, outputLang].join('--');
+  }
+
   /* ---------- History index ---------- */
 
   /* The index and the wordbooks are small and are read constantly — every
@@ -299,6 +304,11 @@ window.LINGUIST = window.LINGUIST || {};
   function removeEntry(id) {
     saveHistory(listHistory().filter(function (item) { return item.id !== id; }));
     rawRemove(STORAGE.entryPrefix + id);
+    var rootIndex = readJSON(STORAGE.rootIndex, null);
+    if (rootIndex && rootIndex.entries && rootIndex.entries[id]) {
+      delete rootIndex.entries[id];
+      writeJSON(STORAGE.rootIndex, rootIndex);
+    }
     /* Do not leave a dangling reference behind in any wordbook. */
     var books = listWordbooks();
     var changed = false;
@@ -347,6 +357,8 @@ window.LINGUIST = window.LINGUIST || {};
      starred. Adding to a book stars the word; removing a book never unstars
      anything, and deleting a book never deletes a word. */
 
+  var SURPRISE_BOOK_ID = 'surprise';
+
   function listWordbooks() {
     if (!cache.wordbooks) {
       var books = readJSON(STORAGE.wordbooks, []);
@@ -390,6 +402,7 @@ window.LINGUIST = window.LINGUIST || {};
   }
 
   function renameWordbook(id, name) {
+    if (id === SURPRISE_BOOK_ID) return false;
     var clean = cleanName(name);
     if (!clean) return false;
     var books = listWordbooks();
@@ -403,6 +416,7 @@ window.LINGUIST = window.LINGUIST || {};
 
   /* Removes the book only. Its words stay in the favourites. */
   function removeWordbook(id) {
+    if (id === SURPRISE_BOOK_ID) return false;
     var books = listWordbooks();
     var next = books.filter(function (book) { return book.id !== id; });
     if (next.length === books.length) return false;
@@ -411,6 +425,10 @@ window.LINGUIST = window.LINGUIST || {};
   }
 
   function addToWordbook(bookId, id) {
+    var entry = getEntry(id);
+    var discovery = !!(entry && entry.kind === 'discovery');
+    if (bookId === SURPRISE_BOOK_ID && !discovery) return false;
+    if (bookId !== SURPRISE_BOOK_ID && discovery) return false;
     var books = listWordbooks();
     var added = false;
     books.forEach(function (book) {
@@ -442,6 +460,40 @@ window.LINGUIST = window.LINGUIST || {};
     return listWordbooks().filter(function (book) {
       return book.entries.indexOf(id) > -1;
     });
+  }
+
+  function ensureSurpriseBook() {
+    var book = findWordbook(SURPRISE_BOOK_ID);
+    if (book) return book;
+    var books = listWordbooks();
+    book = { id: SURPRISE_BOOK_ID, name: 'Surprise me', ts: Date.now(), entries: [] };
+    books.push(book);
+    saveWordbooks(books);
+    return book;
+  }
+
+  function saveDiscovery(entry) {
+    if (!entry || !entry.id || entry.kind !== 'discovery') return null;
+    if (!writeJSON(STORAGE.entryPrefix + entry.id, entry)) return null;
+    upsertRow({
+      id: entry.id,
+      word: entry.word,
+      kind: 'discovery',
+      language: '',
+      languageName: entry.languageName || entry.language || '',
+      languageCode: entry.languageCode || '',
+      pos: '',
+      quickMeaning: entry.coreMeaning || entry.quickMeaning || '',
+      reading: entry.pronunciation || '',
+      rootNote: entry.rootNote || '',
+      ts: entry.ts || Date.now(),
+      starred: !!entry.starred,
+      status: 'ok',
+      model: entry.model || '',
+      outputLang: entry.outputLang || ''
+    });
+    if (entry.starred) addToWordbook(ensureSurpriseBook().id, entry.id);
+    return entry;
   }
 
   /* ---------- Entry payloads ---------- */
@@ -486,12 +538,15 @@ window.LINGUIST = window.LINGUIST || {};
          put a language-less row in history and in the favourites, where it
          could not be grouped or analysed correctly. */
       language: entry.language && entry.language !== 'auto' ? entry.language : '',
+      languageName: entry.languageName || '',
+      languageCode: entry.languageCode || '',
       pos: entry.pos || '',
       quickMeaning: entry.overview && entry.overview.quick_meaning ? entry.overview.quick_meaning : '',
       /* Kept on the row so the practice pool can be computed without loading
          every entry payload — Chinese and Japanese need a reading to be
          practisable at all. */
       reading: entry.overview && entry.overview.reading ? entry.overview.reading : '',
+      rootNote: entry.rootNote || '',
       ts: entry.ts || Date.now(),
       starred: !!(entry.starred),
       status: entry.status || 'ok',
@@ -527,10 +582,12 @@ window.LINGUIST = window.LINGUIST || {};
   function toggleStar(id) {
     var rows = listHistory();
     var starred = false;
+    var row = null;
     for (var i = 0; i < rows.length; i += 1) {
       if (rows[i].id === id) {
         rows[i].starred = !rows[i].starred;
         starred = rows[i].starred;
+        row = rows[i];
       }
     }
     saveHistory(rows);
@@ -538,6 +595,10 @@ window.LINGUIST = window.LINGUIST || {};
     if (entry) {
       entry.starred = starred;
       writeJSON(STORAGE.entryPrefix + id, entry);
+    }
+    if (row && row.kind === 'discovery') {
+      if (starred) addToWordbook(ensureSurpriseBook().id, id);
+      else listWordbooks().forEach(function (book) { removeFromWordbook(book.id, id); });
     }
     return starred;
   }
@@ -654,6 +715,8 @@ window.LINGUIST = window.LINGUIST || {};
       })(),
       history: payload.history,
       entries: payload.entries,
+      rootProgress: readJSON(STORAGE.rootProgress, {}),
+      rootIndex: readJSON(STORAGE.rootIndex, null),
       /* Wordbooks are the user's own curation; leaving them out meant a backup
          round-trip silently threw them away. */
       wordbooks: payload.wordbooks
@@ -689,9 +752,12 @@ window.LINGUIST = window.LINGUIST || {};
            restored sentences look like headwords. */
         kind: row.kind || 'word',
         language: row.language || '',
+        languageName: row.languageName || '',
+        languageCode: row.languageCode || '',
         pos: row.pos || '',
         quickMeaning: row.quickMeaning || '',
         reading: row.reading || '',
+        rootNote: row.rootNote || '',
         ts: row.ts || Date.now(),
         starred: !!(row.starred || (existing && existing.starred)),
         status: row.status || 'ok',
@@ -706,6 +772,19 @@ window.LINGUIST = window.LINGUIST || {};
     prune(merged);
     saveHistory(merged);
     restoreWordbooks(payload.wordbooks);
+    if (payload.rootProgress && typeof payload.rootProgress === 'object') {
+      var progress = readJSON(STORAGE.rootProgress, {});
+      Object.keys(payload.rootProgress).forEach(function (key) {
+        var next = payload.rootProgress[key];
+        var old = progress[key];
+        if (!old || (next.lastSeen || 0) >= (old.lastSeen || 0)) progress[key] = next;
+      });
+      writeJSON(STORAGE.rootProgress, progress);
+    }
+    if (payload.rootIndex && typeof payload.rootIndex === 'object') {
+      writeJSON(STORAGE.rootIndex, payload.rootIndex);
+      if (ns.roots) ns.roots.invalidate();
+    }
 
     if (payload.settings && typeof payload.settings === 'object') {
       var safe = {};
@@ -865,6 +944,7 @@ window.LINGUIST = window.LINGUIST || {};
     entryId: entryId,
     sentenceId: sentenceId,
     documentId: documentId,
+    discoveryId: discoveryId,
     listHistory: listHistory,
     getEntry: getEntry,
     saveEntry: saveEntry,
@@ -893,6 +973,9 @@ window.LINGUIST = window.LINGUIST || {};
     removeWordbook: removeWordbook,
     addToWordbook: addToWordbook,
     removeFromWordbook: removeFromWordbook,
-    wordbooksFor: wordbooksFor
+    wordbooksFor: wordbooksFor,
+    ensureSurpriseBook: ensureSurpriseBook,
+    saveDiscovery: saveDiscovery,
+    SURPRISE_BOOK_ID: SURPRISE_BOOK_ID
   };
 })(window.LINGUIST);

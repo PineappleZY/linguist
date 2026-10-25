@@ -471,13 +471,20 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     var items = line && Array.isArray(line.components) ? line.components.filter(Boolean) : [];
     if (!items.length) return '';
     return '<div class="morph-formula">' + items.map(function (item, i) {
+      var rootKey = ns.roots && item.part
+        ? ns.roots._keyOf('component', item.origin || (state.entry && state.entry.language) || 'han', item.part)
+        : '';
+      var open = rootKey
+        ? '<button type="button" class="morph-part is-link" data-root-link="' + ui.esc(rootKey) + '">'
+        : '<span class="morph-part">';
+      var close = rootKey ? '</button>' : '</span>';
       return (i ? '<span class="morph-op">+</span>' : '') +
-        '<span class="morph-part">' +
+        open +
         '<b>' + ui.esc(item.part || '') + '</b>' +
         (item.meaning ? '<i>' + ui.esc(item.meaning) + '</i>' : '') +
         (item.kind ? '<em>' + ui.esc(item.kind) + '</em>' : '') +
         (item.note ? '<u>' + ui.esc(item.note) + '</u>' : '') +
-        '</span>';
+        close;
     }).join('') + '</div>';
   }
 
@@ -489,11 +496,18 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     var html = '';
     if (parts.length) {
       html += '<div class="morph-formula">' + parts.map(function (part, i) {
+        var rootKey = part.type === 'root' && ns.roots
+          ? ns.roots._keyOf('morpheme', part.origin || (state.entry && state.entry.language), part.part)
+          : '';
+        var open = rootKey
+          ? '<button type="button" class="morph-part is-link" data-root-link="' + ui.esc(rootKey) + '">'
+          : '<span class="morph-part">';
+        var close = rootKey ? '</button>' : '</span>';
         return (i ? '<span class="morph-op">+</span>' : '') +
-          '<span class="morph-part"><b>' + ui.esc(part.part || '') + '</b>' +
+          open + '<b>' + ui.esc(part.part || '') + '</b>' +
           (part.meaning ? '<i>' + ui.esc(part.meaning) + '</i>' : '') +
           (part.origin ? '<em>' + ui.esc(part.origin) + '</em>' : '') +
-          (part.form_note ? '<u>' + ui.esc(part.form_note) + '</u>' : '') + '</span>';
+          (part.form_note ? '<u>' + ui.esc(part.form_note) + '</u>' : '') + close;
       }).join('') + '</div>';
     }
     if (morph.composition) html += '<p class="morph-composition">' + ui.esc(morph.composition) + '</p>';
@@ -1260,6 +1274,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     if (!meta) return null;
     var overview = entry.overview || {};
     if (meta.needsReading && !overview.reading) return null;
+    var roots = ns.roots ? ns.roots.rootsFromEntry(entry) : [];
     return {
       word: entry.word,
       reading: overview.reading || '',
@@ -1267,6 +1282,10 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       /* The exercise shows these two from the first frame. */
       pos: overview.pos || '',
       language: entry.language,
+      languageName: meta.native || entry.language,
+      languageCode: entry.language || '',
+      roots: roots,
+      primaryRoot: roots[0] || null,
       /* Needed to find the translation in the explanation language the reader
          has configured for this source language. */
       model: entry.model || '',
@@ -1485,6 +1504,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
   function noteSave(entry) {
     var saved = store.saveEntry(entry);
     if (!saved) state.storageError = true;
+    if (saved && ns.roots && (entry.kind || 'word') === 'word') ns.roots.indexEntry(saved);
     return saved;
   }
 
@@ -2024,6 +2044,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
 
       state.kind = cached.kind || 'word';
       state.entry = cached;
+      if (state.kind === 'word' && ns.roots) ns.roots.indexEntry(cached);
       state.overviewState = cached.status === 'not_found' ? 'not_found' : 'ready';
       lines().forEach(function (line) {
         state.lineState[line] = cached.lines && cached.lines[line] ? 'ready' : 'idle';
@@ -2162,6 +2183,13 @@ window.LINGUIST.views = window.LINGUIST.views || {};
         location.hash = '#/dictionary';
       });
     }
+
+    container.querySelectorAll('[data-root-link]').forEach(function (button) {
+      button.addEventListener('click', function (event) {
+        event.stopPropagation();
+        location.hash = '#/root/' + encodeURIComponent(button.getAttribute('data-root-link'));
+      });
+    });
 
     wireRegion(container, entry);
 

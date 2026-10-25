@@ -894,6 +894,47 @@ window.LINGUIST = window.LINGUIST || {};
     'Output json only.'
   ].join('\n');
 
+  /* A pool is generated once and then drawn locally. 100 rows per request
+     keeps one bad answer cheap and leaves room for the JSON wrapper. */
+  var SURPRISE_POOL = [
+    'You are {APP}. Build a pool of {N} memorable words for a curious language learner.',
+    '',
+    JSON_RULE,
+    'Shape: {"words":[{"word":"...","language":"English","code":"en","native":"English","theme":"scenery"}]}',
+    '',
+    'Rules:',
+    '- {SCOPE}',
+    '- Themes should mix beautiful, scenic, romantic and positive ideas. Avoid proper nouns, inflections,',
+    '  and the most common textbook vocabulary.',
+    '- Every row must be a real headword or a short fixed expression in its own script.',
+    '- language is the English name; code is an ISO 639 code when known; native is the name in that language.',
+    '- theme is one short English label: beauty, scenery, romance, hope, calm, memory, light, water, or similar.',
+    '- Do not repeat a word already in the avoid list.',
+    'Output json only.'
+  ].join('\n');
+
+  /* The compact card for a language outside the five full-dictionary
+     languages. It deliberately asks for less: a precise meaning, examples and
+     an honest root note, never a fabricated etymology. */
+  var DISCOVERY = [
+    'You are {APP}, introducing one word from {SRC} to a learner whose explanation language is {LANG}.',
+    'The word is "{WORD}".',
+    '',
+    JSON_RULE,
+    'Shape: {"word":"...","language":"...","native":"...","code":"...","pronunciation":"...",',
+    ' "core_meaning":"...","examples":[{"text":"...","translation":"..."}],',
+    ' "root_note":"...","why":"..."}',
+    '',
+    'Rules:',
+    '- core_meaning: one or two plain sentences in {LANG}; state the precise central meaning, no imagery.',
+    '- examples: exactly 2 short natural examples in {SRC}, each with a {LANG} translation.',
+    '- pronunciation: IPA or the most useful learner notation; empty if unknown.',
+    '- root_note: at most one sentence on a genuine root or etymology. If uncertain, use "".',
+    '- why: at most one short sentence in {LANG} on why the word is worth knowing.',
+    '- Never invent a word, etymology, example or translation.',
+    'Output json only.'
+  ].join('\n');
+
   var ACCENT_PROMPT = [
     'You are {APP}. A learner of {SRC} typed "{INPUT}" but cannot easily type {SRC} diacritics,',
     'so the accents may be missing or wrong.',
@@ -1258,6 +1299,28 @@ window.LINGUIST = window.LINGUIST || {};
     });
   }
 
+  function surprisePoolPrompt(sourceLang, count, outputLang) {
+    var auto = !sourceLang || sourceLang === 'auto';
+    return fill(SURPRISE_POOL, {
+      APP: ns.CONFIG.appName,
+      N: String(count),
+      LANG: outName(outputLang),
+      SCOPE: auto
+        ? 'About 80% of the words must be in ' + queryLanguageListText() +
+          '; the remaining 20% should be beautiful words from other living languages.'
+        : 'Every word must be in ' + srcName(sourceLang) + '.'
+    });
+  }
+
+  function discoveryPrompt(word, language, outputLang) {
+    return fill(DISCOVERY, {
+      APP: ns.CONFIG.appName,
+      WORD: String(word || ''),
+      SRC: String(language || 'its language'),
+      LANG: outName(outputLang)
+    });
+  }
+
   ns.prompts = {
     outName: outName,
     srcName: srcName,
@@ -1269,6 +1332,8 @@ window.LINGUIST = window.LINGUIST || {};
     document: documentPrompt,
     documentMerge: documentMergePrompt,
     surprise: surprisePrompt,
+    surprisePool: surprisePoolPrompt,
+    discovery: discoveryPrompt,
     detect: detectPrompt,
     templates: { OVERVIEW: OVERVIEW, ETYM: ETYM, USAGE: USAGE, INFL: INFL, DIST: DIST, DETECT: DETECT,
       ACCENT: ACCENT_PROMPT, REVERSE: REVERSE, DOC: DOC_SHARED, DOC_MERGE: DOC_MERGE,

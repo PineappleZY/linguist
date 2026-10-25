@@ -1,7 +1,7 @@
 {
-  "generated": "2026-10-17T06:57:12.168Z",
+  "generated": "2026-10-25T05:51:14.376Z",
   "counts": {
-    "version": "6.5.0",
+    "version": "7.0.0",
     "languages": 7,
     "liveLanguages": 5,
     "retiredLanguages": [
@@ -12,13 +12,13 @@
     "sentenceCards": 9,
     "documentCards": 4,
     "uiLanguages": 5,
-    "strings": 420,
+    "strings": 463,
     "timeoutMs": 45000,
     "documentTimeoutMs": 90000,
     "chunkChars": 20000,
     "maxFileChars": 200000,
     "practiceRound": 5,
-    "assertions": 765
+    "assertions": 792
   },
   "cardLists": {
     "latin": 25,
@@ -44,18 +44,80 @@
     }
   ],
   "latest": {
-    "version": "6.5.0",
-    "summary": "练习不再自动朗读、看过提示才能播放；拼错后可直接重打；随机拒收外语词；补全主题/模型/词源标签；文档真正截断且 id 用全文；取消星标的行先留在原页。"
+    "version": "7.0.0",
+    "summary": "网页版 7.0：拼写语种提示、非单词单行删除、200 词随机池、异语发现卡与保留单词本、Roots 词根学习闭环；桌面与移动打包不在此版。"
   },
   "badges": {
+    "tabs": "updated",
+    "router": "updated",
+    "history": "updated",
+    "starred": "updated",
+    "wordbooks": "updated",
     "practice": "updated",
+    "practice-hints": "updated",
+    "dna": "updated",
+    "entry": "updated",
     "surprise": "updated",
-    "i18n": "updated",
+    "store": "updated",
     "ids": "updated",
-    "doc-view": "updated",
-    "starred": "updated"
+    "import": "updated",
+    "i18n": "updated",
+    "tour": "updated",
+    "prompts": "updated",
+    "api": "updated",
+    "build": "updated",
+    "tests": "updated",
+    "preview": "updated",
+    "roots-tab": "new",
+    "root-index": "new",
+    "root-detail": "new",
+    "root-mastery": "new",
+    "root-review": "new",
+    "surprise-pool": "new",
+    "discovery-card": "new",
+    "surprise-book": "new",
+    "row-delete": "new",
+    "spell-language": "new"
   },
   "changes": [
+    {
+      "version": "7.0.0",
+      "summary": "网页版 7.0：拼写语种提示、非单词单行删除、200 词随机池、异语发现卡与保留单词本、Roots 词根学习闭环；桌面与移动打包不在此版。",
+      "added": [
+        "roots-tab",
+        "root-index",
+        "root-detail",
+        "root-mastery",
+        "root-review",
+        "surprise-pool",
+        "discovery-card",
+        "surprise-book",
+        "row-delete",
+        "spell-language"
+      ],
+      "changed": [
+        "tabs",
+        "router",
+        "history",
+        "starred",
+        "wordbooks",
+        "practice",
+        "practice-hints",
+        "dna",
+        "entry",
+        "surprise",
+        "store",
+        "ids",
+        "import",
+        "i18n",
+        "tour",
+        "prompts",
+        "api",
+        "build",
+        "tests",
+        "preview"
+      ]
+    },
     {
       "version": "6.5.0",
       "summary": "练习不再自动朗读、看过提示才能播放；拼错后可直接重打；随机拒收外语词；补全主题/模型/词源标签；文档真正截断且 id 用全文；取消星标的行先留在原页。",
@@ -130,7 +192,7 @@
         "js/app.js",
         "index.html"
       ],
-      "summary": "Hash router, top bar, three-tab bar, theme, interface language, first paint. Also the first-run order: import prompt → tour.",
+      "summary": "Hash router, top bar, four-tab bar, theme, interface language, first paint. Also the first-run order: import prompt → tour.",
       "keys": [
         "#/dictionary",
         "#/favorites",
@@ -146,17 +208,17 @@
       "files": [
         "js/app.js"
       ],
-      "summary": "Four routes; scroll is remembered per route; leaving the word view aborts its requests."
+      "summary": "Routes for dictionary, word, roots, root detail, discovery, Starred and Profile; scroll is remembered per route."
     },
     {
       "id": "tabs",
       "layer": "ui",
       "label": "Bottom tabs",
-      "zh": "底部三标签",
+      "zh": "底部四标签",
       "files": [
         "js/app.js"
       ],
-      "summary": "Dictionary / Starred / Profile — the only navigation. Real links, so they can be opened in a new tab."
+      "summary": "Dictionary / Roots / Starred / Profile — real links, so they can be opened in a new tab."
     },
     {
       "id": "dictionary",
@@ -211,9 +273,10 @@
       "label": "Surprise me",
       "zh": "随手一查",
       "files": [
-        "js/view-dictionary.js"
+        "js/view-dictionary.js",
+        "js/pool.js"
       ],
-      "summary": "One beautiful word, remembered so it is never repeated (100 remembered), shown for a beat before the ordinary lookup runs."
+      "summary": "Draws from a persistent 200-word pool, prefers the selected language, and sends non-dictionary languages to a discovery card."
     },
     {
       "id": "history",
@@ -224,7 +287,7 @@
         "js/view-dictionary.js",
         "js/ui.js"
       ],
-      "summary": "One group per calendar day, foldable, searchable by word and gloss (accent-insensitive), each row starred or deleted with undo."
+      "summary": "One group per calendar day, foldable, searchable; sentence, file and discovery rows delete with Undo, words keep their entry-page delete."
     },
     {
       "id": "entry",
@@ -276,9 +339,10 @@
       "zh": "词根块",
       "files": [
         "js/config.js",
-        "assets/app.css"
+        "js/view-word.js",
+        "js/roots.js"
       ],
-      "summary": "The root cards share one container with a guide line, so the first thing a reader meets is where the word came from."
+      "summary": "The root cards share one container; root and component chips open the root detail and learning loop."
     },
     {
       "id": "forms",
@@ -363,7 +427,7 @@
       "files": [
         "js/view-favorites.js"
       ],
-      "summary": "The full set of starred entries, grouped by language, with a practice source selector and wordbooks. A row just unstarred keeps its place with a hollow star until the screen is left."
+      "summary": "Language groups exclude discovery words; a separate Surprise section and reserved book hold them. Rows just unstarred keep their place until the screen is left."
     },
     {
       "id": "wordbooks",
@@ -374,7 +438,7 @@
         "js/view-favorites.js",
         "js/store.js"
       ],
-      "summary": "Named subsets of the starred set, cross-language, many-to-many; deleting a book only unlinks."
+      "summary": "Normal books are many-to-many and cross-language; the reserved Surprise book only accepts discovery words and cannot be renamed or deleted."
     },
     {
       "id": "starred-groups",
@@ -402,9 +466,10 @@
       "label": "Practice layer",
       "zh": "练习层",
       "files": [
-        "js/practice.js"
+        "js/practice.js",
+        "js/roots.js"
       ],
-      "summary": "A modal spelling drill: prompt (part of speech and meaning) from the first frame, then typed input judged by language. Nothing is spoken until a hint has been asked for, and typing after a mistake starts a clean attempt."
+      "summary": "A modal spelling drill with a language chip, prompt, hints, skip and clean retry; outcomes update root mastery."
     },
     {
       "id": "practice-forms",
@@ -508,7 +573,7 @@
       "files": [
         "js/tour.js"
       ],
-      "summary": "Nine spotlight steps across the screens, re-playable from Profile; the card is positioned by a pure function, so a step cannot land off screen."
+      "summary": "Ten spotlight steps including Roots, re-playable from Profile; positioning is pure and always clamped on screen."
     },
     {
       "id": "store",
@@ -518,7 +583,7 @@
       "files": [
         "js/store.js"
       ],
-      "summary": "One namespaced key per entry, a history index and wordbooks cached in memory; quota failures prune the oldest unstarred entries and say so if they cannot."
+      "summary": "dict7 entries, history, wordbooks, root index/progress and the Surprise pool; quota failures prune the oldest unstarred entries."
     },
     {
       "id": "ids",
@@ -528,18 +593,18 @@
       "files": [
         "js/store.js"
       ],
-      "summary": "slug, fingerprint, source language, model and explanation language, so the same word in two languages, or in two explanation languages, never collides. A document is fingerprinted over its whole text."
+      "summary": "Word, sentence, document and discovery ids use a readable slug plus a full fingerprint; language, model and explanation language keep variants apart."
     },
     {
       "id": "import",
       "layer": "feature",
-      "label": "Import from 5.x",
+      "label": "Import from 6.x",
       "zh": "导入旧版",
       "files": [
         "js/store.js",
         "js/app.js"
       ],
-      "summary": "dict5 into dict6 (then dict4, dict3): one read, re-keyed, de-duplicated; the old prefix is never written."
+      "summary": "dict6 into dict7 (then dict5, dict4, dict3): one read, re-keyed, de-duplicated; old prefixes are never written."
     },
     {
       "id": "i18n",
@@ -549,7 +614,7 @@
       "files": [
         "js/strings.js"
       ],
-      "summary": "420 keys in 5 languages, written per language rather than translated word for word; a missing key falls back to English, then to the key itself."
+      "summary": "463 keys in 5 languages, written per language rather than translated word for word; a missing key falls back to English, then to the key itself."
     },
     {
       "id": "api",
@@ -569,7 +634,7 @@
       "files": [
         "js/prompts.js"
       ],
-      "summary": "Seven source languages by seven explanation languages, table-driven; overview, four deep lines, sentence, document and small helper prompts share one set of honesty and length rules."
+      "summary": "Full dictionary prompts plus Surprise-pool and discovery-card prompts; seven source languages share honesty and length rules."
     },
     {
       "id": "errors",
@@ -595,7 +660,7 @@
     {
       "id": "tests",
       "layer": "module",
-      "label": "765 assertions",
+      "label": "792 assertions",
       "zh": "测试",
       "files": [
         "web/tests/smoke.js"
@@ -634,15 +699,128 @@
       "summary": "Shell precache, install prompt, and a single-file build for file:// — the service worker is optional everywhere."
     },
     {
+      "id": "roots-tab",
+      "layer": "ui",
+      "label": "Roots tab",
+      "zh": "词根标签",
+      "files": [
+        "js/app.js",
+        "js/view-roots.js"
+      ],
+      "summary": "The fourth bottom tab: due roots, mastery statistics, the root list and a five-question review."
+    },
+    {
+      "id": "root-index",
+      "layer": "feature",
+      "label": "Root index",
+      "zh": "词根索引",
+      "files": [
+        "js/roots.js",
+        "js/store.js"
+      ],
+      "summary": "Builds a compact index of roots and components from stored etymology data, with variants and source entries; no model call."
+    },
+    {
+      "id": "root-detail",
+      "layer": "feature",
+      "label": "Root detail",
+      "zh": "词根详情",
+      "files": [
+        "js/view-roots.js",
+        "js/view-word.js"
+      ],
+      "summary": "Clickable Word DNA roots open meaning, origin, variants, family words and source entries."
+    },
+    {
+      "id": "root-mastery",
+      "layer": "feature",
+      "label": "Root mastery",
+      "zh": "词根掌握度",
+      "files": [
+        "js/roots.js",
+        "js/practice.js"
+      ],
+      "summary": "Strength 0–5 with a 10m/1d/3d/7d/21d/60d ladder; spelling outcomes update the root."
+    },
+    {
+      "id": "root-review",
+      "layer": "feature",
+      "label": "Root review",
+      "zh": "词根复习",
+      "files": [
+        "js/root-review.js",
+        "js/view-roots.js"
+      ],
+      "summary": "Five questions: three choices and two objective typed answers; updates mastery and returns focus."
+    },
+    {
+      "id": "surprise-pool",
+      "layer": "feature",
+      "label": "Surprise pool",
+      "zh": "随机词池",
+      "files": [
+        "js/pool.js",
+        "js/api.js",
+        "js/prompts.js"
+      ],
+      "summary": "200 words in two 100-word batches, persisted used flags, local anti-repeat and a 100-word language top-up."
+    },
+    {
+      "id": "discovery-card",
+      "layer": "feature",
+      "label": "Discovery card",
+      "zh": "异语发现卡",
+      "files": [
+        "js/view-discovery.js",
+        "js/api.js",
+        "js/prompts.js"
+      ],
+      "summary": "Compact card for a language outside the five: pronunciation, core meaning, two examples and an honest root note."
+    },
+    {
+      "id": "surprise-book",
+      "layer": "feature",
+      "label": "Surprise wordbook",
+      "zh": "随便看看单词本",
+      "files": [
+        "js/store.js",
+        "js/view-favorites.js"
+      ],
+      "summary": "The reserved, non-deletable book for discovery words; normal wordbooks reject them and they never enter practice."
+    },
+    {
+      "id": "row-delete",
+      "layer": "feature",
+      "label": "Delete one row",
+      "zh": "单行删除",
+      "files": [
+        "js/view-dictionary.js",
+        "js/view-favorites.js",
+        "js/store.js"
+      ],
+      "summary": "Sentence, file and discovery rows delete with an eight-second Undo; payload, star and wordbook links are restored."
+    },
+    {
+      "id": "spell-language",
+      "layer": "feature",
+      "label": "Practice language chip",
+      "zh": "拼写语种提示",
+      "files": [
+        "js/practice.js",
+        "js/strings.js"
+      ],
+      "summary": "The spelling prompt always names the source language and its code before the part of speech."
+    },
+    {
       "id": "packaging",
       "layer": "feature",
-      "label": "Desktop & mobile (later)",
-      "zh": "桌面与移动端（待做）",
+      "label": "Desktop & mobile (other assistants)",
+      "zh": "桌面与移动端（其他助手）",
       "files": [
         "README.md",
         "DEPLOY.md"
       ],
-      "summary": "Electron portable exe, Android as a local web page or PWA, Apple via PWA first. The four invariants that keep it cheap are tested."
+      "summary": "Packaging is not part of 7.0 web work; exe, apk and Apple targets are handed to other assistants."
     }
   ],
   "edges": [
@@ -885,6 +1063,138 @@
     [
       "packaging",
       "build"
+    ],
+    [
+      "shell",
+      "roots-tab"
+    ],
+    [
+      "roots-tab",
+      "root-index"
+    ],
+    [
+      "roots-tab",
+      "root-mastery"
+    ],
+    [
+      "roots-tab",
+      "root-review"
+    ],
+    [
+      "root-index",
+      "dna"
+    ],
+    [
+      "root-index",
+      "store"
+    ],
+    [
+      "root-detail",
+      "root-index"
+    ],
+    [
+      "root-detail",
+      "dna"
+    ],
+    [
+      "root-mastery",
+      "practice"
+    ],
+    [
+      "root-mastery",
+      "root-review"
+    ],
+    [
+      "root-mastery",
+      "store"
+    ],
+    [
+      "root-review",
+      "root-index"
+    ],
+    [
+      "root-review",
+      "i18n"
+    ],
+    [
+      "profile",
+      "roots-tab"
+    ],
+    [
+      "surprise",
+      "surprise-pool"
+    ],
+    [
+      "surprise-pool",
+      "api"
+    ],
+    [
+      "surprise-pool",
+      "prompts"
+    ],
+    [
+      "surprise-pool",
+      "store"
+    ],
+    [
+      "surprise",
+      "discovery-card"
+    ],
+    [
+      "discovery-card",
+      "starred"
+    ],
+    [
+      "discovery-card",
+      "surprise-book"
+    ],
+    [
+      "discovery-card",
+      "api"
+    ],
+    [
+      "discovery-card",
+      "prompts"
+    ],
+    [
+      "discovery-card",
+      "i18n"
+    ],
+    [
+      "surprise-book",
+      "wordbooks"
+    ],
+    [
+      "surprise-book",
+      "starred"
+    ],
+    [
+      "surprise-book",
+      "store"
+    ],
+    [
+      "row-delete",
+      "history"
+    ],
+    [
+      "row-delete",
+      "starred"
+    ],
+    [
+      "row-delete",
+      "store"
+    ],
+    [
+      "spell-language",
+      "practice"
+    ],
+    [
+      "spell-language",
+      "i18n"
+    ],
+    [
+      "entry",
+      "root-detail"
     ]
   ]
 }

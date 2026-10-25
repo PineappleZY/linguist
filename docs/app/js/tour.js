@@ -35,6 +35,7 @@ window.LINGUIST = window.LINGUIST || {};
     { id: 'lang', route: '#/dictionary', targets: ['[data-picker="lookup-lang"]'] },
     { id: 'explain', route: '#/profile', targets: ['[data-picker="out-lang-en"]'] },
     { id: 'cards', route: '#/profile', targets: ['[data-pref-group="latin"]'] },
+    { id: 'roots', route: '#/roots', targets: ['#roots-review', '#tabbar'] },
     { id: 'surprise', route: '#/dictionary', targets: ['#lookup-surprise'] },
     /* Showing the file panel rather than the segment that opens it: the panel
        is the thing being explained, and the mode is put back afterwards. */

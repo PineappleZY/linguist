@@ -457,6 +457,22 @@ window.LINGUIST.views = window.LINGUIST.views || {};
 
   /* ---------- Screen ---------- */
 
+  function rootsSection() {
+    var stats = ns.roots ? ns.roots.stats() : { due: 0, learning: 0, known: 0, words: 0 };
+    var pool = ns.pool ? ns.pool.stats() : { total: 0, unused: 0 };
+    return sectionHead(ui.t('profile.section.roots')) +
+      '<div class="card"><div class="root-stats">' +
+      '<div><b>' + stats.due + '</b><span>' + ui.esc(ui.t('roots.stat.due')) + '</span></div>' +
+      '<div><b>' + stats.learning + '</b><span>' + ui.esc(ui.t('roots.stat.learning')) + '</span></div>' +
+      '<div><b>' + stats.known + '</b><span>' + ui.esc(ui.t('roots.stat.known')) + '</span></div>' +
+      '<div><b>' + stats.words + '</b><span>' + ui.esc(ui.t('roots.stat.words')) + '</span></div></div>' +
+      '<p class="hint">' + ui.esc(ui.t('profile.poolStats', { ready: pool.unused, total: pool.total })) + '</p>' +
+      '<div class="notice-actions"><button type="button" class="btn btn-primary btn-sm" id="profile-review-roots">' +
+      ui.esc(ui.t('roots.review', { n: stats.due })) + '</button>' +
+      '<button type="button" class="btn btn-sm" id="profile-reset-roots">' +
+      ui.esc(ui.t('roots.reset')) + '</button></div></div>';
+  }
+
   function render(container, params) {
     var settings = store.getSettings();
     var html = '';
@@ -472,6 +488,8 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     html += '<div style="height:16px"></div>';
     html += cardsSection(settings);
     html += '<div style="height:16px"></div>';
+    html += rootsSection();
+    html += '<div style="height:16px"></div>';
     html += dataSection();
     html += aboutSection();
 
@@ -485,6 +503,15 @@ window.LINGUIST.views = window.LINGUIST.views || {};
   }
 
   function wire(container) {
+    var reviewRoots = container.querySelector('#profile-review-roots');
+    if (reviewRoots) reviewRoots.addEventListener('click', function () { ns.rootReview.open(); });
+    var resetRoots = container.querySelector('#profile-reset-roots');
+    if (resetRoots) resetRoots.addEventListener('click', function () {
+      if (!window.confirm(ui.t('roots.resetConfirm'))) return;
+      ns.roots.reset();
+      ui.toast(ui.t('roots.resetDone'));
+      ns.router.refresh();
+    });
     ui.bindSegmented(container, 'model', function (next) {
       store.patchSettings({ model: next });
       ui.toast(ui.t('profile.model.set', { model: ui.modelMeta(next).label }));

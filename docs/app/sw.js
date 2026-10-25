@@ -12,7 +12,7 @@
  * Bump CACHE_VERSION on every release; there is no server-side invalidation.
  */
 
-var CACHE_VERSION = 'v6.5.0';
+var CACHE_VERSION = 'v7.0.0';
 var CACHE_NAME = 'linguist-' + CACHE_VERSION;
 
 var PRECACHE = [
@@ -28,6 +28,8 @@ var PRECACHE = [
   './js/speech.js',
   './js/ui.js',
   './js/extract.js',
+  './js/pool.js',
+  './js/roots.js',
   './js/practice.js',
   './js/api.js',
   './js/pwa.js',
@@ -35,7 +37,10 @@ var PRECACHE = [
   './js/view-document.js',
   './js/view-word.js',
   './js/view-favorites.js',
+  './js/view-roots.js',
+  './js/view-discovery.js',
   './js/view-profile.js',
+  './js/root-review.js',
   './js/tour.js',
   './js/app.js',
   './icons/icon-192.png',

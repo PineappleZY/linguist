@@ -346,20 +346,12 @@ window.LINGUIST.views = window.LINGUIST.views || {};
      sensible: an unknown language ("Portuguese"), or a retired one. The caller
      treats '' as a bad pick and asks again. */
   function surpriseTarget(pinned, returned, word) {
-    var said = languageMeta(returned) ? returned : '';
-    if (pinned && pinned !== CONFIG.autoLang) {
-      /* The model naming another language is a conflict, not a suggestion: a
-         French word offered while English is pinned must not be looked up as
-         English. The one exception is a script the pinned language cannot
-         write — Japanese kana for an English pin can only be Japanese. */
-      if (said && said !== pinned) {
-        var meta = languageMeta(pinned);
-        var impossibleScript = meta && meta.script === 'latin' && isNonLatin(String(word || ''));
-        return impossibleScript && isLiveLanguage(said) ? said : '';
-      }
-      return pinned;
-    }
-    return isLiveLanguage(said) ? said : '';
+    /* 7.0 deliberately removes the hard language ceiling. The pool itself
+       controls the mix; this helper must preserve whatever the pick named so
+       the caller can choose a full entry or a discovery card. */
+    var said = String(returned == null ? '' : returned).trim();
+    if (said) return said;
+    return pinned && pinned !== CONFIG.autoLang ? pinned : CONFIG.autoLang;
   }
 
   /* ---------- Surprise me ----------
@@ -399,46 +391,71 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     }
 
     var pinned = currentLang();
-    var avoid = surpriseSeen().concat(store.listHistory().map(function (row) { return row.word; }));
     var label = button.textContent;
     button.disabled = true;
     button.textContent = ui.t('dict.surprise.thinking');
 
-    function ask(left) {
-      return ns.api.surprise({
-        apiKey: settings.apiKey,
-        model: settings.model,
-        sourceLang: pinned === CONFIG.autoLang ? 'auto' : pinned,
-        outputLang: store.outputLangFor(pinned === CONFIG.autoLang ? 'auto' : pinned),
-        avoid: avoid
-      }).then(function (result) {
-        if (!result || !result.word) return null;
-        /* Two reasons to ask again: the word is in no language this app can
-           look up, or it is one it has already offered. Both are handled here
-           so the caller only ever sees a usable pick. */
-        var target = surpriseTarget(pinned, result.language, result.word);
-        if (!target) return left === 0 ? null : ask(left - 1);
-        if (alreadyOffered(result.word) && left > 0) return ask(left - 1);
-        return { item: result, target: target };
-      });
-    }
-
-    ask(SURPRISE_RETRIES).then(function (picked) {
+    ns.pool.pick(pinned, settings).then(function (picked) {
       button.disabled = false;
       button.textContent = label;
-      if (!picked) { ui.toast(ui.t('dict.surprise.empty')); return; }
-      if (alreadyOffered(picked.item.word)) { ui.toast(ui.t('dict.surprise.repeat')); return; }
-      rememberSurprise(picked.item.word);
-
-      var target = picked.target;
+      if (!picked || !picked.item) { ui.toast(ui.t('dict.surprise.empty')); return; }
+      var item = picked.item;
+      var live = CONFIG.languageByAnyName(item.code) || CONFIG.languageByAnyName(item.language);
+      var supported = !!live && CONFIG.queryLanguages.some(function (lang) { return lang.id === live; });
       ns.session.query = picked.item.word;
-      ns.session.surprise = { word: picked.item.word, language: target, gloss: picked.item.gloss || '' };
+      ns.session.surprise = { word: item.word, language: item.language, gloss: '' };
       ns.router.refresh();
 
-      window.setTimeout(function () {
+      if (supported) {
+        window.setTimeout(function () {
+          ns.session.surprise = null;
+          openWord(item.word, live);
+        }, 700);
+        return;
+      }
+
+      var out = store.outputLangFor('auto');
+      var id = store.discoveryId(item.word, item.language, settings.model, out);
+      var cached = store.getEntry(id);
+      if (cached) {
         ns.session.surprise = null;
-        openWord(picked.item.word, target);
-      }, 900);
+        location.hash = '#/discovery/' + encodeURIComponent(id);
+        return;
+      }
+      ns.api.discoveryCard({
+        apiKey: settings.apiKey,
+        model: settings.model,
+        word: item.word,
+        language: item.language,
+        code: item.code,
+        outputLang: out
+      }).then(function (card) {
+        ns.session.surprise = null;
+        if (!card) { ui.toast(ui.t('dict.surprise.empty')); return; }
+        var entry = {
+          id: id,
+          kind: 'discovery',
+          word: card.word || item.word,
+          language: item.language,
+          languageName: item.language,
+          languageCode: item.code || '',
+          native: item.native || card.native || '',
+          pronunciation: card.pronunciation || '',
+          coreMeaning: card.coreMeaning || '',
+          examples: card.examples || [],
+          rootNote: card.rootNote || '',
+          why: card.why || '',
+          quickMeaning: card.coreMeaning || '',
+          overview: { status: 'ok', quick_meaning: card.coreMeaning || '' },
+          model: settings.model,
+          outputLang: out,
+          ts: Date.now(),
+          starred: false
+        };
+        if (!store.saveDiscovery(entry)) { ui.toast(ui.t('entry.saveFailed')); return; }
+        location.hash = '#/discovery/' + encodeURIComponent(id);
+        ns.router.refresh();
+      });
     }).catch(function (err) {
       button.disabled = false;
       button.textContent = label;
@@ -616,7 +633,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
        English sentence with the word interpolated twice. */
     return '<div class="surprise-line fade-in">' + ui.icon('sparkle') +
       '<span>' + ui.esc(ui.t('dict.surprise.picked', { word: pick.word })) +
-      (meta ? ' · ' + ui.esc(meta.native) : '') +
+      (meta ? ' · ' + ui.esc(meta.native) : (pick.language ? ' · ' + ui.esc(pick.language) : '')) +
       (pick.gloss ? ' · ' + ui.esc(pick.gloss) : '') + '</span></div>';
   }
 
@@ -731,17 +748,27 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     var starred = row.starred ? ' is-starred' : '';
     var starIcon = row.starred ? ui.iconFilled('star') : ui.icon('star');
     var kindChip = row.kind === 'sentence'
-      ? '<span class="chip">' + ui.esc(ui.t('dict.badge.sentence')) + '</span>' : '';
+      ? '<span class="chip">' + ui.esc(ui.t('dict.badge.sentence')) + '</span>'
+      : (row.kind === 'document'
+        ? '<span class="chip">' + ui.esc(ui.t('dict.badge.document')) + '</span>'
+        : (row.kind === 'discovery'
+          ? '<span class="chip">' + ui.esc(ui.t('dict.surprise')) + '</span>' : ''));
     return '<div class="row" data-open="' + ui.esc(row.id) + '">' +
       '<span class="row-main"><span class="row-title">' + ui.esc(row.word) + '</span>' +
       '<span class="row-sub">' + kindChip +
       (row.pos ? ui.esc(row.pos) + ' · ' : '') + ui.esc(row.quickMeaning || '') + '</span></span>' +
-      '<span class="row-aside">' + (row.language ? ui.langBadge(row.language) : '') +
+      '<span class="row-aside">' + (row.kind === 'discovery'
+        ? '<span class="badge-lang" dir="auto">' + ui.esc(row.languageName || '') + '</span>'
+        : (row.language ? ui.langBadge(row.language) : '')) +
       /* The group header already carries the date, so the row shows the clock. */
       '<span class="nowrap">' + ui.esc(ui.rowTime(row.ts || 0)) + '</span>' +
       '<button type="button" class="icon-btn' + starred + '" data-star="' + ui.esc(row.id) + '" ' +
       'aria-label="' + ui.esc(ui.t('dict.history.star')) + '" title="' +
-      ui.esc(ui.t('dict.history.star')) + '">' + starIcon + '</button></span></div>';
+      ui.esc(ui.t('dict.history.star')) + '">' + starIcon + '</button>' +
+      (row.kind === 'word' ? '' :
+        '<button type="button" class="icon-btn is-muted" data-delete-row="' + ui.esc(row.id) + '" ' +
+        'aria-label="' + ui.esc(ui.t('entry.delete')) + '" title="' + ui.esc(ui.t('entry.delete')) + '">' +
+        ui.icon('trash') + '</button>') + '</span></div>';
   }
 
   /* ---------- Screen ---------- */
@@ -900,9 +927,35 @@ window.LINGUIST.views = window.LINGUIST.views || {};
 
     container.querySelectorAll('[data-open]').forEach(function (row) {
       row.addEventListener('click', function (event) {
-        if (event.target.closest('[data-star]')) return;
+        if (event.target.closest('button')) return;
         ns.session.pending = null;
-        location.hash = '#/word/' + encodeURIComponent(row.getAttribute('data-open'));
+        var id = row.getAttribute('data-open');
+        var found = store.findRow(id);
+        location.hash = (found && found.kind === 'discovery' ? '#/discovery/' : '#/word/') + encodeURIComponent(id);
+      });
+    });
+
+    container.querySelectorAll('[data-delete-row]').forEach(function (button) {
+      button.addEventListener('click', function (event) {
+        event.stopPropagation();
+        var id = button.getAttribute('data-delete-row');
+        var snapshot = store.snapshotEntry(id);
+        if (!snapshot) return;
+        store.removeEntry(id);
+        if (ns.roots) ns.roots.invalidate();
+        ui.toast(ui.t('entry.deleted'), {
+          ms: 8000,
+          action: {
+            label: ui.t('common.undo'),
+            onClick: function () {
+              store.restoreEntry(snapshot);
+              if (ns.roots) ns.roots.invalidate();
+              ui.toast(ui.t('entry.restored'));
+              ns.router.refresh();
+            }
+          }
+        });
+        ns.router.refresh();
       });
     });
 

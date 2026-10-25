@@ -1797,3 +1797,69 @@ body.is-spelling { overflow: hidden; }
 .pref-actions .icon-btn svg { width: 15px; height: 15px; }
 .pref-actions .chip-button { padding: 4px 10px; font-size: var(--size-caption); }
 .pref-actions-row { display: flex; justify-content: flex-end; padding: var(--space-2) var(--space-1) 0; }
+
+/* 7.0 — spelling language, roots, discovery */
+.spell-lang {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: var(--size-caption);
+  font-weight: 600;
+}
+
+.morph-part.is-link { cursor: pointer; border: 0; background: transparent; color: inherit; font: inherit; padding: 0; text-align: left; }
+.morph-part.is-link:hover b { color: var(--accent); }
+
+.root-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 4px 0 12px;
+}
+.root-stats > div {
+  background: var(--bg-2);
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+}
+.root-stats b { display: block; font-size: 20px; color: var(--text-1); }
+.root-stats span { font-size: var(--size-caption); color: var(--text-3); }
+.root-detail-head { display: flex; align-items: center; gap: 14px; margin: 6px 0 16px; }
+.root-glyph { font-size: 36px; font-weight: 700; color: var(--accent); }
+.root-meaning { font-size: var(--size-headline); }
+
+.root-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(20, 20, 22, 0.34);
+  backdrop-filter: blur(14px);
+}
+.root-review-card {
+  width: min(560px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  background: var(--bg-1);
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: var(--shadow-2);
+}
+.root-review-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.root-review-prompt { font-size: 32px; font-weight: 700; margin: 24px 0 8px; text-align: center; }
+.root-options { display: grid; gap: 8px; margin-top: 14px; }
+.root-options .row { width: 100%; text-align: left; }
+.root-feedback { margin-top: 14px; color: var(--accent); }
+
+.discovery-head { display: flex; align-items: flex-start; gap: 14px; margin: 4px 0 16px; }
+.discovery-word { flex: 1; font-size: 38px; line-height: 1.1; font-weight: 700; overflow-wrap: anywhere; }
+.discovery-meta { color: var(--text-3); font-size: var(--size-caption); margin-top: 6px; }
+.discovery-meaning { font-size: 18px; line-height: 1.6; margin: 0; }
+.discovery-examples { display: grid; gap: 12px; }
+.discovery-example { padding: 10px 0; border-top: 1px solid var(--separator-soft); }
+.discovery-example:first-child { border-top: 0; }

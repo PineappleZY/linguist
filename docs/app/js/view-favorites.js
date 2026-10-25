@@ -46,6 +46,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
   function kindOf(row) {
     if (row.kind === 'sentence') return 'sentence';
     if (row.kind === 'document') return 'document';
+    if (row.kind === 'discovery') return 'discovery';
     return 'word';
   }
 
@@ -56,7 +57,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
   /* The three kinds in the order they are listed inside a language group:
      headwords first, because that is what the screen is mostly for. */
   var KIND_LABEL = { word: 'fav.words', sentence: 'fav.sentences', document: 'fav.documents' };
-  var KIND_CHIP = { sentence: 'dict.badge.sentence', document: 'dict.badge.document' };
+  var KIND_CHIP = { sentence: 'dict.badge.sentence', document: 'dict.badge.document', discovery: 'dict.surprise' };
 
   function bookEntries(bookId) {
     var book = store.findWordbook(bookId);
@@ -148,7 +149,9 @@ window.LINGUIST.views = window.LINGUIST.views || {};
   var inFlight = {};     /* id -> true while the question is out */
 
   function unknownLanguage() {
-    return favourites().filter(function (row) { return !CONFIG.languageByAnyName(row.language); });
+    return favourites().filter(function (row) {
+      return kindOf(row) !== 'discovery' && !CONFIG.languageByAnyName(row.language);
+    });
   }
 
   function identify(row) {
@@ -232,12 +235,18 @@ window.LINGUIST.views = window.LINGUIST.views || {};
 
   function toItem(row, progress) {
     var meta = languageMeta(row.language) || { practice: 'spell' };
+    var entry = store.getEntry(row.id);
+    var roots = ns.roots && entry ? ns.roots.rootsFromEntry(entry) : [];
     return {
       word: row.word,
       reading: row.reading || '',
       meaning: row.quickMeaning || '',
       pos: row.pos || '',
       language: row.language,
+      languageName: row.languageName || (meta && meta.native) || row.language,
+      languageCode: row.languageCode || '',
+      roots: roots,
+      primaryRoot: roots[0] || null,
       model: row.model || '',
       outputLang: row.outputLang || '',
       practice: meta.practice,
@@ -366,7 +375,8 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       });
     });
     books.forEach(function (book) {
-      options.push({ id: book.id, label: book.name + ' (' + practicePool(book.id).length + ')' });
+      var name = book.id === store.SURPRISE_BOOK_ID ? ui.t('dict.surprise') : book.name;
+      options.push({ id: book.id, label: name + ' (' + practicePool(book.id).length + ')' });
     });
 
     /* One control and one action. The source selector already filters the list
@@ -395,7 +405,9 @@ window.LINGUIST.views = window.LINGUIST.views || {};
   function groupKeys() {
     var keys = ['books'];
     var byLanguage = {};
+    var hasDiscovery = false;
     sourceRows(ns.session.favoritesSource || 'all').forEach(function (row) {
+      if (kindOf(row) === 'discovery') { hasDiscovery = true; return; }
       var language = CONFIG.languageByAnyName(row.language);
       if (!language) return;
       if (!byLanguage[language]) byLanguage[language] = { words: 0, sentences: 0 };
@@ -410,6 +422,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
         keys.push('lang:' + language + ':sentence');
       }
     });
+    if (hasDiscovery) keys.push('discoveries');
     return keys;
   }
 
@@ -425,6 +438,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     books.forEach(function (book) {
       var counts = {};
       sourceRows(book.id).forEach(function (row) {
+        if (kindOf(row) === 'discovery') { counts.surprise = (counts.surprise || 0) + 1; return; }
         var key = CONFIG.languageByAnyName(row.language) || '??';
         counts[key] = (counts[key] || 0) + 1;
       });
@@ -433,14 +447,15 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       }).join(' · ');
 
       body += '<div class="row row-static">' +
-        '<span class="row-main"><span class="row-title">' + ui.esc(book.name) + '</span>' +
+        '<span class="row-main"><span class="row-title">' +
+        ui.esc(book.id === store.SURPRISE_BOOK_ID ? ui.t('dict.surprise') : book.name) + '</span>' +
         '<span class="row-sub">' + ui.esc(breakdown || 'Empty') + '</span></span>' +
-        '<span class="row-aside">' +
+        '<span class="row-aside">' + (book.id === store.SURPRISE_BOOK_ID ? '' :
         '<button type="button" class="icon-btn is-muted" data-rename-book="' + ui.esc(book.id) + '" ' +
         'aria-label="' + ui.esc(ui.t('fav.rename')) + '" title="' + ui.esc(ui.t('fav.rename')) + '">' + ui.icon('pencil') + '</button>' +
         '<button type="button" class="icon-btn is-muted" data-delete-book="' + ui.esc(book.id) + '" ' +
         'aria-label="' + ui.esc(ui.t('fav.delete')) + '" title="' + ui.esc(ui.t('fav.delete')) + '">' + ui.icon('trash') + '</button>' +
-        '</span></div>';
+        '') + '</span></div>';
     });
     /* Adding a book belongs with the books, not in the control row above. */
     body += '<button type="button" class="row" id="wordbook-new">' +
@@ -466,7 +481,9 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     var groups = {};
     var order = [];
     var unknown = [];
+    var discoveries = [];
     rows.forEach(function (row) {
+      if (kindOf(row) === 'discovery') { discoveries.push(row); return; }
       var key = CONFIG.languageByAnyName(row.language);
       /* No language is not a language. These are shown as a plain cluster at
          the top, with a way to fill the gap, rather than under a label like
@@ -485,6 +502,10 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     });
 
     var html = '';
+    if (discoveries.length) {
+      html += groupToggle('discoveries', ui.t('dict.surprise'), discoveries.length,
+        '<div class="list">' + discoveries.map(wordRow).join('') + '</div>');
+    }
     if (unknown.length) html += unknownSection(unknown);
 
     order.forEach(function (key) {
@@ -564,12 +585,19 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       (KIND_CHIP[kindOf(row)] ? '<span class="chip">' + ui.esc(ui.t(KIND_CHIP[kindOf(row)])) + '</span> ' : '') +
       (row.pos ? ui.esc(row.pos) + ' · ' : '') +
       ui.esc(row.quickMeaning || '') +
-      (books.length ? ' · ' + books.map(function (b) { return ui.esc(b.name); }).join(', ') : '') +
+      (books.length ? ' · ' + books.map(function (b) {
+        return ui.esc(b.id === store.SURPRISE_BOOK_ID ? ui.t('dict.surprise') : b.name);
+      }).join(', ') : '') +
       '</span></span>' +
       '<span class="row-aside">' +
-      '<button type="button" class="icon-btn is-muted" data-pick-books="' + ui.esc(row.id) + '" ' +
-      'aria-label="' + ui.esc(ui.t('fav.wordbooks')) + '" title="' + ui.esc(ui.t('fav.wordbooks')) + '">' + ui.icon('folder') + '</button>' +
+      (kindOf(row) === 'discovery' ? '' :
+        '<button type="button" class="icon-btn is-muted" data-pick-books="' + ui.esc(row.id) + '" ' +
+        'aria-label="' + ui.esc(ui.t('fav.wordbooks')) + '" title="' + ui.esc(ui.t('fav.wordbooks')) + '">' + ui.icon('folder') + '</button>') +
       action +
+      (kindOf(row) === 'word' ? '' :
+        '<button type="button" class="icon-btn is-muted" data-delete-row="' + ui.esc(row.id) + '" ' +
+        'aria-label="' + ui.esc(ui.t('entry.delete')) + '" title="' + ui.esc(ui.t('entry.delete')) + '">' +
+        ui.icon('trash') + '</button>') +
       /* A row kept after being unstarred shows a hollow star, and the same
          button puts it back — one control, two states. */
       (row.starred
@@ -588,7 +616,10 @@ window.LINGUIST.views = window.LINGUIST.views || {};
   /* A word can belong to several books, so this is a row of toggles rather than
      a single choice. */
   function bookPicker(row) {
-    var books = store.listWordbooks();
+    var discovery = kindOf(row) === 'discovery';
+    var books = store.listWordbooks().filter(function (book) {
+      return discovery ? book.id === store.SURPRISE_BOOK_ID : book.id !== store.SURPRISE_BOOK_ID;
+    });
     var member = {};
     store.wordbooksFor(row.id).forEach(function (book) { member[book.id] = true; });
 
@@ -602,8 +633,10 @@ window.LINGUIST.views = window.LINGUIST.views || {};
           (member[book.id] ? '✓ ' : '+ ') + ui.esc(book.name) + '</button>';
       }).join('');
     }
-    html += '<button type="button" class="chip chip-button" data-new-book-for="' + ui.esc(row.id) + '">' +
-      ui.esc(ui.t('fav.newBookInline')) + '</button>';
+    if (!discovery) {
+      html += '<button type="button" class="chip chip-button" data-new-book-for="' + ui.esc(row.id) + '">' +
+        ui.esc(ui.t('fav.newBookInline')) + '</button>';
+    }
     return html + '</div>';
   }
 
@@ -730,7 +763,33 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       row.addEventListener('click', function (event) {
         if (event.target.closest('button')) return;
         ns.session.pending = null;
-        location.hash = '#/word/' + encodeURIComponent(row.getAttribute('data-open'));
+        var id = row.getAttribute('data-open');
+        var found = store.findRow(id);
+        location.hash = (found && found.kind === 'discovery' ? '#/discovery/' : '#/word/') + encodeURIComponent(id);
+      });
+    });
+
+    container.querySelectorAll('[data-delete-row]').forEach(function (button) {
+      button.addEventListener('click', function (event) {
+        event.stopPropagation();
+        var id = button.getAttribute('data-delete-row');
+        var snapshot = store.snapshotEntry(id);
+        if (!snapshot) return;
+        store.removeEntry(id);
+        if (ns.roots) ns.roots.invalidate();
+        ui.toast(ui.t('entry.deleted'), {
+          ms: 8000,
+          action: {
+            label: ui.t('common.undo'),
+            onClick: function () {
+              store.restoreEntry(snapshot);
+              if (ns.roots) ns.roots.invalidate();
+              ui.toast(ui.t('entry.restored'));
+              ns.router.refresh();
+            }
+          }
+        });
+        ns.router.refresh();
       });
     });
 

@@ -535,6 +535,65 @@ window.LINGUIST = window.LINGUIST || {};
       });
   }
 
+  function surprisePool(options) {
+    var key;
+    try { key = requireKey(options.apiKey); } catch (err) { return Promise.reject(err); }
+    var avoid = Array.isArray(options.avoid) ? options.avoid.filter(Boolean).slice(0, 100) : [];
+    var messages = [
+      { role: 'system', content: prompts.surprisePool(options.sourceLang, options.count || 100, options.outputLang) },
+      {
+        role: 'user',
+        content: avoid.length
+          ? 'Avoid these already used words: ' + avoid.join(', ')
+          : 'Nothing to avoid yet.'
+      }
+    ];
+    return request(key, basePayload(options.model, messages, CONFIG.maxTokens.surprisePool), options.signal)
+      .then(extractJSON)
+      .then(function (data) {
+        var list = data && Array.isArray(data.words) ? data.words : [];
+        return list.map(function (item) {
+          if (!item || !item.word) return null;
+          return {
+            word: String(item.word).trim(),
+            language: String(item.language || '').trim(),
+            code: String(item.code || '').trim(),
+            native: String(item.native || '').trim(),
+            theme: String(item.theme || '').trim()
+          };
+        }).filter(Boolean);
+      });
+  }
+
+  function discoveryCard(options) {
+    var key;
+    try { key = requireKey(options.apiKey); } catch (err) { return Promise.reject(err); }
+    var messages = [
+      { role: 'system', content: prompts.discovery(options.word, options.language, options.outputLang) },
+      { role: 'user', content: 'Return the compact discovery card as JSON.' }
+    ];
+    return request(key, basePayload(options.model, messages, CONFIG.maxTokens.discovery), options.signal)
+      .then(extractJSON)
+      .then(function (data) {
+        if (!data || !data.word) return null;
+        return {
+          word: String(data.word).trim(),
+          language: String(data.language || options.language || '').trim(),
+          native: String(data.native || '').trim(),
+          code: String(data.code || options.code || '').trim(),
+          pronunciation: String(data.pronunciation || '').trim(),
+          coreMeaning: String(data.core_meaning || data.coreMeaning || '').trim(),
+          examples: (Array.isArray(data.examples) ? data.examples : []).filter(function (ex) {
+            return ex && (ex.text || ex.translation);
+          }).slice(0, 3).map(function (ex) {
+            return { text: String(ex.text || ''), translation: String(ex.translation || '') };
+          }),
+          rootNote: String(data.root_note || data.rootNote || '').trim(),
+          why: String(data.why || '').trim()
+        };
+      });
+  }
+
   ns.api = {
     ApiError: ApiError,
     isApiError: isApiError,
@@ -553,6 +612,8 @@ window.LINGUIST = window.LINGUIST || {};
     reverseCandidates: reverseCandidates,
     testConnection: testConnection,
     surprise: surprise,
+    surprisePool: surprisePool,
+    discoveryCard: discoveryCard,
     errorText: ERROR_TEXT
   };
 })(window.LINGUIST);

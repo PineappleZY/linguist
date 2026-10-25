@@ -20,7 +20,7 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..');
-const APP = path.join(ROOT, '6.0');
+const APP = path.join(ROOT, '7.0');
 const WEB = path.join(APP, 'web');
 
 function loadApp() {
