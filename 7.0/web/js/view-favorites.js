@@ -30,7 +30,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
        star can be un-clicked by eye instead of the whole list shifting under
        the finger. `keptUnstarred` is emptied on leaving the screen. */
     var kept = ns.session.keptUnstarred || {};
-    return store.listHistory().filter(function (row) {
+    return store.listGroups().filter(function (row) {
       return row.starred || kept[row.id];
     });
   }
@@ -590,14 +590,14 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       }).join(', ') : '') +
       '</span></span>' +
       '<span class="row-aside">' +
+      (kindOf(row) === 'discovery' ? ui.languageBadge(row.languageCode, row.languageName) : '') +
       (kindOf(row) === 'discovery' ? '' :
         '<button type="button" class="icon-btn is-muted" data-pick-books="' + ui.esc(row.id) + '" ' +
         'aria-label="' + ui.esc(ui.t('fav.wordbooks')) + '" title="' + ui.esc(ui.t('fav.wordbooks')) + '">' + ui.icon('folder') + '</button>') +
       action +
-      (kindOf(row) === 'word' ? '' :
-        '<button type="button" class="icon-btn is-muted" data-delete-row="' + ui.esc(row.id) + '" ' +
-        'aria-label="' + ui.esc(ui.t('entry.delete')) + '" title="' + ui.esc(ui.t('entry.delete')) + '">' +
-        ui.icon('trash') + '</button>') +
+      '<button type="button" class="icon-btn is-muted" data-delete-row="' + ui.esc(row.id) + '" ' +
+      'aria-label="' + ui.esc(ui.t('entry.delete')) + '" title="' + ui.esc(ui.t('entry.delete')) + '">' +
+      ui.icon('trash') + '</button>' +
       /* A row kept after being unstarred shows a hollow star, and the same
          button puts it back — one control, two states. */
       (row.starred
@@ -775,7 +775,8 @@ window.LINGUIST.views = window.LINGUIST.views || {};
         var id = button.getAttribute('data-delete-row');
         var snapshot = store.snapshotEntry(id);
         if (!snapshot) return;
-        store.removeEntry(id);
+        openPicker = null;
+        store.removeGroup(id);
         if (ns.roots) ns.roots.invalidate();
         ui.toast(ui.t('entry.deleted'), {
           ms: 8000,

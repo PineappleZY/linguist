@@ -1810,6 +1810,13 @@ body.is-spelling { overflow: hidden; }
   font-weight: 600;
 }
 
+.badge-lang.is-full {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .morph-part.is-link { cursor: pointer; border: 0; background: transparent; color: inherit; font: inherit; padding: 0; text-align: left; }
 .morph-part.is-link:hover b { color: var(--accent); }
 

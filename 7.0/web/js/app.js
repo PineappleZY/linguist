@@ -33,7 +33,7 @@ window.LINGUIST = window.LINGUIST || {};
     var word = /^#\/word\/(.+)$/.exec(hash);
     if (word) return { name: 'word', tab: 'dictionary', params: { id: decodeURIComponent(word[1]) } };
     var discovery = /^#\/discovery\/(.+)$/.exec(hash);
-    if (discovery) return { name: 'discovery', tab: 'favorites', params: { id: decodeURIComponent(discovery[1]) } };
+    if (discovery) return { name: 'discovery', tab: 'dictionary', params: { id: decodeURIComponent(discovery[1]) } };
     var root = /^#\/root\/(.+)$/.exec(hash);
     if (root) return { name: 'roots', tab: 'roots', params: { key: decodeURIComponent(root[1]) } };
     if (hash.indexOf('#/roots') === 0) return { name: 'roots', tab: 'roots', params: {} };
@@ -164,6 +164,26 @@ window.LINGUIST = window.LINGUIST || {};
   ];
   ns.router.parse = parseRoute;
 
+  /* Small in-process event bus. Mutations are often made on an entry page,
+     while the changed list is a different view; emitting one event keeps every
+     screen and the root index from showing yesterday's counts. */
+  ns.events = ns.events || {
+    _listeners: {},
+    on: function (name, fn) {
+      if (!this._listeners[name]) this._listeners[name] = [];
+      this._listeners[name].push(fn);
+    },
+    emit: function (name, detail) {
+      (this._listeners[name] || []).forEach(function (fn) {
+        try { fn(detail); } catch (err) { /* a listener must not break a write */ }
+      });
+    }
+  };
+  ns.events.on('catalog:changed', function () {
+    if (ns.roots) ns.roots.invalidate();
+    if (ns.router) ns.router.refresh();
+  });
+
   /* ---------- Bootstrap ---------- */
 
   /* One import path, shared by the first-run prompt and by Profile. It reads
@@ -244,6 +264,13 @@ window.LINGUIST = window.LINGUIST || {};
       /* No data to import: the tour is the first thing a newcomer sees. */
       window.setTimeout(function () { ns.tour.maybeStart(); }, 0);
     }
+
+    /* Warm the Surprise pool without making the first click wait. This is a
+       background job: a missing key or offline state simply leaves it alone. */
+    window.setTimeout(function () {
+      var current = store.getSettings();
+      if (current.apiKey && ns.pool) ns.pool.warmup(current).catch(function () {});
+    }, 1500);
   }
 
   if (document.readyState === 'loading') {

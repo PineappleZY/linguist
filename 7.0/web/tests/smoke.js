@@ -377,8 +377,8 @@ function testConfig(env) {
   const C = env.ns.CONFIG;
   const S = env.ns.strings;
   const locales = Object.keys(S);
-  check('version reads 7.0.0', C.version === '7.0.0', C.version);
-  check('the stored entry shape was bumped', C.schemaVersion === 6, String(C.schemaVersion));
+  check('version reads 7.2.0', C.version === '7.2.0', C.version);
+  check('the stored entry shape was bumped', C.schemaVersion === 8, String(C.schemaVersion));
   check('the product name is not translated', C.appName === 'Linguist', C.appName);
   check('and the name every interface language shows is the same string',
     locales.every((lang) => S[lang]['app.name'] === 'Linguist'),
@@ -4064,7 +4064,8 @@ function testSurprisePool(env) {
   check('the pool limit is 200 with 100-word batches',
     env.ns.CONFIG.limits.surprisePool.target === 200 && env.ns.CONFIG.limits.surprisePool.batch === 100);
   const prompt = env.ns.prompts.surprisePool('auto', 100, 'zh');
-  check('the pool prompt asks for an 80/20 mix', /80%/.test(prompt));
+  check('the pool prompt restricts every word to the five live languages',
+    /Every word must be in one of/.test(prompt) && /do not use any other language/.test(prompt));
   check('the pool prompt names all five live languages',
     ['English', 'French', 'German', 'Japanese', 'Chinese'].every((name) => prompt.indexOf(name) > -1));
 }
@@ -4097,13 +4098,25 @@ function testRoots(env) {
   env.ns.store.writeAux('rootProgress', {});
   roots.recordWordOutcome({ roots: found }, 'known');
   const progress = env.ns.store.readAux('rootProgress', {});
-  check('a first-try spelling raises root strength', progress[found[0].key].strength === 1);
+  check('spelling records an encounter without changing the review date',
+    progress[found[0].key].correct === 1 && !progress[found[0].key].dueAt);
   roots.recordRootAnswer(found[0].key, false);
   const after = env.ns.store.readAux('rootProgress', {});
-  check('a wrong review lowers strength without going below zero',
-    after[found[0].key].strength === 0 && after[found[0].key].wrong === 1);
+  check('a wrong stage does not change the review date',
+    after[found[0].key].dueAt === 0 && after[found[0].key].intervalIndex === 0 &&
+    after[found[0].key].wrong === 1);
+  roots.recordStage(found[0].key, 1, true);
+  roots.recordStage(found[0].key, 2, true);
+  roots.recordStage(found[0].key, 3, true);
+  const completed = env.ns.store.readAux('rootProgress', {})[found[0].key];
+  check('all three correct stages advance one Ebbinghaus interval',
+    completed.intervalIndex === 1 && completed.dueAt > Date.now());
   check('mastery states map from strength',
     roots._stateFor(0) === 'new' && roots._stateFor(3) === 'familiar' && roots._stateFor(5) === 'known');
+  const stageOne = env.ns.rootReview._stageQuestion({ key: found[0].key, display: 'tend', meaning: 'stretch', variants: ['tens'] }, 1, []);
+  const stageTwo = env.ns.rootReview._stageQuestion({ key: found[0].key, display: 'tend', meaning: 'stretch', variants: ['tens'] }, 2, []);
+  check('root review fixes meaning, spelling and family stages',
+    stageOne.type === 'choice' && stageTwo.type === 'input' && stageTwo.answers.indexOf('tens') > -1);
   const discovery = env.ns.prompts.discovery('sobremesa', 'Spanish', 'zh');
   check('the discovery prompt asks for two examples', /exactly 2/.test(discovery));
   check('and forbids invented etymology', /Never invent/.test(discovery));
@@ -4155,6 +4168,32 @@ function testDiscoveryBook(env) {
   check('the roots view exists', fs.existsSync(path.join(JS_DIR, 'view-roots.js')));
 }
 
+function testVersionGroups(env) {
+  section('7.1 Version groups');
+  const ns = env.ns;
+  const store = ns.store;
+  const word = 'version-test-' + Date.now();
+  const base = {
+    kind: 'word', word, language: 'en', model: 'deepseek-flash',
+    overview: { status: 'ok', language: 'en', quick_meaning: 'test', reading: '' },
+    lines: {}, ts: Date.now(), starred: false
+  };
+  const zh = Object.assign({}, base, { id: store.entryId(word, 'en', 'deepseek-flash', 'zh'), outputLang: 'zh', ts: Date.now() - 1000 });
+  const en = Object.assign({}, base, { id: store.entryId(word, 'en', 'deepseek-flash', 'en'), outputLang: 'en', ts: Date.now() });
+  store.saveEntry(zh);
+  store.saveEntry(en);
+  const groups = store.listGroups().filter((row) => row.word === word);
+  check('two explanation languages collapse to one history group', groups.length === 1, String(groups.length));
+  check('the group carries both versions', groups[0] && groups[0].versions.length === 2);
+  check('the first version language is the earliest version', groups[0] && groups[0].firstOutputLang === 'zh');
+  store.removeGroup(groups[0].id);
+  check('deleting the group removes every version', !store.getEntry(zh.id) && !store.getEntry(en.id));
+  const langs = Object.keys(ns.roots.rootGroups('learning', 'zh'));
+  check('root groups are fixed to en/fr/de', langs.join(',') === 'en,fr,de', langs.join(','));
+  check('the discovery route highlights Dictionary',
+    /name: 'discovery', tab: 'dictionary'/.test(fs.readFileSync(path.join(JS_DIR, 'app.js'), 'utf8')));
+}
+
 async function testDistribution() {
   const { execFileSync } = require('child_process');
   section('Distribution');
@@ -4200,7 +4239,7 @@ async function testDistribution() {
   /* 6.0 additions. The single file is what a file:// reader (and, later, a
      desktop shell) actually opens, so what is inside it is asserted. */
   check('the offline bundle is named after this release',
-    path.basename(offlinePath) === 'linguist_7.0.0.html', path.basename(offlinePath));
+    path.basename(offlinePath) === 'linguist_7.2.0.html', path.basename(offlinePath));
   check('it inlines the vendored pdf.js rather than linking to it',
     /pdfjsLib/.test(offline) && offline.indexOf('vendor/pdfjs/pdf.min.js') === -1);
   check('and carries the worker source for the blob URL',
@@ -4210,7 +4249,7 @@ async function testDistribution() {
 
   const sw = fs.readFileSync(path.join(WEB_DIR, 'sw.js'), 'utf8');
   check('the cache is named after the product and this release',
-    /CACHE_VERSION = 'v7\.0\.0'/.test(sw) && /linguist-' \+ CACHE_VERSION/.test(sw));
+    /CACHE_VERSION = 'v7\.2\.0'/.test(sw) && /linguist-' \+ CACHE_VERSION/.test(sw));
   ['js/extract.js', 'js/view-document.js', 'vendor/pdfjs/pdf.min.js', 'vendor/pdfjs/pdf.worker.min.js']
     .forEach((file) => {
       check('the shell precaches ' + file, sw.indexOf("'./" + file + "'") > -1);
@@ -4271,6 +4310,7 @@ async function testDistribution() {
   testSurprisePool(env);
   testRoots(env);
   testDiscoveryBook(env);
+  testVersionGroups(env);
   testFeatureMap(env);
   testRoundReview(env);
   testRetryAndPlayback(env);

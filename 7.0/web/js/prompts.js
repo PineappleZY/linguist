@@ -1306,8 +1306,8 @@ window.LINGUIST = window.LINGUIST || {};
       N: String(count),
       LANG: outName(outputLang),
       SCOPE: auto
-        ? 'About 80% of the words must be in ' + queryLanguageListText() +
-          '; the remaining 20% should be beautiful words from other living languages.'
+        ? 'Every word must be in one of ' + queryLanguageListText() +
+          '; do not use any other language.'
         : 'Every word must be in ' + srcName(sourceLang) + '.'
     });
   }

@@ -658,7 +658,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
 
   function historySection() {
     var settings = store.getSettings();
-    var all = store.listHistory();
+    var all = store.listGroups();
     var query = ns.session.historyQuery || '';
     var rows = query ? all.filter(function (row) { return matchesQuery(row, query); }) : all;
 
@@ -758,17 +758,16 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       '<span class="row-sub">' + kindChip +
       (row.pos ? ui.esc(row.pos) + ' · ' : '') + ui.esc(row.quickMeaning || '') + '</span></span>' +
       '<span class="row-aside">' + (row.kind === 'discovery'
-        ? '<span class="badge-lang" dir="auto">' + ui.esc(row.languageName || '') + '</span>'
+        ? ui.languageBadge(row.languageCode, row.languageName)
         : (row.language ? ui.langBadge(row.language) : '')) +
       /* The group header already carries the date, so the row shows the clock. */
       '<span class="nowrap">' + ui.esc(ui.rowTime(row.ts || 0)) + '</span>' +
       '<button type="button" class="icon-btn' + starred + '" data-star="' + ui.esc(row.id) + '" ' +
       'aria-label="' + ui.esc(ui.t('dict.history.star')) + '" title="' +
       ui.esc(ui.t('dict.history.star')) + '">' + starIcon + '</button>' +
-      (row.kind === 'word' ? '' :
-        '<button type="button" class="icon-btn is-muted" data-delete-row="' + ui.esc(row.id) + '" ' +
-        'aria-label="' + ui.esc(ui.t('entry.delete')) + '" title="' + ui.esc(ui.t('entry.delete')) + '">' +
-        ui.icon('trash') + '</button>') + '</span></div>';
+      '<button type="button" class="icon-btn is-muted" data-delete-row="' + ui.esc(row.id) + '" ' +
+      'aria-label="' + ui.esc(ui.t('entry.delete')) + '" title="' + ui.esc(ui.t('entry.delete')) + '">' +
+      ui.icon('trash') + '</button></span></div>';
   }
 
   /* ---------- Screen ---------- */
@@ -941,7 +940,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
         var id = button.getAttribute('data-delete-row');
         var snapshot = store.snapshotEntry(id);
         if (!snapshot) return;
-        store.removeEntry(id);
+        store.removeGroup(id);
         if (ns.roots) ns.roots.invalidate();
         ui.toast(ui.t('entry.deleted'), {
           ms: 8000,
@@ -980,6 +979,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
         var value = field ? field.value.trim() : '';
         if (!value) { ui.toast(ui.t('dict.key.empty')); return; }
         store.patchSettings({ apiKey: value });
+        if (ns.pool) ns.pool.warmup(store.getSettings()).catch(function () {});
         ui.toast(ui.t('dict.key.saved'));
         ns.session.focusSearch = true;
         ns.router.refresh();
@@ -1012,7 +1012,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     if (historyToggle) {
       historyToggle.addEventListener('click', function () {
         var map = collapsedDays();
-        var keys = store.listHistory().map(function (row) { return ui.dayKey(row.ts || 0); });
+        var keys = store.listGroups().map(function (row) { return ui.dayKey(row.ts || 0); });
         var allFolded = keys.length && keys.every(function (key) { return map[key]; });
         keys.forEach(function (key) {
           if (allFolded) delete map[key]; else map[key] = true;

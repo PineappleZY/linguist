@@ -1,15 +1,12 @@
-/* LINGUIST — root index, mastery and scheduling.
-
-   Roots come from data the entry already has: morphology for the Latin family,
-   character components for Chinese and Japanese. No extra model request is
-   made just to open the Roots tab. */
+/* LINGUIST — root index, mastery and Ebbinghaus scheduling. */
 
 window.LINGUIST = window.LINGUIST || {};
 
 (function (ns) {
   'use strict';
 
-  var INTERVALS = [10 * 60000, 86400000, 3 * 86400000, 7 * 86400000, 21 * 86400000, 60 * 86400000];
+  var DAY = 86400000;
+  var INTERVALS = [0, 1 * DAY, 2 * DAY, 4 * DAY, 7 * DAY, 15 * DAY, 30 * DAY, 60 * DAY, 120 * DAY];
   var indexCache = null;
 
   function norm(text) {
@@ -32,6 +29,7 @@ window.LINGUIST = window.LINGUIST || {};
 
   function rootsFromEntry(entry) {
     var found = [];
+    if (!entry || ['en', 'fr', 'de'].indexOf(entry.language) < 0) return found;
     var lines = entry && entry.lines && typeof entry.lines === 'object' ? entry.lines : {};
     Object.keys(lines).forEach(function (name) {
       var line = lines[name];
@@ -40,7 +38,8 @@ window.LINGUIST = window.LINGUIST || {};
       var morph = line.morphology;
       if (morph && Array.isArray(morph.breakdown)) {
         var primary = morph.breakdown.filter(function (part) {
-          return part && part.type === 'root' && cleanPart(part.part);
+          return part && part.type === 'root' && cleanPart(part.part).length >= 2 &&
+            String(part.meaning || '').trim() && String(part.origin || '').trim();
         });
         var variants = (Array.isArray(morph.root_variants) ? morph.root_variants : [])
           .map(function (item) { return item && item.form ? cleanPart(item.form) : ''; })
@@ -61,6 +60,7 @@ window.LINGUIST = window.LINGUIST || {};
             meaning: String(part.meaning || ''),
             origin: String(part.origin || ''),
             language: entry.language || '',
+            outputLang: entry.outputLang || '',
             variants: variants,
             family: family,
             entryId: entry.id,
@@ -69,41 +69,6 @@ window.LINGUIST = window.LINGUIST || {};
         });
       }
 
-      if (Array.isArray(line.components)) {
-        line.components.forEach(function (part) {
-          if (!part || !part.part) return;
-          found.push({
-            key: keyOf('component', part.origin || entry.language || 'han', part.part),
-            kind: 'component',
-            display: cleanPart(part.part),
-            meaning: String(part.meaning || ''),
-            origin: String(part.origin || ''),
-            language: entry.language || '',
-            variants: [],
-            family: [],
-            entryId: entry.id,
-            word: entry.word || ''
-          });
-        });
-      }
-
-      if (Array.isArray(line.kanji_origin)) {
-        line.kanji_origin.forEach(function (part) {
-          if (!part || !part.kanji) return;
-          found.push({
-            key: keyOf('component', 'han', part.kanji),
-            kind: 'component',
-            display: cleanPart(part.kanji),
-            meaning: String(part.original_image || part.formation || ''),
-            origin: 'Han',
-            language: entry.language || 'ja',
-            variants: [],
-            family: [],
-            entryId: entry.id,
-            word: entry.word || ''
-          });
-        });
-      }
     });
 
     var unique = {};
@@ -137,6 +102,7 @@ window.LINGUIST = window.LINGUIST || {};
       ts: entry.ts || Date.now(),
       word: entry.word || '',
       language: entry.language || '',
+      outputLang: entry.outputLang || '',
       roots: roots
     };
     writeIndex();
@@ -153,6 +119,7 @@ window.LINGUIST = window.LINGUIST || {};
         ts: row.ts || entry.ts || 0,
         word: row.word || entry.word || '',
         language: row.language || entry.language || '',
+        outputLang: entry.outputLang || row.firstOutputLang || '',
         roots: roots
       };
     });
@@ -172,7 +139,8 @@ window.LINGUIST = window.LINGUIST || {};
           current = map[root.key] = {
             key: root.key, kind: root.kind, display: root.display,
             meaning: root.meaning, origin: root.origin, language: root.language,
-            variants: [], family: [], entries: [], firstTs: item.ts || 0
+            variants: [], family: [], entries: [], firstTs: item.ts || 0,
+            latestTs: item.ts || 0, outputLangs: []
           };
         }
         if (root.variants) root.variants.forEach(function (v) {
@@ -182,8 +150,11 @@ window.LINGUIST = window.LINGUIST || {};
           if (!current.family.some(function (w) { return norm(w.word) === norm(word.word); })) current.family.push(word);
         });
         if (!current.entries.some(function (e) { return e.id === id; })) {
-          current.entries.push({ id: id, word: item.word, ts: item.ts });
+          current.entries.push({ id: id, word: item.word, ts: item.ts, outputLang: item.outputLang || '' });
         }
+        current.starred = current.entries.some(function (entry) { return ns.store.isStarred(entry.id); });
+        if (item.ts > current.latestTs) current.latestTs = item.ts;
+        if (item.outputLang && current.outputLangs.indexOf(item.outputLang) < 0) current.outputLangs.push(item.outputLang);
         if (!current.meaning && root.meaning) current.meaning = root.meaning;
       });
     });
@@ -213,11 +184,16 @@ window.LINGUIST = window.LINGUIST || {};
         meaning: root.meaning, origin: root.origin, language: root.language,
         variants: (root.variants || []).slice(), wordIds: [],
         state: 'new', strength: 0, correct: 0, wrong: 0,
-        lastSeen: 0, dueAt: 0
+        lastSeen: 0, lastReviewed: 0, dueAt: 0,
+        intervalIndex: 0, stage: 1, lapses: 0, streak: 0
       };
     }
     var p = progress[root.key];
     if (!p.meaning && root.meaning) p.meaning = root.meaning;
+    if (p.intervalIndex == null) p.intervalIndex = 0;
+    if (!p.stage) p.stage = 1;
+    if (p.lapses == null) p.lapses = 0;
+    if (p.streak == null) p.streak = 0;
     (root.entries || []).forEach(function (entry) {
       if (p.wordIds.indexOf(entry.id) < 0) p.wordIds.push(entry.id);
     });
@@ -232,22 +208,50 @@ window.LINGUIST = window.LINGUIST || {};
     return progress;
   }
 
-  function recordRootAnswer(key, correct) {
+  function stateForInterval(index) {
+    if (index >= 7) return 'known';
+    if (index >= 4) return 'familiar';
+    if (index >= 1) return 'learning';
+    return 'new';
+  }
+
+  function nextInterval(root) {
+    var index = Math.max(0, Math.min(INTERVALS.length - 1, root.intervalIndex || 0));
+    return INTERVALS[index];
+  }
+
+  /* A stage answer never changes dueAt on failure. It only moves the same
+     stage to the end of the session queue. A complete three-stage pass is the
+     only thing that advances the Ebbinghaus interval. */
+  function recordStage(key, stage, correct) {
     var progress = readProgress();
     var p = progress[key];
     if (!p) return null;
     var now = Date.now();
-    if (correct) {
-      p.correct += 1;
-      p.strength = Math.min(5, p.strength + 1);
-    } else {
+    if (!correct) {
       p.wrong += 1;
-      p.strength = Math.max(0, p.strength - 1);
+      p.lapses = (p.lapses || 0) + 1;
+      p.lastSeen = now;
+      writeProgress(progress);
+      if (ns.events) ns.events.emit('catalog:changed');
+      return { status: 'repeat', stage: stage, dueAt: p.dueAt || 0 };
     }
-    p.state = stateFor(p.strength);
+    p.correct += 1;
+    p.stage = Number(stage) + 1;
     p.lastSeen = now;
-    p.dueAt = now + INTERVALS[p.strength];
+    if (p.stage > 3) {
+      p.streak = (p.streak || 0) + 1;
+      p.intervalIndex = Math.min(INTERVALS.length - 1, (p.intervalIndex || 0) + 1);
+      p.strength = Math.min(5, Math.floor(p.intervalIndex / 2));
+      p.state = stateForInterval(p.intervalIndex);
+      p.lastReviewed = now;
+      p.dueAt = now + INTERVALS[p.intervalIndex];
+      p.stage = 1;
+    } else {
+      if (p.intervalIndex === 0 && !p.dueAt) p.dueAt = 0;
+    }
     writeProgress(progress);
+    if (ns.events) ns.events.emit('catalog:changed');
     return p;
   }
 
@@ -257,26 +261,24 @@ window.LINGUIST = window.LINGUIST || {};
     var progress = readProgress();
     item.roots.forEach(function (root) {
       var p = ensureProgress(progress, root);
-      var known = outcome === 'known';
-      if (known) {
-        p.correct += 1;
-        p.strength = Math.min(5, p.strength + 1);
-      } else {
-        p.wrong += 1;
-        p.strength = Math.max(0, p.strength - 1);
-      }
-      p.state = stateFor(p.strength);
+      if (outcome === 'known') p.correct += 1;
+      else { p.wrong += 1; p.lapses = (p.lapses || 0) + 1; }
       p.lastSeen = Date.now();
-      p.dueAt = p.lastSeen + INTERVALS[p.strength];
     });
     writeProgress(progress);
+    if (ns.events) ns.events.emit('catalog:changed');
   }
 
   function dueQueue(limit) {
     var progress = ensureAllProgress();
     var now = Date.now();
+    var starred = {};
+    allRoots().forEach(function (root) { if (root.starred) starred[root.key] = true; });
     return Object.keys(progress).map(function (key) { return progress[key]; })
-      .filter(function (p) { return !p.dueAt || p.dueAt <= now || p.state === 'new'; })
+      .filter(function (p) {
+        return starred[p.key] && ['en', 'fr', 'de'].indexOf(p.language) > -1 &&
+          (!p.dueAt || p.dueAt <= now || p.state === 'new');
+      })
       .sort(function (a, b) {
         if (a.state === 'new' && b.state !== 'new') return -1;
         if (b.state === 'new' && a.state !== 'new') return 1;
@@ -285,16 +287,52 @@ window.LINGUIST = window.LINGUIST || {};
       .slice(0, limit || ns.CONFIG.limits.rootReviewRound);
   }
 
+  function rootGroups(sort, uiLang) {
+    var progress = ensureAllProgress();
+    var roots = allRoots().filter(function (root) { return !!root.starred; });
+    var collator = null;
+    try { collator = new Intl.Collator(uiLang || 'en'); } catch (err) { collator = null; }
+    var byLanguage = { en: [], fr: [], de: [] };
+    roots.forEach(function (root) {
+      if (!byLanguage[root.language]) return;
+      var p = progress[root.key] || {};
+      byLanguage[root.language].push({
+        key: root.key, display: root.display, meaning: p.meaning || root.meaning,
+        origin: root.origin, language: root.language, state: p.state || 'new',
+        strength: p.strength || 0, dueAt: p.dueAt || 0, latestTs: root.latestTs || root.firstTs || 0,
+        familyCount: (root.family || []).length, variants: root.variants || [],
+        entries: root.entries || []
+      });
+    });
+    function rank(state) {
+      return { new: 0, learning: 1, familiar: 2, known: 3 }[state] == null ? 4 : { new: 0, learning: 1, familiar: 2, known: 3 }[state];
+    }
+    ['en', 'fr', 'de'].forEach(function (language) {
+      byLanguage[language].sort(function (a, b) {
+        if (sort === 'latest') return (b.latestTs || 0) - (a.latestTs || 0);
+        if (sort === 'alphabetical') return collator ? collator.compare(a.display, b.display) : a.display.localeCompare(b.display);
+        if (sort === 'family') return (b.familyCount - a.familyCount) || ((b.latestTs || 0) - (a.latestTs || 0));
+        return (rank(a.state) - rank(b.state)) ||
+          ((a.dueAt || Number.MAX_SAFE_INTEGER) - (b.dueAt || Number.MAX_SAFE_INTEGER)) ||
+          ((b.latestTs || 0) - (a.latestTs || 0)) ||
+          a.display.localeCompare(b.display);
+      });
+    });
+    return byLanguage;
+  }
+
   function stats() {
     var progress = ensureAllProgress();
-    var list = Object.keys(progress).map(function (key) { return progress[key]; });
+    var groups = rootGroups('learning', 'en');
+    var roots = ['en', 'fr', 'de'].reduce(function (sum, lang) { return sum.concat(groups[lang] || []); }, []);
+    var list = roots.map(function (root) { return progress[root.key]; }).filter(Boolean);
     return {
       total: list.length,
       new: list.filter(function (p) { return p.state === 'new'; }).length,
       learning: list.filter(function (p) { return p.state === 'learning'; }).length,
       familiar: list.filter(function (p) { return p.state === 'familiar'; }).length,
       known: list.filter(function (p) { return p.state === 'known'; }).length,
-      due: list.filter(function (p) { return !p.dueAt || p.dueAt <= Date.now(); }).length,
+      due: list.filter(function (p) { return p.state === 'new' || !p.dueAt || p.dueAt <= Date.now(); }).length,
       words: list.reduce(function (sum, p) { return sum + (p.wordIds ? p.wordIds.length : 0); }, 0)
     };
   }
@@ -307,6 +345,53 @@ window.LINGUIST = window.LINGUIST || {};
     var p = ensureProgress(progress, root);
     writeProgress(progress);
     return p;
+  }
+
+  function reviewRoots(language, outputLang, scope) {
+    var progress = ensureAllProgress();
+    var index = readIndex();
+    var now = Date.now();
+    return allRoots().filter(function (root) {
+      if (!root.starred || root.language !== language) return false;
+      return root.entries.some(function (entry) { return entry.outputLang === outputLang; });
+    }).map(function (root) {
+      var entry = root.entries.filter(function (item) { return item.outputLang === outputLang; })[0];
+      var p = progress[root.key] || {};
+      var indexed = (index.entries[entry.id] && index.entries[entry.id].roots || [])
+        .filter(function (item) { return item.key === root.key; })[0] || {};
+      return {
+        key: root.key, display: root.display, meaning: indexed.meaning || p.meaning || root.meaning,
+        origin: root.origin, language: root.language, outputLang: outputLang,
+        variants: indexed.variants || root.variants || [],
+        wordIds: root.entries.map(function (item) { return item.id; }),
+        state: p.state || 'new', strength: p.strength || 0, dueAt: p.dueAt || 0,
+        intervalIndex: p.intervalIndex || 0, lapses: p.lapses || 0, stage: p.stage || 1
+      };
+    }).filter(function (root) {
+      if (scope === 'new') return root.state === 'new';
+      if (scope === 'all') return true;
+      return root.state === 'new' || !root.dueAt || root.dueAt <= now;
+    });
+  }
+
+  function todayQueue(language, outputLang) {
+    return reviewRoots(language, outputLang, 'due');
+  }
+
+  function rootVersion(rootKey, outputLang) {
+    var all = ns.store.readAux('rootVersions', {});
+    return all[rootKey + '|' + outputLang] || null;
+  }
+
+  function addRootVersion(rootKey, outputLang, value) {
+    var all = ns.store.readAux('rootVersions', {});
+    all[rootKey + '|' + outputLang] = Object.assign({ ts: Date.now() }, value || {});
+    ns.store.writeAux('rootVersions', all);
+    return all[rootKey + '|' + outputLang];
+  }
+
+  function recordRootAnswer(key, correct) {
+    return correct ? recordStage(key, 3, true) : recordStage(key, 1, false);
   }
 
   function familyWords(key) {
@@ -354,6 +439,13 @@ window.LINGUIST = window.LINGUIST || {};
     rebuildIndex: rebuildIndex,
     allRoots: allRoots,
     dueQueue: dueQueue,
+    todayQueue: todayQueue,
+    nextInterval: nextInterval,
+    recordStage: recordStage,
+    rootVersion: rootVersion,
+    addRootVersion: addRootVersion,
+    rootGroups: rootGroups,
+    reviewRoots: reviewRoots,
     stats: stats,
     getRoot: getRoot,
     familyWords: familyWords,

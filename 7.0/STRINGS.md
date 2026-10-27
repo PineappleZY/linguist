@@ -1,6 +1,6 @@
-# Linguist 7.0.0 — 界面文案对照表
+# Linguist 7.2.0 — 界面文案对照表
 
-这份表是 `web/js/strings.js` 的直接产物（`node tools/strings-md.mjs` 重新生成），供你或母语者复核。共 **463 条 × 5 种语言**。
+这份表是 `web/js/strings.js` 的直接产物（`node tools/strings-md.mjs` 重新生成），供你或母语者复核。共 **476 条 × 5 种语言**。
 
 **怎么用**：切到某一语言后，可能觉得某句不像该语言的人会说的话——直接在表里指出 key 与建议改法即可，我会改 `strings.js`（改一行，五个语言各自独立）。
 
@@ -31,6 +31,19 @@
 | `roots.emptyTitle` | No roots yet | 还没有词根 | Pas encore de racines | Noch keine Wurzeln | 語根はまだありません |
 | `roots.emptyText` | Look up a word with an etymology card, then come back. | 先查一个已经生成词源卡片的词，再回来。 | Cherchez un mot avec une carte étymologique, puis revenez. | Schlage ein Wort mit Etymologiekarte nach und komm zurück. | 語源カードのある語を調べてから戻ってください。 |
 | `roots.review` | Review {n} roots | 复习 {n} 个词根 | Revoir {n} racines | {n} Wurzeln wiederholen | {n} 個の語根を復習 |
+| `roots.sort` | Sort | 排序 | Tri | Sortierung | 並び順 |
+| `roots.sort.learning` | Learning groups | 学习分组 | Groupes d’apprentissage | Lerngruppen | 学習グループ |
+| `roots.sort.latest` | Latest | 最新 | Récent | Neueste | 最新 |
+| `roots.sort.alphabetical` | A–Z | 字母 | A–Z | A–Z | A–Z |
+| `roots.sort.family` | Family size | 词族规模 | Taille de famille | Familiengröße | 語族の規模 |
+| `roots.reviewLanguage` | Review language | 复习语言 | Langue de révision | Wiederholungssprache | 復習する言語 |
+| `roots.reviewScope` | Scope | 范围 | Portée | Umfang | 範囲 |
+| `roots.scope.due` | Due now | 到期 | À revoir | Jetzt fällig | 復習待ち |
+| `roots.scope.all` | All starred roots | 全部已星标词根 | Toutes les racines favorites | Alle markierten Wurzeln | 星付きの全語根 |
+| `roots.scope.new` | New roots | 新词根 | Nouvelles racines | Neue Wurzeln | 新しい語根 |
+| `roots.dueToday` | Due today | 今天复习 | À revoir aujourd’hui | Heute fällig | 今日復習 |
+| `roots.dueIn` | Due in {n} days | {n} 天后复习 | À revoir dans {n} jours | In {n} Tagen fällig | {n} 日後に復習 |
+| `roots.lapses` | {n} misses in review | 复习中错过 {n} 次 | {n} erreurs en révision | {n} Fehler in der Wiederholung | 復習で {n} 回間違い |
 | `roots.all` | All roots | 全部词根 | Toutes les racines | Alle Wurzeln | すべての語根 |
 | `roots.state.new` | New | 新词根 | Nouvelle | Neu | 新規 |
 | `roots.state.learning` | Learning | 在学 | En cours | Im Lernen | 学習中 |

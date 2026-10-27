@@ -22,7 +22,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     var starred = store.isStarred(entry.id);
     var html = '<div class="discovery-head">' +
       '<div class="discovery-word" dir="auto">' + ui.esc(entry.word) + '</div>' +
-      '<div class="discovery-meta">' + ui.esc(entry.languageName || entry.language || '') +
+      '<div class="discovery-meta">' + ui.esc(ui.languageLabel(entry.languageCode, entry.languageName || entry.language)) +
       (entry.pronunciation ? ' · <span class="mono" dir="auto">' + ui.esc(entry.pronunciation) + '</span>' : '') +
       '</div><div class="topbar-actions">' +
       '<button type="button" class="icon-btn' + (starred ? ' is-starred' : '') + '" data-discovery-star>' +

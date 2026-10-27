@@ -35,8 +35,8 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     html += '<div class="list">';
     html += row(ui.t('profile.device.title'), ui.t('profile.device.text'));
     html += row(ui.t('profile.history.title'), ui.t('profile.history.sub', {
-      n: store.listHistory().length,
-      m: store.listHistory().filter(function (item) { return item.starred; }).length
+      n: store.listGroups().length,
+      m: store.listGroups().filter(function (item) { return item.starred; }).length
     }));
     html += installRow();
     html += '</div>';
@@ -562,6 +562,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
         if (event.key === 'Enter') {
           event.preventDefault();
           store.patchSettings({ apiKey: currentKey() });
+        if (ns.pool) ns.pool.warmup(store.getSettings()).catch(function () {});
           ui.toast(ui.t('profile.key.saved'));
           ns.router.refresh();
         }

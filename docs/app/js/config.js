@@ -500,10 +500,10 @@ window.LINGUIST = window.LINGUIST || {};
        below it IS translated — see strings.js. */
     taglineKey: 'app.tagline',
     descriptionKey: 'app.description',
-    version: '7.0.0',
+    version: '7.2.0',
 
     /* Bumped whenever the stored entry shape changes. */
-    schemaVersion: 6,
+    schemaVersion: 8,
 
     api: {
       endpoint: 'https://api.deepseek.com/chat/completions',
@@ -704,6 +704,7 @@ window.LINGUIST = window.LINGUIST || {};
       practiceRound: 5,
       surprisePool: { batch: 100, target: 200, topUp: 100, lowWater: 20, seenMax: 20000 },
       rootReviewRound: 5,
+      rootIntervals: [0, 1, 2, 4, 7, 15, 30, 60, 120],
       maxWordbooks: 50,
       maxWordbookName: 40,
       /* A file is read in pieces. One piece is a single request, which keeps
@@ -772,6 +773,7 @@ window.LINGUIST = window.LINGUIST || {};
     /* Which cards each reading family shows, and in what order. Empty means
        "exactly what the app ships with" — see CONFIG.resolveCardPrefs. */
     cardPrefs: {},
+    rootSort: 'learning',
     model: ns.CONFIG.defaultModel,
     theme: ns.CONFIG.defaultTheme
   };

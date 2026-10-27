@@ -1403,7 +1403,7 @@ const html = [
   '<!DOCTYPE html>', '<html lang="en" data-theme="auto">', '<head>',
   '<meta charset="utf-8">',
   '<meta name="viewport" content="width=device-width, initial-scale=1">',
-  '<title>Linguist 7.0 — design preview</title>',
+  '<title>Linguist 7.2 — design preview</title>',
   '<style>', css,
   '\n/* preview chrome only */',
   'body { padding: 24px 0 64px; }',
@@ -1423,7 +1423,7 @@ const html = [
   '.pv-spell-tools { display: flex; justify-content: center; gap: 90px; margin-top: 20px; }',
   '.pv-note { margin-top: 40px; padding: 16px 18px; border-radius: 14px; background: var(--fill); font-size: 13px; color: var(--text-2); line-height: 1.55; }',
   '</style>', '</head>', '<body>', '<div class="pv-wrap">',
-  '<div class="pv-title">Linguist 7.0 — design preview</div>',
+  '<div class="pv-title">Linguist 7.2 — design preview</div>',
   '<p class="pv-sub">Sample data for the five languages in use: the word-root-first reading order, the practice prompt and its skip round, card preferences in the interface language, the practice source by language, File mode and the document page. No API key, no network, no tokens spent.</p>'
 ].concat(chosen, [
   '<div class="pv-note">这是用 Node 直接渲染真实视图模块生成的静态页面，用来在沒有 Key 的情况下检查版式。' +

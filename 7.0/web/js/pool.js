@@ -12,6 +12,7 @@ window.LINGUIST = window.LINGUIST || {};
 
   var LIMITS = ns.CONFIG.limits.surprisePool;
   var generating = null;
+  var warming = null;
 
   function norm(text) {
     var value = String(text == null ? '' : text);
@@ -140,6 +141,49 @@ window.LINGUIST = window.LINGUIST || {};
     return state.items.filter(function (item) { return !item.used; });
   }
 
+  function languageCounts(state) {
+    var counts = {};
+    ns.CONFIG.queryLanguages.forEach(function (lang) { counts[lang.id] = 0; });
+    state.items.forEach(function (item) {
+      if (item.used) return;
+      var id = languageId(item);
+      if (Object.prototype.hasOwnProperty.call(counts, id)) counts[id] += 1;
+    });
+    return counts;
+  }
+
+  function ensureMinimums(settings) {
+    if (!settings || !settings.apiKey || warming) return warming || Promise.resolve();
+    var state = readState();
+    var counts = languageCounts(state);
+    var missing = ns.CONFIG.queryLanguages.map(function (lang) { return lang.id; })
+      .filter(function (id) { return counts[id] < 3; });
+    if (!missing.length) return Promise.resolve();
+    warming = missing.reduce(function (chain, id) {
+      return chain.then(function () { return generate(id, settings, 50); });
+    }, Promise.resolve()).then(function () {
+      warming = null;
+      return readState();
+    }).catch(function (error) {
+      warming = null;
+      throw error;
+    });
+    return warming;
+  }
+
+  function warmup(settings) {
+    if (!settings || !settings.apiKey || warming) return warming || Promise.resolve();
+    var state = readState();
+    if (!state.items.length) {
+      warming = generate(ns.CONFIG.autoLang, settings, LIMITS.batch)
+        .then(function () { return generate(ns.CONFIG.autoLang, settings, LIMITS.batch); })
+        .then(function () { warming = null; return ensureMinimums(settings); })
+        .catch(function (error) { warming = null; throw error; });
+      return warming;
+    }
+    return ensureMinimums(settings);
+  }
+
   function random(list) {
     return list.length ? list[Math.floor(Math.random() * list.length)] : null;
   }
@@ -173,7 +217,7 @@ window.LINGUIST = window.LINGUIST || {};
     var pickNow = random(matching);
     if (pickNow) {
       markUsed(pickNow);
-      topUpInBackground(pinned, settings, state);
+      setTimeout(function () { ensureMinimums(settings).catch(function () {}); }, 10);
       return Promise.resolve({ item: pickNow, fallback: false });
     }
 
@@ -185,15 +229,14 @@ window.LINGUIST = window.LINGUIST || {};
         markUsed(got);
         if (auto) {
           setTimeout(function () {
-            fillOnce(ns.CONFIG.autoLang, settings).catch(function () {});
+            fillOnce(ns.CONFIG.autoLang, settings)
+              .then(function () { return ensureMinimums(settings); })
+              .catch(function () {});
           }, 10);
         }
         return { item: got, fallback: false };
       }
-      var fallback = random(allUnused(next));
-      if (!fallback) return null;
-      markUsed(fallback);
-      return { item: fallback, fallback: true };
+      return null;
     });
   }
 
@@ -214,6 +257,8 @@ window.LINGUIST = window.LINGUIST || {};
 
   ns.pool = {
     pick: pick,
+    warmup: warmup,
+    ensureMinimums: ensureMinimums,
     stats: stats,
     reset: reset,
     readState: readState,

@@ -270,6 +270,50 @@ window.LINGUIST = window.LINGUIST || {};
     return null;
   }
 
+  /* Rows for different explanation languages are versions of one entry. The
+     stored rows stay separate (each payload has its own id), but every screen
+     works with one virtual group row: the earliest version is the reading
+     order's "first language", the latest timestamp decides history order, and
+     deleting the group removes every version. */
+  function groupKeyOf(row) {
+    if (!row) return '';
+    return [row.kind || 'word', String(row.word || '').normalize('NFC'),
+      row.language || '', row.model || '', row.sourceLangArg || ''].join('|');
+  }
+
+  function versionRows(id) {
+    var row = findRow(id);
+    if (!row) return [];
+    var key = groupKeyOf(row);
+    return listHistory().filter(function (item) { return groupKeyOf(item) === key; });
+  }
+
+  function listGroups() {
+    var byKey = {};
+    var order = [];
+    listHistory().forEach(function (row) {
+      var key = groupKeyOf(row);
+      if (!byKey[key]) { byKey[key] = []; order.push(key); }
+      byKey[key].push(row);
+    });
+    return order.map(function (key) {
+      var versions = byKey[key].slice().sort(function (a, b) { return (a.ts || 0) - (b.ts || 0); });
+      var primary = versions[0];
+      var latest = versions[versions.length - 1];
+      var group = JSON.parse(JSON.stringify(primary));
+      group.id = primary.id;
+      group.groupKey = key;
+      group.firstOutputLang = primary.outputLang || '';
+      group.outputLang = primary.outputLang || '';
+      group.ts = latest.ts || primary.ts || 0;
+      group.starred = versions.some(function (row) { return !!row.starred; });
+      group.versions = versions.map(function (row) {
+        return { id: row.id, outputLang: row.outputLang || '', ts: row.ts || 0, starred: !!row.starred };
+      });
+      return group;
+    }).sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); });
+  }
+
   /* Upsert: the index stays in timestamp order, and the same id never appears
      twice. Inserting by position rather than always unshifting matters because
      a saved entry does not have to be the newest one — an imported backup or a
@@ -301,6 +345,30 @@ window.LINGUIST = window.LINGUIST || {};
     return rows;
   }
 
+  function removeGroup(id) {
+    var rows = versionRows(id);
+    if (!rows.length) rows = findRow(id) ? [findRow(id)] : [];
+    var ids = rows.map(function (row) { return row.id; });
+    saveHistory(listHistory().filter(function (item) { return ids.indexOf(item.id) < 0; }));
+    ids.forEach(function (versionId) { rawRemove(STORAGE.entryPrefix + versionId); });
+    var rootIndex = readJSON(STORAGE.rootIndex, null);
+    if (rootIndex && rootIndex.entries) {
+      ids.forEach(function (versionId) { delete rootIndex.entries[versionId]; });
+      writeJSON(STORAGE.rootIndex, rootIndex);
+    }
+    /* Do not leave a dangling reference behind in any wordbook. */
+    var books = listWordbooks();
+    var changed = false;
+    books.forEach(function (book) {
+      var next = book.entries.filter(function (entry) { return ids.indexOf(entry) < 0; });
+      if (next.length !== book.entries.length) { book.entries = next; changed = true; }
+    });
+    if (changed) saveWordbooks(books);
+    if (ns.events) ns.events.emit('catalog:changed');
+  }
+
+  /* Keep the historical single-row primitive for callers that are explicitly
+     re-keying one payload. User-facing deletion uses removeGroup. */
   function removeEntry(id) {
     saveHistory(listHistory().filter(function (item) { return item.id !== id; }));
     rawRemove(STORAGE.entryPrefix + id);
@@ -309,7 +377,6 @@ window.LINGUIST = window.LINGUIST || {};
       delete rootIndex.entries[id];
       writeJSON(STORAGE.rootIndex, rootIndex);
     }
-    /* Do not leave a dangling reference behind in any wordbook. */
     var books = listWordbooks();
     var changed = false;
     books.forEach(function (book) {
@@ -493,6 +560,7 @@ window.LINGUIST = window.LINGUIST || {};
       outputLang: entry.outputLang || ''
     });
     if (entry.starred) addToWordbook(ensureSurpriseBook().id, entry.id);
+    if (ns.events) ns.events.emit('catalog:changed');
     return entry;
   }
 
@@ -581,31 +649,35 @@ window.LINGUIST = window.LINGUIST || {};
 
   function toggleStar(id) {
     var rows = listHistory();
-    var starred = false;
-    var row = null;
-    for (var i = 0; i < rows.length; i += 1) {
-      if (rows[i].id === id) {
-        rows[i].starred = !rows[i].starred;
-        starred = rows[i].starred;
-        row = rows[i];
-      }
-    }
+    var group = versionRows(id);
+    if (!group.length) return false;
+    var starred = !group.some(function (item) { return !!item.starred; });
+    group.forEach(function (item) {
+      rows.forEach(function (candidate) {
+        if (candidate.id === item.id) candidate.starred = starred;
+      });
+    });
     saveHistory(rows);
-    var entry = getEntry(id);
-    if (entry) {
-      entry.starred = starred;
-      writeJSON(STORAGE.entryPrefix + id, entry);
-    }
+    group.forEach(function (item) {
+      var entry = getEntry(item.id);
+      if (entry) {
+        entry.starred = starred;
+        writeJSON(STORAGE.entryPrefix + item.id, entry);
+      }
+    });
+    var row = group[0];
     if (row && row.kind === 'discovery') {
-      if (starred) addToWordbook(ensureSurpriseBook().id, id);
-      else listWordbooks().forEach(function (book) { removeFromWordbook(book.id, id); });
+      if (starred) addToWordbook(ensureSurpriseBook().id, row.id);
+      else listWordbooks().forEach(function (book) {
+        group.forEach(function (item) { removeFromWordbook(book.id, item.id); });
+      });
     }
+    if (ns.events) ns.events.emit('catalog:changed');
     return starred;
   }
 
   function isStarred(id) {
-    var row = findRow(id);
-    return !!(row && row.starred);
+    return versionRows(id).some(function (row) { return !!row.starred; });
   }
 
   /* ---------- Bulk operations ---------- */
@@ -662,25 +734,39 @@ window.LINGUIST = window.LINGUIST || {};
   /* Enough to put an entry back exactly as it was, for an undo. */
   function snapshotEntry(id) {
     if (!id) return null;
-    return JSON.parse(JSON.stringify({
-      row: findRow(id),
-      entry: getEntry(id),
+    var rows = versionRows(id);
+    if (!rows.length && findRow(id)) rows = [findRow(id)];
+    var snapshot = {
+      rows: rows,
+      entries: rows.reduce(function (map, row) {
+        map[row.id] = getEntry(row.id);
+        return map;
+      }, {}),
       books: listWordbooks().filter(function (book) {
-        return book.entries.indexOf(id) > -1;
+        return rows.some(function (row) { return book.entries.indexOf(row.id) > -1; });
       }).map(function (book) { return book.id; })
-    }));
+    };
+    snapshot.row = rows[0] || null;
+    snapshot.entry = snapshot.row ? snapshot.entries[snapshot.row.id] : null;
+    return JSON.parse(JSON.stringify(snapshot));
   }
 
   function restoreEntry(snapshot) {
-    if (!snapshot || !snapshot.row || !snapshot.row.id) return false;
-    var id = snapshot.row.id;
-    if (snapshot.entry) writeJSON(STORAGE.entryPrefix + id, snapshot.entry);
-    upsertRow(snapshot.row);
+    if (!snapshot) return false;
+    var rows = snapshot.rows || (snapshot.row ? [snapshot.row] : []);
+    if (!rows.length || !rows[0].id) return false;
+    rows.forEach(function (row) {
+      var entry = snapshot.entries ? snapshot.entries[row.id] : (row.id === (snapshot.row && snapshot.row.id) ? snapshot.entry : null);
+      if (entry) writeJSON(STORAGE.entryPrefix + row.id, entry);
+      upsertRow(row);
+    });
     if (snapshot.books && snapshot.books.length) {
       var books = listWordbooks();
       books.forEach(function (book) {
         if (snapshot.books.indexOf(book.id) < 0) return;
-        if (book.entries.indexOf(id) < 0) book.entries.push(id);
+        rows.forEach(function (row) {
+          if (book.entries.indexOf(row.id) < 0) book.entries.push(row.id);
+        });
       });
       saveWordbooks(books);
     }
@@ -792,7 +878,7 @@ window.LINGUIST = window.LINGUIST || {};
          the history but reset the explanation language, the interface language
          or the card preferences would be a backup of half a setup. */
       ['outputLang', 'outputLangBySource', 'model', 'theme', 'thinking',
-        'uiLang', 'queryLang', 'queryMode', 'cardPrefs', 'tourDone'].forEach(function (key) {
+        'uiLang', 'queryLang', 'queryMode', 'cardPrefs', 'rootSort', 'tourDone'].forEach(function (key) {
         if (Object.prototype.hasOwnProperty.call(payload.settings, key)) safe[key] = payload.settings[key];
       });
       patchSettings(safe);
@@ -946,6 +1032,9 @@ window.LINGUIST = window.LINGUIST || {};
     documentId: documentId,
     discoveryId: discoveryId,
     listHistory: listHistory,
+    listGroups: listGroups,
+    versionsFor: versionRows,
+    groupKeyOf: groupKeyOf,
     getEntry: getEntry,
     saveEntry: saveEntry,
     setLanguage: setLanguage,
@@ -953,6 +1042,7 @@ window.LINGUIST = window.LINGUIST || {};
     toggleStar: toggleStar,
     isStarred: isStarred,
     removeEntry: removeEntry,
+    removeGroup: removeGroup,
     clearHistory: clearHistory,
     clearStarred: clearStarred,
     exportAll: exportAll,

@@ -1,10 +1,10 @@
-# Linguist · 智能辞典 7.0
+# Linguist · 智能辞典 7.2
 
 以词根为纲的词典：查一个词先看它从哪里来、怎么构成，再读它是什么意思；句子与整份文件用同一套思路读完。
 
-> **这里是 7.0**（新目录 `7.0/`，只交付网页版；6.5 的 `6.0/` 冻结）。
+> **这里是 7.2**（目录仍为 `7.0/`，只交付网页版；6.5 的 `6.0/` 冻结）。
 >
-> **7.0 · 词根学习闭环与随机词池**：新增 Roots 第四标签、词根索引/详情/掌握度/五题复习；拼写显示语种；句子、文件、发现词可单行删除并 Undo；随机改为 200 词池（两次 100 词生成，80/20 语言配比）；五种在用语之外的词渲染紧凑发现卡，只进“随便看看”保留单词本，不参与练习。功能知识图谱同步到 7.0。
+> **7.0 · 词根学习闭环与随机词池**：新增 Roots 第四标签、词根索引/详情/掌握度/复习；拼写显示语种；所有词条可单行删除并 Undo；随机改为 200 词池；五种在用语之外的词渲染紧凑发现卡，只进“随便看看”保留单词本，不参与练习。7.1 进一步加入启动预热、严格五语筛选、版本化解释语言和英法德星级词根复习。
 >
 > **6.5 · 只修正确性**：练习不再自动朗读，看过一次提示后才能手动播放；拼错后重新输入不再回显上一次的错拼；随机在锁定语言时不再接受模型给出的另一种语言；补齐主题、模型说明、词源标签与解释语言面板的界面文案；文档落盘真正截到 60,000 字、id 改为全文哈希；**取消星标后行先留在当前页**（变成空心星，切页才消失）。
 >
@@ -245,8 +245,8 @@ python design/icon-concepts/make_app_icons.py --previews   # 重出方案对比�
 
 ```powershell
 python -m http.server 5173 --directory 7.0/web   # 或直接双击 web/index.html
-node 7.0/web/tests/smoke.js                      # 792 条断言
-node 7.0/tools/build.mjs                         # dist/site + dist/linguist_7.0.0.html
+node 7.0/web/tests/smoke.js                      # 800 条断言
+node 7.0/tools/build.mjs                         # dist/site + dist/linguist_7.2.0.html
 node 6.0/tools/preview.mjs                       # dist/preview.html（不联网、不花 token）
 ```
 
@@ -257,14 +257,14 @@ node 6.0/tools/preview.mjs                       # dist/preview.html（不联网
 | 路径 | 是什么 | 备注 |
 | --- | --- | --- |
 | `dist/site/` | 可部署的 PWA 文件夹 | 上传这个目录的内容 |
-| `dist/linguist_7.0.0.html` | 单文件离线版（约 2.2 MB，含内置 pdf.js 与其 worker） | 双击即用，可直接发给别人 |
+| `dist/linguist_7.2.0.html` | 单文件离线版（约 2.2 MB，含内置 pdf.js 与其 worker） | 双击即用，可直接发给别人 |
 | `dist/preview.html` | 版式预览，20 个面板 | `node tools/preview.mjs` |
 | `dist/shots/` | 无头 Chrome 核对截图 | 见 `web/README.md` |
 | `dist/measure/` | 真实调用的原始返回，以及当时喂进去的样本文件 | `node tools/measure.mjs contend en`、`--doc <文件> <语言>` |
 
 ## 验收清单
 
-自动化（`node 7.0/web/tests/smoke.js`，792 条）覆盖 6.5 的全部基线，加上 7.0 的词池去重与 80/20 提示词、词根索引/变体/掌握度、发现卡存储与保留单词本、普通单词本拒绝发现词、发现词不进练习、删除与 Undo 恢复、Roots 与发现视图渲染；打包链路（白名单、离线包内联 pdf.js 与 worker、SW 预缓存、`linguist_7.0.0.html`、dist 里不留上一代产物）。
+自动化（`node 7.0/web/tests/smoke.js`，800 条）覆盖 6.5 的全部基线，加上 7.0–7.2 的词池预热与严格五语、词根索引/排序/艾宾浩斯滚动复习、发现卡与保留单词本、全部词条删除与 Undo、解释语言版本组和即时刷新；打包链路（白名单、离线包内联 pdf.js 与 worker、SW 预缓存、`linguist_7.2.0.html`、dist 里不留上一代产物）。
 
 需要你在浏览器里确认的：
 
@@ -277,7 +277,7 @@ node 6.0/tools/preview.mjs                       # dist/preview.html（不联网
 7. **Profile → Show the tour again**：中英界面各重放一次，确认不再卡住，跨页步骤定位正确。
 8. 中文与日文解释语言各查一个词，确认释义短、`Core meaning` 给的是精确中心义。
 9. Starred 里确认 `Words / Sentences / Files` 的小组标签与文件行；深浅色各看一遍新图标与四段式类型控件。
-10. **图谱**：打开 `../docs/feature-map/feature-map.html`，确认顶部「本版 7.0.0」以及 Roots / 词池 / 发现卡的新节点。
+10. **图谱**：打开 `../docs/feature-map/feature-map.html`，确认顶部「本版 7.2.0」以及词根记忆、滚动复习、版本组和刷新节点。
 
 ## 关于命名
 

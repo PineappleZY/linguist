@@ -48,20 +48,21 @@ flowchart LR
 
 支持英语、法语、德语、日语与中文，并覆盖单词、整句和文件三种阅读尺度。
 
-## 7.0 网页版更新
+## 7.2 网页版更新
 
-当前网页版已升级到 **Linguist 7.0.0**：
+当前网页版已升级到 **Linguist 7.2.0**：
 
-- **Roots 词根标签**：从查词结果建立词根索引，查看关联词与掌握度。
-- **词根复习闭环**：按 10 分钟、1 天、3 天、7 天、21 天、60 天的阶梯安排掌握度，并提供五题混合复习。
-- **200 词随机池**：随机查词改为持久词池，降低重复率，并按 80/20 混合常用语言和非在用语。
-- **发现词卡**：非词典语言也能显示核心义、例句、读音与词源说明；只进入专用单词本，不混入普通单词本或练习。
-- **更顺手的整理**：句子、文件和发现词支持单行删除与 Undo；拼写练习会明确显示语种。
+- **词根记忆周期**：在掌握度阶梯上加入“今日复习”，到期词根会进入当天队列。
+- **三阶段滚动复习**：在一轮中交替进行释义判断、拼写和同根词识别，并用相似词作为干扰项。
+- **解释语言版本组**：同一条词根的不同解释语言可以归为一组，切换时不需要重复建立关系。
+- **词根详情增强**：补充来源演化、关联词、掌握度与复习记录。
+- **即时刷新**：星标、删除和答题结果会立刻同步到 Roots、Starred 与历史视图。
+- **7.1 基础能力**：启动预热词池、严格五语筛选、版本化解释语言和英法德星级词根复习。
 
-Android APK 与 Windows EXE 仍为 **6.5.0**，尚未包含 7.0 新功能。网页版、PWA 与鸿蒙 NEXT 使用最新 7.0.0。
+Android APK 与 Windows EXE 仍为 **6.5.0**，尚未包含 7.x 新功能。网页版、PWA 与鸿蒙 NEXT 使用最新 7.2.0。
 
-- [下载 7.0 单文件 HTML](https://github.com/PineappleZY/linguist/releases/download/v7.0.0/linguist_7.0.0.html)
-- [下载 7.0 PWA 网站 ZIP](https://github.com/PineappleZY/linguist/releases/download/v7.0.0/Linguist-7.0.0-web.zip)
+- [下载 7.2 单文件 HTML](https://github.com/PineappleZY/linguist/releases/download/v7.2.0/linguist_7.2.0.html)
+- [下载 7.2 PWA 网站 ZIP](https://github.com/PineappleZY/linguist/releases/download/v7.2.0/Linguist-7.2.0-web.zip)
 
 ## 立即使用
 
@@ -163,7 +164,7 @@ Linguist 的“图谱”首先服务于学习者，而不是数据库展示。�
 ├── docs/                  GitHub Pages 落地页与可安装 PWA（含鸿蒙 NEXT）
 │   ├── app/               当前网页应用成品
 │   └── feature-map/       交互式功能知识图谱
-├── 7.0/                   Linguist 7.0 网页源码、测试与构建（本轮唯一交付）
+├── 7.0/                   Linguist 7.2 网页源码、测试与构建（目录沿用 7.0）
 ├── 6.0/                   Linguist 6.5 已冻结；其 android 工具链与 6.5 产物保持不动
 │   └── android/           Android WebView 壳与 APK 构建脚本
 ├── 落地/windows/          Electron 桌面壳与打包脚本
@@ -209,7 +210,7 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1
 - 查询与文件分析需要联网；安装后的 PWA 只有静态界面可以离线打开。
 - 文件图片、扫描版 PDF 和旧版 `.doc` 暂不支持。扫描版 PDF 没有文字层时无法抽取正文。
 - Android 版通过侧载安装，目前不通过 Google Play 发布；系统安全提示属于未上架应用的正常行为。
-- Android 与 Windows 当前仍是 6.5.0，不包含 7.0 的 Roots、词池与发现词；最新网页功能以网页版为准。
+- Android 与 Windows 当前仍是 6.5.0，不包含 7.x 的 Roots、滚动复习、词池与发现词；最新网页功能以网页版为准。
 - HarmonyOS NEXT 目前通过网页版使用，不提供原生 HAP；Android APK 仅适用于仍兼容 Android 应用的鸿蒙版本。
 - Windows 版目前为 x64 免安装包，不含自动更新、ARM64 或代码签名。
 - Electron 环境通常没有可用的系统语音合成音色，因此桌面版的朗读按钮可能隐藏。

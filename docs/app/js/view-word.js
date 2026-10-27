@@ -1454,6 +1454,12 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       entry.overview = named;
       entry.status = named.status === 'not_found' ? 'not_found' : 'ok';
       entry.word = named.word || entry.word;
+      var namedLive = CONFIG.languageByAnyName(named.language);
+      var outsideFive = named.language && !CONFIG.queryLanguages.some(function (lang) { return lang.id === namedLive; });
+      if (entry.status !== 'not_found' && outsideFive) {
+        openDiscoveryFromOverview(entry, named, settings);
+        return;
+      }
       /* Never store the picker's word "auto" as if it were a language. */
       entry.language = resolveLanguage(named.language, entry);
 
@@ -1485,6 +1491,46 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       if (isAborted(err) || !current(generation)) return;
       state.overviewState = 'error';
       state.overviewError = err;
+      renderScreen();
+    });
+  }
+
+  /* The model occasionally answers a five-language pool pick with a language
+     outside the five. That is the only path that creates a discovery card;
+     otherwise a five-language word stays an ordinary entry. */
+  function openDiscoveryFromOverview(entry, named, settings) {
+    var language = String(named.language || '').trim();
+    var code = CONFIG.languageByAnyName(language) || '';
+    var out = effectiveOutputLang(entry);
+    var id = store.discoveryId(entry.word, language, settings.model, out);
+    if (store.getEntry(id)) {
+      location.hash = '#/discovery/' + encodeURIComponent(id);
+      return;
+    }
+    ns.api.discoveryCard({
+      apiKey: settings.apiKey, model: settings.model,
+      word: entry.word, language: language, code: code, outputLang: out
+    }).then(function (card) {
+      if (!card) {
+        state.overviewState = 'error';
+        state.overviewError = { kind: 'language', message: ui.t('error.kind.language') };
+        renderScreen();
+        return;
+      }
+      var discovery = {
+        id: id, kind: 'discovery', word: card.word || entry.word,
+        language: language, languageName: language, languageCode: code,
+        native: card.native || '', pronunciation: card.pronunciation || '',
+        coreMeaning: card.coreMeaning || '', examples: card.examples || [],
+        rootNote: card.rootNote || '', why: card.why || '',
+        quickMeaning: card.coreMeaning || '', overview: { status: 'ok', quick_meaning: card.coreMeaning || '' },
+        model: settings.model, outputLang: out, ts: Date.now(), starred: false
+      };
+      store.saveDiscovery(discovery);
+      location.hash = '#/discovery/' + encodeURIComponent(id);
+    }).catch(function (error) {
+      state.overviewState = 'error';
+      state.overviewError = error;
       renderScreen();
     });
   }
@@ -2166,7 +2212,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
         /* An undo instead of a confirmation: deleting a word you just looked up
            is common and cheap to reverse, and a modal for it is friction. */
         var snapshot = store.snapshotEntry(entry.id);
-        store.removeEntry(entry.id);
+        store.removeGroup(entry.id);
         ui.toast(ui.t('entry.deleted'), {
           ms: 8000,
           action: {

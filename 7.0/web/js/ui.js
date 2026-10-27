@@ -324,6 +324,28 @@ window.LINGUIST = window.LINGUIST || {};
     return '<span class="badge-lang">' + esc(String(code).toUpperCase()) + '</span>';
   }
 
+  function languageLabel(code, name, which) {
+    var fallback = String(name || code || '').trim();
+    var tag = String(code || '').trim();
+    if (!tag) return fallback;
+    try {
+      if (typeof Intl !== 'undefined' && Intl.DisplayNames) {
+        var display = new Intl.DisplayNames([localeTag(which)], { type: 'language' });
+        var value = display.of(tag.toLowerCase());
+        if (value && value !== tag) return value;
+      }
+    } catch (err) { /* fall back to the model's name */ }
+    return fallback || tag;
+  }
+
+  function languageBadge(code, name, which) {
+    var id = ns.CONFIG.languageByAnyName(code) || ns.CONFIG.languageByAnyName(name);
+    if (id && ns.CONFIG.queryLanguages.some(function (lang) { return lang.id === id; })) {
+      return langBadge(id);
+    }
+    return '<span class="badge-lang is-full">' + esc(languageLabel(code, name, which)) + '</span>';
+  }
+
   function outputLangMeta(id) {
     var list = ns.CONFIG.outputLanguages;
     for (var i = 0; i < list.length; i += 1) {
@@ -533,6 +555,8 @@ window.LINGUIST = window.LINGUIST || {};
     dayLabel: dayLabel,
     rowTime: rowTime,
     langBadge: langBadge,
+    languageLabel: languageLabel,
+    languageBadge: languageBadge,
     outputLangMeta: outputLangMeta,
     modelMeta: modelMeta,
     skeletonCard: skeletonCard,
