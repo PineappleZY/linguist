@@ -57,13 +57,28 @@ window.LINGUIST.views = window.LINGUIST.views || {};
   function bodyVocabulary(doc) {
     var items = (Array.isArray(doc.vocabulary) ? doc.vocabulary : []).filter(Boolean);
     if (!items.length) return '';
-    return '<ul class="deflist">' + items.map(function (item) {
+    var rootMap = {};
+    items.forEach(function (item) {
+      var found = ns.roots && ns.roots.findRootForWord(item.term, doc.language);
+      if (found) rootMap[found.key] = found;
+    });
+    var summary = Object.keys(rootMap).length
+      ? '<div class="chips">' + Object.keys(rootMap).map(function (key) {
+        var root = rootMap[key];
+        return '<a class="chip chip-button" href="#/root/' + encodeURIComponent(root.key) + '">' +
+          ui.esc(root.display) + '</a>';
+      }).join('') + '</div>'
+      : '';
+    return summary + '<ul class="deflist">' + items.map(function (item) {
       var root = ns.roots && ns.roots.findRootForWord(item.term, doc.language);
       return '<li>' +
         '<div class="def-term">' + ui.esc(item.term || '') +
         (item.reading ? '<span class="mono muted-3"> ' + ui.esc(item.reading) + '</span>' : '') +
         (root ? '<a class="chip chip-button" href="#/root/' + encodeURIComponent(root.key) + '">' +
-          ui.esc(root.display) + '</a>' : '') +
+          ui.esc(root.display) + '</a>' :
+          '<button type="button" class="chip chip-button" data-context-word="' +
+          ui.esc(item.term || '') + '" data-context-lang="' + ui.esc(doc.language || '') + '">' +
+          ui.esc(ui.t('roots.lookupForRoot')) + '</button>') +
         '</div>' +
         (item.meaning ? '<div class="def-desc">' + ui.esc(item.meaning) + '</div>' : '') +
         (item.example ? '<div class="example"><div class="example-text">' + ui.esc(item.example) +

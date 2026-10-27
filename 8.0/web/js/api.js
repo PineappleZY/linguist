@@ -594,6 +594,27 @@ window.LINGUIST = window.LINGUIST || {};
       });
   }
 
+  function rootDetail(options) {
+    var key;
+    try { key = requireKey(options.apiKey); } catch (err) { return Promise.reject(err); }
+    var messages = [
+      { role: 'system', content: prompts.rootDetail(options.root, options.sourceLang, options.outputLang) },
+      { role: 'user', content: 'Return the root detail JSON.' }
+    ];
+    return request(key, basePayload(options.model, messages, CONFIG.maxTokens.rootDetail), options.signal)
+      .then(extractJSON)
+      .then(function (data) {
+        if (!data) return null;
+        return {
+          meaning: String(data.meaning || '').trim(),
+          origin: String(data.origin || '').trim(),
+          evolution: String(data.evolution || '').trim(),
+          variants: (Array.isArray(data.variants) ? data.variants : []).filter(Boolean),
+          family: (Array.isArray(data.family) ? data.family : []).filter(Boolean).slice(0, 8)
+        };
+      });
+  }
+
   ns.api = {
     ApiError: ApiError,
     isApiError: isApiError,
@@ -614,6 +635,7 @@ window.LINGUIST = window.LINGUIST || {};
     surprise: surprise,
     surprisePool: surprisePool,
     discoveryCard: discoveryCard,
+    rootDetail: rootDetail,
     errorText: ERROR_TEXT
   };
 })(window.LINGUIST);

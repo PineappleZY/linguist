@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img alt="web version" src="https://img.shields.io/badge/web-8.0.0-0071E3">
+  <img alt="web version" src="https://img.shields.io/badge/web-8.1.0-0071E3">
   <img alt="native version" src="https://img.shields.io/badge/native-6.5.0-6E6E73">
   <img alt="license" src="https://img.shields.io/badge/license-MIT-34A853">
 </p>
@@ -48,21 +48,21 @@ flowchart LR
 
 支持英语、法语、德语、日语与中文，并覆盖单词、整句和文件三种阅读尺度。
 
-## 8.0 网页版更新
+## 8.1 网页版更新
 
-当前网页版已升级到 **Linguist 8.0.0**：
+当前网页版已升级到 **Linguist 8.1.0**：
 
-- **Root Atlas**：把词根、词族、别名、来源与掌握状态放进一张可筛选的地图。
-- **Personal Root Map**：把查过的词条、个人笔记和复习关系组织成自己的词根网络。
-- **Context-to-Root**：从句子或文件中的词根线索找回相关词根与词族。
-- **稳定 RootEntity**：词根使用稳定实体与别名，不因拼写变体或解释语言切换而分裂。
-- **本地词族操作**：可以在个人地图中整理词族、补充笔记和关联词条。
-- **8.0 兼容**：从 7.x 的数据与既有词条平滑升级，不新增 AI 自动补根。
+- **统一 rootId**：Atlas、词条、版本组和个人地图共享同一个词根身份。
+- **词根级星标**：可以直接收藏词根，并让它进入个人地图。
+- **Personal Map 并集**：查询、星标、笔记和词族关系在个人地图中合并，不再互相覆盖。
+- **词族关系**：本地维护词族成员与别名，保持 Context-to-Root 链接一致。
+- **Context 回流**：从句子和文件找回的词根会进入同一套 Atlas 结构。
+- **搜索与缓存修复**：Atlas 搜索、词根版本生成和缓存刷新保持一致。
 
-Android APK 与 Windows EXE 仍为 **6.5.0**，尚未包含 8.0 新功能。网页版、PWA 与鸿蒙 NEXT 使用最新 8.0.0。
+Android APK 与 Windows EXE 仍为 **6.5.0**，尚未包含 8.x 新功能。网页版、PWA 与鸿蒙 NEXT 使用最新 8.1.0。
 
-- [下载 8.0 单文件 HTML](https://github.com/PineappleZY/linguist/releases/download/v8.0.0/linguist_8.0.0.html)
-- [下载 8.0 PWA 网站 ZIP](https://github.com/PineappleZY/linguist/releases/download/v8.0.0/Linguist-8.0.0-web.zip)
+- [下载 8.1 单文件 HTML](https://github.com/PineappleZY/linguist/releases/download/v8.1.0/linguist_8.1.0.html)
+- [下载 8.1 PWA 网站 ZIP](https://github.com/PineappleZY/linguist/releases/download/v8.1.0/Linguist-8.1.0-web.zip)
 
 ## 立即使用
 
@@ -116,7 +116,7 @@ c74489950f6bb90e258d3d3912cd675f232e49fb472a415c1bab8396413a068d
 ## 第一次使用
 
 1. 在 [DeepSeek 开放平台](https://platform.deepseek.com/) 创建自己的 API Key。
-2. 打开 8.0 网页版、Android 6.5、Windows 6.5，或在鸿蒙 NEXT 的浏览器中打开网页版，进入 **Profile / 个人**。
+2. 打开 8.1 网页版、Android 6.5、Windows 6.5，或在鸿蒙 NEXT 的浏览器中打开网页版，进入 **Profile / 个人**。
 3. 粘贴 Key，点击保存与连接测试。
 4. 回到 **Dictionary / 词典**，输入单词、句子，或切换到“文件”读取本地文本、Markdown、字幕、HTML、DOCX、PDF。
 
@@ -164,7 +164,7 @@ Linguist 的“图谱”首先服务于学习者，而不是数据库展示。�
 ├── docs/                  GitHub Pages 落地页与可安装 PWA（含鸿蒙 NEXT）
 │   ├── app/               当前网页应用成品
 │   └── feature-map/       交互式功能知识图谱
-├── 8.0/                   Linguist 8.0.0 网页源码、测试与构建（当前版本）
+├── 8.0/                   Linguist 8.1.0 网页源码、测试与构建（目录沿用 8.0）
 ├── 7.0/                   Linguist 7.2.1 已冻结
 ├── 6.0/                   Linguist 6.5 已冻结；其 android 工具链与 6.5 产物保持不动
 │   └── android/           Android WebView 壳与 APK 构建脚本
@@ -211,7 +211,7 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1
 - 查询与文件分析需要联网；安装后的 PWA 只有静态界面可以离线打开。
 - 文件图片、扫描版 PDF 和旧版 `.doc` 暂不支持。扫描版 PDF 没有文字层时无法抽取正文。
 - Android 版通过侧载安装，目前不通过 Google Play 发布；系统安全提示属于未上架应用的正常行为。
-- Android 与 Windows 当前仍是 6.5.0，不包含 8.0 的 Root Atlas、个人词根地图与 Context-to-Root；最新网页功能以网页版为准。
+- Android 与 Windows 当前仍是 6.5.0，不包含 8.x 的 Root Atlas、个人词根地图与 Context-to-Root；最新网页功能以网页版为准。
 - HarmonyOS NEXT 目前通过网页版使用，不提供原生 HAP；Android APK 仅适用于仍兼容 Android 应用的鸿蒙版本。
 - Windows 版目前为 x64 免安装包，不含自动更新、ARM64 或代码签名。
 - Electron 环境通常没有可用的系统语音合成音色，因此桌面版的朗读按钮可能隐藏。

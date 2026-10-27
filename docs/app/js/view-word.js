@@ -972,7 +972,11 @@ window.LINGUIST.views = window.LINGUIST.views || {};
           (item.lemma && item.lemma !== item.form ? '<span class="chip">→ ' + ui.esc(item.lemma) + '</span>' : '') +
           (item.pos ? '<span class="pos">' + ui.esc(item.pos) + '</span>' : '') +
           (root ? '<a class="chip chip-button" href="#/root/' + encodeURIComponent(root.key) + '">' +
-            ui.esc(root.display) + '</a>' : ''),
+            ui.esc(root.display) + '</a>' :
+            '<button type="button" class="chip chip-button" data-context-word="' +
+            ui.esc(item.lemma || item.form) + '" data-context-lang="' +
+            ui.esc(state.entry && state.entry.language || '') + '">' +
+            ui.esc(ui.t('roots.lookupForRoot')) + '</button>'),
         desc: ui.esc(item.meaning || '') + (item.note ? ' · ' + ui.esc(item.note) : '')
       };
     });
@@ -1973,6 +1977,17 @@ window.LINGUIST.views = window.LINGUIST.views || {};
   /* Everything inside the card region, wired separately so the region can be
      repainted on its own without touching the header or the shell. */
   function wireRegion(root, entry) {
+    root.querySelectorAll('[data-context-word]').forEach(function (button) {
+      button.addEventListener('click', function (event) {
+        event.stopPropagation();
+        var word = button.getAttribute('data-context-word');
+        var lang = button.getAttribute('data-context-lang') || '';
+        ns.session.query = word;
+        if (lang) ns.store.patchSettings({ queryLang: lang, queryMode: 'word' });
+        ns.views.dictionary.openWord(word, lang || undefined);
+      });
+    });
+
     root.querySelectorAll('[data-root-link]').forEach(function (button) {
       button.addEventListener('click', function (event) {
         event.stopPropagation();

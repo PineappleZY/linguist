@@ -5,6 +5,9 @@
     { "id": "module", "label": "模块", "colour": "#8E8E93" }
   ],
   "changes": [
+    { "version": "8.1.0", "summary": "Root Atlas 统一 rootId、词根级星标、Personal Map 并集、词族关系、Context 回流、root version 生成、Atlas 缓存与搜索修复。",
+      "added": ["root-star", "family-relations", "root-migration"],
+      "changed": ["root-atlas", "root-entity", "root-aliases", "personal-root-map", "context-to-root", "root-search", "root-versions", "roots-tab", "store", "i18n", "tests", "preview"] },
     { "version": "8.0.0", "summary": "Root Atlas、Personal Root Map 与 Context-to-Root；稳定 RootEntity、搜索筛选、词族操作、个人笔记与句子/文件回流；不新增 AI 自动补根。",
       "added": ["root-atlas", "root-entity", "personal-root-map", "context-to-root", "root-search", "root-aliases"],
       "changed": ["roots-tab", "root-index", "root-detail", "root-review", "root-versions", "entry", "sentence", "doc-view", "store", "ids", "i18n", "tests", "preview"] },
@@ -182,6 +185,12 @@
       "summary": "Search by root form, variant, family word, meaning and origin family, with language filtering." },
     { "id": "root-aliases", "layer": "feature", "label": "Root aliases", "zh": "词根别名迁移", "files": ["js/roots.js", "js/store.js"],
       "summary": "Maps old morpheme keys to stable root IDs while preserving root progress and old backups." },
+    { "id": "root-star", "layer": "feature", "label": "Root stars", "zh": "词根星标", "files": ["js/roots.js", "js/view-roots.js"],
+      "summary": "Explicit root stars join the personal map and review; source-word stars still contribute inherited eligibility." },
+    { "id": "family-relations", "layer": "feature", "label": "Saved family relations", "zh": "词族关系", "files": ["js/roots.js", "js/view-roots.js"],
+      "summary": "Saves root families to the personal map without bulk-starring words or changing wordbook membership." },
+    { "id": "root-migration", "layer": "feature", "label": "Root progress migration", "zh": "词根进度迁移", "files": ["js/roots.js", "js/app.js"],
+      "summary": "Idempotently merges old root keys into canonical rootId while preserving aliases, notes, counters and due dates." },
     { "id": "packaging", "layer": "feature", "label": "Desktop & mobile (other assistants)", "zh": "桌面与移动端（其他助手）", "files": ["README.md", "DEPLOY.md"],
       "summary": "Packaging is not part of 7.0 web work; exe, apk and Apple targets are handed to other assistants." }
   ],
@@ -224,6 +233,8 @@
     ["refresh-events", "store"], ["refresh-events", "roots-tab"], ["refresh-events", "starred"], ["refresh-events", "history"],
     ["roots-tab", "root-atlas"], ["root-atlas", "root-entity"], ["root-atlas", "root-search"], ["root-atlas", "root-aliases"],
     ["root-atlas", "personal-root-map"], ["personal-root-map", "root-review"], ["context-to-root", "root-atlas"],
-    ["context-to-root", "sentence"], ["context-to-root", "doc-view"], ["root-aliases", "store"]
+    ["context-to-root", "sentence"], ["context-to-root", "doc-view"], ["root-aliases", "store"],
+    ["root-atlas", "root-star"], ["root-star", "personal-root-map"], ["root-star", "root-review"],
+    ["root-migration", "root-aliases"], ["root-migration", "store"], ["family-relations", "personal-root-map"]
   ]
 }

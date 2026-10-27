@@ -1,6 +1,6 @@
-# Linguist 8.0.0 — 界面文案对照表
+# Linguist 8.1.0 — 界面文案对照表
 
-这份表是 `web/js/strings.js` 的直接产物（`node tools/strings-md.mjs` 重新生成），供你或母语者复核。共 **488 条 × 5 种语言**。
+这份表是 `web/js/strings.js` 的直接产物（`node tools/strings-md.mjs` 重新生成），供你或母语者复核。共 **494 条 × 5 种语言**。
 
 **怎么用**：切到某一语言后，可能觉得某句不像该语言的人会说的话——直接在表里指出 key 与建议改法即可，我会改 `strings.js`（改一行，五个语言各自独立）。
 
@@ -54,6 +54,12 @@
 | `roots.lapses` | {n} misses in review | 复习中错过 {n} 次 | {n} erreurs en révision | {n} Fehler in der Wiederholung | 復習で {n} 回間違い |
 | `roots.aiNote` | AI analysis — a learning aid, not a cited source. | AI 推演，仅供学习参考，不是引证来源。 | Analyse IA — aide à l’apprentissage, pas une source citée. | KI-Analyse — Lernhilfe, keine zitierte Quelle. | AI による推論です。学習の参考であり、出典ではありません。 |
 | `roots.note` | Personal note | 个人笔记 | Note personnelle | Persönliche Notiz | 個人メモ |
+| `roots.starRoot` | Star this root | 收藏这个词根 | Ajouter cette racine | Diese Wurzel markieren | この語根をスター |
+| `roots.rootStarred` | Root starred | 词根已收藏 | Racine ajoutée | Wurzel markiert | 語根をスター済み |
+| `roots.generateVersion` | Generate this explanation version | 生成这个解释版本 | Générer cette version d’explication | Diese Erklärungsversion erzeugen | この説明バージョンを生成 |
+| `roots.lookupForRoot` | Look up to build its root | 查词建立词根 | Chercher pour créer sa racine | Nachschlagen, um die Wurzel anzulegen | 調べて語根を作成 |
+| `roots.saveFamily` | Save family to my map | 保存词族到我的地图 | Enregistrer la famille dans ma carte | Wortfamilie in meiner Karte speichern | 語族をマイマップに保存 |
+| `roots.familySaved` | Family saved | 词族已保存 | Famille enregistrée | Wortfamilie gespeichert | 語族を保存しました |
 | `roots.all` | All roots | 全部词根 | Toutes les racines | Alle Wurzeln | すべての語根 |
 | `roots.state.new` | New | 新词根 | Nouvelle | Neu | 新規 |
 | `roots.state.learning` | Learning | 在学 | En cours | Im Lernen | 学習中 |

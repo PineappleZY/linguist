@@ -207,6 +207,7 @@ window.LINGUIST = window.LINGUIST || {};
 
   function boot() {
     var settings = store.getSettings();
+    if (ns.roots && ns.roots.migrateAliases) ns.roots.migrateAliases();
     applyTheme(settings.theme);
     applyLang();
     if (!location.hash) location.replace('#/dictionary');

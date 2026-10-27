@@ -37,16 +37,41 @@ window.LINGUIST.views = window.LINGUIST.views || {};
         options: [{ id: '', label: ui.t('roots.allLanguages') }, { id: 'en', label: 'English' },
           { id: 'fr', label: 'Français' }, { id: 'de', label: 'Deutsch' }],
         onPick: function (next) { ns.session.atlasLang = next; ns.router.refresh(); } }) + '</div>';
-    if (!results.length) return html + '<div class="empty"><div class="empty-text">' +
+    html += '<div id="atlas-results">' + atlasRows(results) + '</div>';
+    return html;
+  }
+
+  function atlasRows(results) {
+    if (!results.length) return '<div class="empty"><div class="empty-text">' +
       ui.esc(ui.t('roots.atlasEmpty')) + '</div></div>';
-    html += '<div class="list">' + results.map(function (root) {
-      return '<button type="button" class="row" data-root="' + ui.esc(root.key) + '">' +
+    return '<div class="list">' + results.map(function (root) {
+      var starred = roots.isRootStarred(root.id);
+      return '<button type="button" class="row" data-root="' + ui.esc(root.id) + '">' +
         '<span class="row-main"><span class="row-title"><span class="mono">' + ui.esc(root.form) +
         '</span></span><span class="row-sub">' + ui.esc(root.meaning || root.originLabel || '') +
         ' · ' + ui.esc(root.originFamily) + '</span></span><span class="row-aside"><span class="chip">' +
-        (root.derivedWords || []).length + '</span></span></button>';
+        (root.derivedWords || []).length + '</span><span class="icon-btn' + (starred ? ' is-starred' : '') +
+        '" data-root-star="' + ui.esc(root.id) + '">' + (starred ? ui.iconFilled('star') : ui.icon('star')) +
+        '</span></span></button>';
     }).join('') + '</div>';
-    return html;
+  }
+
+  function bindRootRows(root) {
+    root.querySelectorAll('[data-root]').forEach(function (row) {
+      row.addEventListener('click', function () {
+        location.hash = '#/root/' + encodeURIComponent(row.getAttribute('data-root'));
+      });
+    });
+  }
+
+  function bindRootStars(root) {
+    root.querySelectorAll('[data-root-star]').forEach(function (button) {
+      button.addEventListener('click', function (event) {
+        event.stopPropagation();
+        roots.toggleRootStar(button.getAttribute('data-root-star'));
+        ns.router.refresh();
+      });
+    });
   }
 
   function personalView() {
@@ -57,7 +82,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       ui.esc(ui.t('roots.personalEmpty')) + '</div></div>';
     html += '<div class="list">' + rows.map(function (root) {
       var note = roots.rootNote(root.id);
-      return '<button type="button" class="row" data-root="' + ui.esc(root.key) + '">' +
+      return '<button type="button" class="row" data-root="' + ui.esc(root.id) + '">' +
         '<span class="row-main"><span class="row-title"><span class="mono">' + ui.esc(root.form) +
         '</span></span><span class="row-sub">' + ui.esc(root.meaning || '') +
         (note ? ' · ' + ui.esc(note) : '') + '</span></span><span class="row-aside"><span class="chip">' +
@@ -156,8 +181,14 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       ui.esc(ui.t('roots.state.' + root.state)) + ' · ' + ui.esc(dueLabel(root.dueAt)) +
       '</div><div class="hint">' + ui.esc(ui.t('roots.lapses', { n: root.lapses || 0 })) + '</div></div></div>';
     html += '<p class="hint">' + ui.esc(ui.t('roots.aiNote')) + '</p>';
+    html += '<div class="notice-actions"><button type="button" class="btn btn-sm" data-root-star="' +
+      ui.esc(roots.atlasId(root)) + '">' + ui.esc(roots.isRootStarred(roots.atlasId(root)) ?
+        ui.t('roots.rootStarred') : ui.t('roots.starRoot')) + '</button></div>';
     html += '<div class="notice-actions"><button type="button" class="btn btn-sm" data-root-note="' +
       ui.esc(roots.atlasId(root)) + '">' + ui.esc(ui.t('roots.note')) + '</button></div>';
+    html += '<div class="notice-actions"><button type="button" class="btn btn-sm" data-save-family="' +
+      ui.esc(roots.atlasId(root)) + '">' + ui.esc(ui.t(roots.familySaved(roots.atlasId(root)) ?
+        'roots.familySaved' : 'roots.saveFamily')) + '</button></div>';
     if (root.variants && root.variants.length) {
       html += '<p class="hint">' + ui.esc(ui.t('roots.variants')) + ': ' +
         ui.esc(root.variants.join(' · ')) + '</p>';
@@ -167,6 +198,11 @@ window.LINGUIST.views = window.LINGUIST.views || {};
         ui.picker({ id: 'root-version', value: versionLang, compact: true, label: ui.t('entry.explainIn'),
           options: versionLangs.map(function (lang) { return { id: lang, label: ui.langName(lang) }; }),
           onPick: function (next) { ns.session.rootVersionLang = next; ns.router.refresh(); } }) + '</div>';
+    } else if (!version) {
+      html += '<div class="notice-actions"><button type="button" class="btn btn-sm" data-root-generate="' +
+        ui.esc(roots.atlasId(root)) + '" data-root-lang="' + ui.esc(root.language || 'en') +
+        '" data-root-out="' + ui.esc(versionLang || '') + '">' + ui.esc(ui.t('roots.generateVersion')) +
+        '</button></div>';
     }
     var sourceEntry = root.wordIds && root.wordIds.length ? ns.store.getEntry(root.wordIds[0]) : null;
     var chain = sourceEntry && sourceEntry.lines && sourceEntry.lines.etymology &&
@@ -216,10 +252,21 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       });
     });
     var atlasSearch = container.querySelector('#atlas-search');
-    if (atlasSearch) atlasSearch.addEventListener('input', function () {
-      ns.session.atlasQuery = atlasSearch.value;
-      ns.router.refresh();
-    });
+    if (atlasSearch) {
+      var timer = null;
+      atlasSearch.addEventListener('input', function () {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(function () {
+          ns.session.atlasQuery = atlasSearch.value;
+          var results = container.querySelector('#atlas-results');
+          if (results) {
+            results.innerHTML = atlasRows(roots.searchAtlas(ns.session.atlasQuery, { language: ns.session.atlasLang || '' }));
+            bindRootRows(results);
+            bindRootStars(results);
+          }
+        }, 120);
+      });
+    }
     var review = container.querySelector('#roots-review');
     if (review) review.addEventListener('click', function () {
       var lang = ns.session.rootReviewLang || 'en';
@@ -243,11 +290,32 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       roots.setRootNote(id, value);
       ns.router.refresh();
     });
-    container.querySelectorAll('[data-root]').forEach(function (row) {
-      row.addEventListener('click', function () {
-        location.hash = '#/root/' + encodeURIComponent(row.getAttribute('data-root'));
-      });
+    var generate = container.querySelector('[data-root-generate]');
+    if (generate) generate.addEventListener('click', function () {
+      var settings = ns.store.getSettings();
+      if (!settings.apiKey) { ui.toast(ui.t('error.kind.no_key')); return; }
+      var id = generate.getAttribute('data-root-generate');
+      var source = generate.getAttribute('data-root-lang') || 'en';
+      var out = generate.getAttribute('data-root-out') || ns.store.outputLangFor(source);
+      generate.disabled = true;
+      ns.api.rootDetail({ apiKey: settings.apiKey, model: settings.model,
+        root: roots.getRoot(id).display, sourceLang: source, outputLang: out })
+        .then(function (data) {
+          if (data) roots.addRootVersion(id, out, data);
+          ns.router.refresh();
+        }).catch(function (err) {
+          ui.toast(err && err.message ? err.message : ui.t('roots.noDue'));
+          generate.disabled = false;
+        });
     });
+    var saveFamily = container.querySelector('[data-save-family]');
+    if (saveFamily) saveFamily.addEventListener('click', function () {
+      roots.saveFamily(saveFamily.getAttribute('data-save-family'));
+      ui.toast(ui.t('roots.familySaved'));
+      ns.router.refresh();
+    });
+    bindRootRows(container);
+    bindRootStars(container);
     container.querySelectorAll('[data-family-word]').forEach(function (row) {
       row.addEventListener('click', function () {
         var word = row.getAttribute('data-family-word');

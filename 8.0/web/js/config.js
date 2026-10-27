@@ -500,10 +500,10 @@ window.LINGUIST = window.LINGUIST || {};
        below it IS translated — see strings.js. */
     taglineKey: 'app.tagline',
     descriptionKey: 'app.description',
-    version: '8.0.0',
+    version: '8.1.0',
 
     /* Bumped whenever the stored entry shape changes. */
-    schemaVersion: 10,
+    schemaVersion: 11,
 
     api: {
       endpoint: 'https://api.deepseek.com/chat/completions',
@@ -540,6 +540,7 @@ window.LINGUIST = window.LINGUIST || {};
       surprise: 300,
       surprisePool: 6000,
       discovery: 900,
+      rootDetail: 1200,
       /* One tiny question — "what language is this?" — asked once for a sentence
          or for an old entry that never recorded one. */
       detect: 60,
@@ -735,6 +736,8 @@ window.LINGUIST = window.LINGUIST || {};
     rootProgress: ns.STORAGE_PREFIX + '.rootProgress',
     rootNotes: ns.STORAGE_PREFIX + '.rootNotes',
     rootAtlas: ns.STORAGE_PREFIX + '.rootAtlas',
+    rootStars: ns.STORAGE_PREFIX + '.rootStars',
+    rootFamilies: ns.STORAGE_PREFIX + '.rootFamilies',
     surprisePool: ns.STORAGE_PREFIX + '.surprisePool',
     surpriseSeen: ns.STORAGE_PREFIX + '.surpriseSeen',
     /* Set once an older version's data has been offered for import, so the prompt never

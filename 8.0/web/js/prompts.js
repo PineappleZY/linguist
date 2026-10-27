@@ -935,6 +935,22 @@ window.LINGUIST = window.LINGUIST || {};
     'Output json only.'
   ].join('\n');
 
+  var ROOT_DETAIL = [
+    'You are {APP}, explaining the root "{ROOT}" from {SRC} in {LANG}.',
+    '',
+    JSON_RULE,
+    'Shape: {"meaning":"...","origin":"...","evolution":"...","variants":["..."],"family":[{"word":"...","gloss":"..."}]}',
+    '',
+    'Rules:',
+    '- meaning: one plain sentence in {LANG}; the semantic core of the root.',
+    '- origin: the source family or origin if known; otherwise "".',
+    '- evolution: at most two sentences on semantic change; otherwise "".',
+    '- variants: root forms only, not complete inflections.',
+    '- family: up to 8 common words sharing the root, each with a short {LANG} gloss.',
+    '- Never invent an etymology or a source citation. Analysis is a learning aid.',
+    'Output json only.'
+  ].join('\n');
+
   var ACCENT_PROMPT = [
     'You are {APP}. A learner of {SRC} typed "{INPUT}" but cannot easily type {SRC} diacritics,',
     'so the accents may be missing or wrong.',
@@ -1321,6 +1337,12 @@ window.LINGUIST = window.LINGUIST || {};
     });
   }
 
+  function rootDetailPrompt(root, sourceLang, outputLang) {
+    return fill(ROOT_DETAIL, {
+      APP: ns.CONFIG.appName, ROOT: String(root || ''), SRC: srcName(sourceLang), LANG: outName(outputLang)
+    });
+  }
+
   ns.prompts = {
     outName: outName,
     srcName: srcName,
@@ -1334,6 +1356,7 @@ window.LINGUIST = window.LINGUIST || {};
     surprise: surprisePrompt,
     surprisePool: surprisePoolPrompt,
     discovery: discoveryPrompt,
+    rootDetail: rootDetailPrompt,
     detect: detectPrompt,
     templates: { OVERVIEW: OVERVIEW, ETYM: ETYM, USAGE: USAGE, INFL: INFL, DIST: DIST, DETECT: DETECT,
       ACCENT: ACCENT_PROMPT, REVERSE: REVERSE, DOC: DOC_SHARED, DOC_MERGE: DOC_MERGE,
