@@ -500,10 +500,10 @@ window.LINGUIST = window.LINGUIST || {};
        below it IS translated — see strings.js. */
     taglineKey: 'app.tagline',
     descriptionKey: 'app.description',
-    version: '7.2.1',
+    version: '8.0.0',
 
     /* Bumped whenever the stored entry shape changes. */
-    schemaVersion: 9,
+    schemaVersion: 10,
 
     api: {
       endpoint: 'https://api.deepseek.com/chat/completions',
@@ -724,7 +724,7 @@ window.LINGUIST = window.LINGUIST || {};
     }
   };
 
-  ns.STORAGE_PREFIX = 'dict7';
+  ns.STORAGE_PREFIX = 'dict8';
 
   ns.STORAGE = {
     settings: ns.STORAGE_PREFIX + '.settings',
@@ -733,6 +733,8 @@ window.LINGUIST = window.LINGUIST || {};
     wordbooks: ns.STORAGE_PREFIX + '.wordbooks',
     rootIndex: ns.STORAGE_PREFIX + '.rootIndex',
     rootProgress: ns.STORAGE_PREFIX + '.rootProgress',
+    rootNotes: ns.STORAGE_PREFIX + '.rootNotes',
+    rootAtlas: ns.STORAGE_PREFIX + '.rootAtlas',
     surprisePool: ns.STORAGE_PREFIX + '.surprisePool',
     surpriseSeen: ns.STORAGE_PREFIX + '.surpriseSeen',
     /* Set once an older version's data has been offered for import, so the prompt never
@@ -744,6 +746,7 @@ window.LINGUIST = window.LINGUIST || {};
      a fresh prefix, so nothing is ever rewritten in place: this is a one-way
      read, and the first folder that actually holds data is the one offered. */
   ns.IMPORT_SOURCES = [
+    { prefix: 'dict7', label: '7.x' },
     { prefix: 'dict6', label: '6.x' },
     { prefix: 'dict5', label: '5.x' },
     { prefix: 'dict4', label: '4.x' },

@@ -1,7 +1,7 @@
 {
-  "generated": "2026-10-27T11:47:48.958Z",
+  "generated": "2026-10-27T12:39:56.473Z",
   "counts": {
-    "version": "7.2.1",
+    "version": "8.0.0",
     "languages": 7,
     "liveLanguages": 5,
     "retiredLanguages": [
@@ -12,13 +12,13 @@
     "sentenceCards": 9,
     "documentCards": 4,
     "uiLanguages": 5,
-    "strings": 479,
+    "strings": 488,
     "timeoutMs": 45000,
     "documentTimeoutMs": 90000,
     "chunkChars": 20000,
     "maxFileChars": 200000,
     "practiceRound": 5,
-    "assertions": 800
+    "assertions": 804
   },
   "cardLists": {
     "latin": 25,
@@ -44,25 +44,58 @@
     }
   ],
   "latest": {
-    "version": "7.2.1",
-    "summary": "修复词根复习范围死开关、5 词根×3 阶段进度、无同根词跳过、实时根链接、版本切换、统计去重、无障碍、预热提示与文档漂移。"
+    "version": "8.0.0",
+    "summary": "Root Atlas、Personal Root Map 与 Context-to-Root；稳定 RootEntity、搜索筛选、词族操作、个人笔记与句子/文件回流；不新增 AI 自动补根。"
   },
   "badges": {
-    "root-review": "updated",
-    "root-scope": "updated",
-    "root-memory": "updated",
-    "root-session": "updated",
-    "root-versions": "updated",
-    "root-distractors": "updated",
+    "roots-tab": "updated",
     "root-index": "updated",
     "root-detail": "updated",
-    "roots-tab": "updated",
+    "root-review": "updated",
+    "root-versions": "updated",
+    "entry": "updated",
+    "sentence": "updated",
+    "doc-view": "updated",
     "store": "updated",
+    "ids": "updated",
     "i18n": "updated",
+    "tests": "updated",
     "preview": "updated",
-    "tests": "updated"
+    "root-atlas": "new",
+    "root-entity": "new",
+    "personal-root-map": "new",
+    "context-to-root": "new",
+    "root-search": "new",
+    "root-aliases": "new"
   },
   "changes": [
+    {
+      "version": "8.0.0",
+      "summary": "Root Atlas、Personal Root Map 与 Context-to-Root；稳定 RootEntity、搜索筛选、词族操作、个人笔记与句子/文件回流；不新增 AI 自动补根。",
+      "added": [
+        "root-atlas",
+        "root-entity",
+        "personal-root-map",
+        "context-to-root",
+        "root-search",
+        "root-aliases"
+      ],
+      "changed": [
+        "roots-tab",
+        "root-index",
+        "root-detail",
+        "root-review",
+        "root-versions",
+        "entry",
+        "sentence",
+        "doc-view",
+        "store",
+        "ids",
+        "i18n",
+        "tests",
+        "preview"
+      ]
+    },
     {
       "version": "7.2.1",
       "summary": "修复词根复习范围死开关、5 词根×3 阶段进度、无同根词跳过、实时根链接、版本切换、统计去重、无障碍、预热提示与文档漂移。",
@@ -666,7 +699,7 @@
       "files": [
         "js/strings.js"
       ],
-      "summary": "479 keys in 5 languages, written per language rather than translated word for word; a missing key falls back to English, then to the key itself."
+      "summary": "488 keys in 5 languages, written per language rather than translated word for word; a missing key falls back to English, then to the key itself."
     },
     {
       "id": "api",
@@ -712,7 +745,7 @@
     {
       "id": "tests",
       "layer": "module",
-      "label": "800 assertions",
+      "label": "804 assertions",
       "zh": "测试",
       "files": [
         "web/tests/smoke.js"
@@ -973,6 +1006,72 @@
         "js/roots.js"
       ],
       "summary": "One catalog:changed event invalidates roots and refreshes History, Starred and wordbook views after stars, deletes, Undo and root answers."
+    },
+    {
+      "id": "root-atlas",
+      "layer": "feature",
+      "label": "Root Atlas",
+      "zh": "词根图谱",
+      "files": [
+        "js/roots.js",
+        "js/view-roots.js"
+      ],
+      "summary": "Derived public root knowledge layer with search, origin filters, families and confidence; no new model request."
+    },
+    {
+      "id": "root-entity",
+      "layer": "feature",
+      "label": "RootEntity",
+      "zh": "词根实体",
+      "files": [
+        "js/roots.js"
+      ],
+      "summary": "Stable root IDs, variants, meanings, entries, families, confidence and local sources derived from etymology data."
+    },
+    {
+      "id": "personal-root-map",
+      "layer": "feature",
+      "label": "Personal Root Map",
+      "zh": "个人词根地图",
+      "files": [
+        "js/roots.js",
+        "js/view-roots.js"
+      ],
+      "summary": "Cards and lightweight relationships for encountered roots, notes, weak roots, mastery and review eligibility."
+    },
+    {
+      "id": "context-to-root",
+      "layer": "feature",
+      "label": "Context to root",
+      "zh": "语境回流",
+      "files": [
+        "js/view-word.js",
+        "js/view-document.js",
+        "js/roots.js"
+      ],
+      "summary": "Sentence words and document vocabulary link to locally indexed roots; missing roots offer a lookup CTA without silent AI calls."
+    },
+    {
+      "id": "root-search",
+      "layer": "feature",
+      "label": "Root search",
+      "zh": "词根搜索",
+      "files": [
+        "js/view-roots.js",
+        "js/roots.js"
+      ],
+      "summary": "Search by root form, variant, family word, meaning and origin family, with language filtering."
+    },
+    {
+      "id": "root-aliases",
+      "layer": "feature",
+      "label": "Root aliases",
+      "zh": "词根别名迁移",
+      "files": [
+        "js/roots.js",
+        "js/store.js"
+      ],
+      "summary": "Maps old morpheme keys to stable root IDs while preserving root progress and old backups."
     },
     {
       "id": "packaging",
@@ -1442,6 +1541,46 @@
     [
       "refresh-events",
       "history"
+    ],
+    [
+      "roots-tab",
+      "root-atlas"
+    ],
+    [
+      "root-atlas",
+      "root-entity"
+    ],
+    [
+      "root-atlas",
+      "root-search"
+    ],
+    [
+      "root-atlas",
+      "root-aliases"
+    ],
+    [
+      "root-atlas",
+      "personal-root-map"
+    ],
+    [
+      "personal-root-map",
+      "root-review"
+    ],
+    [
+      "context-to-root",
+      "root-atlas"
+    ],
+    [
+      "context-to-root",
+      "sentence"
+    ],
+    [
+      "context-to-root",
+      "doc-view"
+    ],
+    [
+      "root-aliases",
+      "store"
     ]
   ]
 }

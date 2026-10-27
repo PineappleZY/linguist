@@ -58,9 +58,12 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     var items = (Array.isArray(doc.vocabulary) ? doc.vocabulary : []).filter(Boolean);
     if (!items.length) return '';
     return '<ul class="deflist">' + items.map(function (item) {
+      var root = ns.roots && ns.roots.findRootForWord(item.term, doc.language);
       return '<li>' +
         '<div class="def-term">' + ui.esc(item.term || '') +
         (item.reading ? '<span class="mono muted-3"> ' + ui.esc(item.reading) + '</span>' : '') +
+        (root ? '<a class="chip chip-button" href="#/root/' + encodeURIComponent(root.key) + '">' +
+          ui.esc(root.display) + '</a>' : '') +
         '</div>' +
         (item.meaning ? '<div class="def-desc">' + ui.esc(item.meaning) + '</div>' : '') +
         (item.example ? '<div class="example"><div class="example-text">' + ui.esc(item.example) +

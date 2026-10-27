@@ -151,7 +151,7 @@ window.LINGUIST = window.LINGUIST || {};
           if (!current.family.some(function (w) { return norm(w.word) === norm(word.word); })) current.family.push(word);
         });
         if (!current.entries.some(function (e) { return e.id === id; })) {
-          current.entries.push({ id: id, word: item.word, ts: item.ts, outputLang: item.outputLang || '' });
+          current.entries.push({ id: id, entryId: id, word: item.word, language: item.language || '', ts: item.ts, outputLang: item.outputLang || '' });
         }
         current.starred = current.entries.some(function (entry) { return ns.store.isStarred(entry.id); });
         if (item.ts > current.latestTs) current.latestTs = item.ts;
@@ -160,6 +160,106 @@ window.LINGUIST = window.LINGUIST || {};
       });
     });
     return Object.keys(map).map(function (key) { return map[key]; });
+  }
+
+  function originFamily(value) {
+    var text = norm(value || '');
+    if (/latin|latino/.test(text)) return 'latin';
+    if (/greek|grec|griech/.test(text)) return 'greek';
+    if (/germanic|german|deutsch/.test(text)) return 'germanic';
+    return 'unknown';
+  }
+
+  function atlasId(root) {
+    if (root.kind === 'component') return 'component:' + (root.language || 'han') + ':' + norm(root.display);
+    return 'root:' + originFamily(root.origin) + ':' + norm(root.display);
+  }
+
+  function buildAtlas() {
+    var source = allRoots();
+    var map = {};
+    source.forEach(function (root) {
+      var id = atlasId(root);
+      var entity = map[id];
+      if (!entity) {
+        entity = map[id] = {
+          id: id, key: root.key, form: root.display, variants: [],
+          originFamily: originFamily(root.origin), originLabel: root.origin || '',
+          meanings: {}, derivedWords: [], cognates: [], falseFriends: [],
+          entries: [], confidence: 'medium', sources: [], aliases: [], ai: true
+        };
+      }
+      (root.variants || []).forEach(function (v) { if (entity.variants.indexOf(v) < 0) entity.variants.push(v); });
+      if (entity.aliases.indexOf(root.key) < 0) entity.aliases.push(root.key);
+      (root.family || []).forEach(function (w) {
+        if (!entity.derivedWords.some(function (x) { return norm(x.word) === norm(w.word); })) entity.derivedWords.push(w);
+      });
+      (root.entries || []).forEach(function (e) {
+        if (!entity.entries.some(function (x) { return x.entryId === e.id; })) entity.entries.push(e);
+      });
+      if (root.outputLangs) root.outputLangs.forEach(function (lang) {
+        if (!entity.meanings[lang]) entity.meanings[lang] = root.meaning || '';
+      });
+      if (!Object.keys(entity.meanings).length) entity.meanings[root.language || ''] = root.meaning || '';
+      if (root.meaning && !entity.meaning) entity.meaning = root.meaning;
+    });
+    var atlas = { version: ns.CONFIG.schemaVersion, builtAt: Date.now(), roots: Object.keys(map).map(function (id) { return map[id]; }) };
+    ns.store.writeAux('rootAtlas', atlas);
+    var aliases = {};
+    atlas.roots.forEach(function (root) { aliases[root.id] = root.aliases; });
+    ns.store.writeAux('rootAliases', aliases);
+    return atlas;
+  }
+
+  function readAtlas() {
+    var atlas = ns.store.readAux('rootAtlas', null);
+    return atlas && atlas.version === ns.CONFIG.schemaVersion ? atlas : buildAtlas();
+  }
+
+  function searchAtlas(query, filters) {
+    var q = norm(query || '');
+    filters = filters || {};
+    return readAtlas().roots.filter(function (root) {
+      if (filters.language && !(root.entries || []).some(function (e) { return (e.language || '') === filters.language; })) return false;
+      if (filters.origin && root.originFamily !== filters.origin) return false;
+      if (!q) return true;
+      var hay = [root.form, root.originLabel, root.originFamily].concat(root.variants || [])
+        .concat((root.derivedWords || []).map(function (w) { return w.word + ' ' + (w.gloss || ''); }))
+        .concat(Object.keys(root.meanings || {}).map(function (k) { return root.meanings[k]; })).join(' ');
+      return norm(hay).indexOf(q) > -1;
+    });
+  }
+
+  function personalRoots() {
+    var progress = ensureAllProgress();
+    return allRoots().map(function (root) {
+      var p = progress[root.key] || {};
+      return {
+        id: atlasId(root), key: root.key, form: root.display, meaning: p.meaning || root.meaning,
+        language: root.language, origin: root.origin, state: p.state || 'new',
+        strength: p.strength || 0, dueAt: p.dueAt || 0, lapses: p.lapses || 0,
+        familyCount: (root.family || []).length, entries: root.entries || []
+      };
+    }).filter(function (root) {
+      return root.state !== 'new' || (root.entries || []).some(function (entry) { return ns.store.isStarred(entry.entryId); });
+    });
+  }
+
+  function addFamilyToWordbook(rootId, bookId) {
+    var root = readAtlas().roots.filter(function (item) { return item.id === rootId; })[0];
+    if (!root) return 0;
+    var added = 0;
+    (root.entries || []).forEach(function (entry) {
+      if (ns.store.findRow(entry.entryId) && ns.store.addToWordbook(bookId, entry.entryId)) added += 1;
+    });
+    return added;
+  }
+
+  function rootNote(rootId) { return (ns.store.readAux('rootNotes', {}) || {})[rootId] || ''; }
+  function setRootNote(rootId, note) {
+    var notes = ns.store.readAux('rootNotes', {}) || {};
+    notes[rootId] = String(note || '');
+    ns.store.writeAux('rootNotes', notes);
   }
 
   function readProgress() {
@@ -425,6 +525,16 @@ window.LINGUIST = window.LINGUIST || {};
     return list;
   }
 
+  function findRootForWord(word, language) {
+    var wanted = norm(word);
+    if (!wanted) return null;
+    return allRoots().filter(function (root) {
+      if (language && root.language !== language) return false;
+      if ((root.entries || []).some(function (entry) { return norm(entry.word) === wanted; })) return true;
+      return (root.family || []).some(function (item) { return norm(item.word) === wanted; });
+    })[0] || null;
+  }
+
   function normalizeAnswer(text) {
     return norm(cleanPart(text)).replace(/\s+/g, '');
   }
@@ -438,7 +548,10 @@ window.LINGUIST = window.LINGUIST || {};
     ns.store.writeAux('rootProgress', {});
   }
 
-  function invalidate() { indexCache = null; }
+  function invalidate() {
+    indexCache = null;
+    ns.store.writeAux('rootAtlas', null);
+  }
 
   function mergeProgress(incoming) {
     if (!incoming || typeof incoming !== 'object') return;
@@ -457,6 +570,15 @@ window.LINGUIST = window.LINGUIST || {};
     indexEntry: indexEntry,
     rebuildIndex: rebuildIndex,
     allRoots: allRoots,
+    originFamily: originFamily,
+    atlasId: atlasId,
+    buildAtlas: buildAtlas,
+    readAtlas: readAtlas,
+    searchAtlas: searchAtlas,
+    personalRoots: personalRoots,
+    addFamilyToWordbook: addFamilyToWordbook,
+    rootNote: rootNote,
+    setRootNote: setRootNote,
     dueQueue: dueQueue,
     todayQueue: todayQueue,
     nextInterval: nextInterval,
@@ -469,6 +591,7 @@ window.LINGUIST = window.LINGUIST || {};
     stats: stats,
     getRoot: getRoot,
     familyWords: familyWords,
+    findRootForWord: findRootForWord,
     recordRootAnswer: recordRootAnswer,
     recordWordOutcome: recordWordOutcome,
     normalizeAnswer: normalizeAnswer,

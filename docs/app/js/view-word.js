@@ -966,10 +966,13 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     var items = line && Array.isArray(line.word_by_word) ? line.word_by_word.filter(Boolean) : [];
     if (!items.length) return '';
     return rows(items, function (item) {
+      var root = ns.roots && state.entry && ns.roots.findRootForWord(item.lemma || item.form, state.entry.language);
       return {
         term: '<span class="mono">' + ui.esc(item.form || '') + '</span>' +
           (item.lemma && item.lemma !== item.form ? '<span class="chip">→ ' + ui.esc(item.lemma) + '</span>' : '') +
-          (item.pos ? '<span class="pos">' + ui.esc(item.pos) + '</span>' : ''),
+          (item.pos ? '<span class="pos">' + ui.esc(item.pos) + '</span>' : '') +
+          (root ? '<a class="chip chip-button" href="#/root/' + encodeURIComponent(root.key) + '">' +
+            ui.esc(root.display) + '</a>' : ''),
         desc: ui.esc(item.meaning || '') + (item.note ? ' · ' + ui.esc(item.note) : '')
       };
     });
@@ -1775,6 +1778,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       translation: translation,
       vocabulary: vocabulary.slice(0, 200),
       register: register,
+      language: entry && entry.language ? entry.language : '',
       parts: parts.length,
       total: state.doc ? state.doc.total : parts.length
     };

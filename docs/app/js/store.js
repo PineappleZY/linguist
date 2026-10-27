@@ -803,6 +803,7 @@ window.LINGUIST = window.LINGUIST || {};
       entries: payload.entries,
       rootProgress: readJSON(STORAGE.rootProgress, {}),
       rootIndex: readJSON(STORAGE.rootIndex, null),
+      rootNotes: readJSON(STORAGE.rootNotes, {}),
       /* Wordbooks are the user's own curation; leaving them out meant a backup
          round-trip silently threw them away. */
       wordbooks: payload.wordbooks
@@ -870,6 +871,9 @@ window.LINGUIST = window.LINGUIST || {};
     if (payload.rootIndex && typeof payload.rootIndex === 'object') {
       writeJSON(STORAGE.rootIndex, payload.rootIndex);
       if (ns.roots) ns.roots.invalidate();
+    }
+    if (payload.rootNotes && typeof payload.rootNotes === 'object') {
+      writeJSON(STORAGE.rootNotes, payload.rootNotes);
     }
 
     if (payload.settings && typeof payload.settings === 'object') {

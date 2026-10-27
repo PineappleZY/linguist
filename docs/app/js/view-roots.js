@@ -15,6 +15,57 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     return ui.t('roots.dueIn', { n: days });
   }
 
+  function tabs(active) {
+    return '<div class="segmented is-block" role="group">' +
+      '<button type="button" class="segment" aria-pressed="' + (active === 'atlas') +
+      '" data-roots-view="atlas">' + ui.esc(ui.t('roots.atlas')) + '</button>' +
+      '<button type="button" class="segment" aria-pressed="' + (active === 'personal') +
+      '" data-roots-view="personal">' + ui.esc(ui.t('roots.personal')) + '</button>' +
+      '<button type="button" class="segment" aria-pressed="' + (active === 'review') +
+      '" data-roots-view="review">' + ui.esc(ui.t('roots.reviewTab')) + '</button></div>';
+  }
+
+  function atlasView() {
+    var q = ns.session.atlasQuery || '';
+    var lang = ns.session.atlasLang || '';
+    var results = roots.searchAtlas(q, { language: lang });
+    var html = stats() + '<div class="searchbar is-small">' + ui.icon('search') +
+      '<input id="atlas-search" type="search" value="' + ui.esc(q) + '" placeholder="' +
+      ui.esc(ui.t('roots.atlasSearch')) + '" aria-label="' + ui.esc(ui.t('roots.atlasSearch')) + '"></div>';
+    html += '<div class="settings-row"><span class="settings-key">' + ui.esc(ui.t('roots.languageFilter')) + '</span>' +
+      ui.picker({ id: 'atlas-lang', value: lang, compact: true, label: ui.t('roots.languageFilter'),
+        options: [{ id: '', label: ui.t('roots.allLanguages') }, { id: 'en', label: 'English' },
+          { id: 'fr', label: 'Français' }, { id: 'de', label: 'Deutsch' }],
+        onPick: function (next) { ns.session.atlasLang = next; ns.router.refresh(); } }) + '</div>';
+    if (!results.length) return html + '<div class="empty"><div class="empty-text">' +
+      ui.esc(ui.t('roots.atlasEmpty')) + '</div></div>';
+    html += '<div class="list">' + results.map(function (root) {
+      return '<button type="button" class="row" data-root="' + ui.esc(root.key) + '">' +
+        '<span class="row-main"><span class="row-title"><span class="mono">' + ui.esc(root.form) +
+        '</span></span><span class="row-sub">' + ui.esc(root.meaning || root.originLabel || '') +
+        ' · ' + ui.esc(root.originFamily) + '</span></span><span class="row-aside"><span class="chip">' +
+        (root.derivedWords || []).length + '</span></span></button>';
+    }).join('') + '</div>';
+    return html;
+  }
+
+  function personalView() {
+    var rows = roots.personalRoots();
+    var html = stats() + '<div class="section-head"><span class="card-title">' + ui.esc(ui.t('roots.personal')) +
+      ' · ' + rows.length + '</span></div>';
+    if (!rows.length) return html + '<div class="empty"><div class="empty-text">' +
+      ui.esc(ui.t('roots.personalEmpty')) + '</div></div>';
+    html += '<div class="list">' + rows.map(function (root) {
+      var note = roots.rootNote(root.id);
+      return '<button type="button" class="row" data-root="' + ui.esc(root.key) + '">' +
+        '<span class="row-main"><span class="row-title"><span class="mono">' + ui.esc(root.form) +
+        '</span></span><span class="row-sub">' + ui.esc(root.meaning || '') +
+        (note ? ' · ' + ui.esc(note) : '') + '</span></span><span class="row-aside"><span class="chip">' +
+        ui.esc(ui.t('roots.state.' + root.state)) + '</span></span></button>';
+    }).join('') + '</div>';
+    return html;
+  }
+
   function stats() {
     var s = roots.stats();
     return '<div class="root-stats">' +
@@ -105,6 +156,8 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       ui.esc(ui.t('roots.state.' + root.state)) + ' · ' + ui.esc(dueLabel(root.dueAt)) +
       '</div><div class="hint">' + ui.esc(ui.t('roots.lapses', { n: root.lapses || 0 })) + '</div></div></div>';
     html += '<p class="hint">' + ui.esc(ui.t('roots.aiNote')) + '</p>';
+    html += '<div class="notice-actions"><button type="button" class="btn btn-sm" data-root-note="' +
+      ui.esc(roots.atlasId(root)) + '">' + ui.esc(ui.t('roots.note')) + '</button></div>';
     if (root.variants && root.variants.length) {
       html += '<p class="hint">' + ui.esc(ui.t('roots.variants')) + ': ' +
         ui.esc(root.variants.join(' · ')) + '</p>';
@@ -152,8 +205,21 @@ window.LINGUIST.views = window.LINGUIST.views || {};
 
   function render(container, params) {
     if (!roots.allRoots().length) roots.rebuildIndex();
-    var html = params && params.key ? detail(decodeURIComponent(params.key)) : list();
+    var active = ns.session.rootsView || 'atlas';
+    var html = tabs(active) + (params && params.key ? detail(decodeURIComponent(params.key)) :
+      (active === 'personal' ? personalView() : (active === 'review' ? list() : atlasView())));
     ui.setHTML(container, html);
+    container.querySelectorAll('[data-roots-view]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        ns.session.rootsView = button.getAttribute('data-roots-view');
+        ns.router.refresh();
+      });
+    });
+    var atlasSearch = container.querySelector('#atlas-search');
+    if (atlasSearch) atlasSearch.addEventListener('input', function () {
+      ns.session.atlasQuery = atlasSearch.value;
+      ns.router.refresh();
+    });
     var review = container.querySelector('#roots-review');
     if (review) review.addEventListener('click', function () {
       var lang = ns.session.rootReviewLang || 'en';
@@ -169,6 +235,14 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     if (toStarred) toStarred.addEventListener('click', function () { location.hash = '#/favorites'; });
     var one = container.querySelector('#root-review-one');
     if (one) one.addEventListener('click', function () { ns.rootReview.open(params.key); });
+    var note = container.querySelector('[data-root-note]');
+    if (note) note.addEventListener('click', function () {
+      var id = note.getAttribute('data-root-note');
+      var value = window.prompt(ui.t('roots.note'), roots.rootNote(id));
+      if (value == null) return;
+      roots.setRootNote(id, value);
+      ns.router.refresh();
+    });
     container.querySelectorAll('[data-root]').forEach(function (row) {
       row.addEventListener('click', function () {
         location.hash = '#/root/' + encodeURIComponent(row.getAttribute('data-root'));

@@ -5,6 +5,9 @@
     { "id": "module", "label": "模块", "colour": "#8E8E93" }
   ],
   "changes": [
+    { "version": "8.0.0", "summary": "Root Atlas、Personal Root Map 与 Context-to-Root；稳定 RootEntity、搜索筛选、词族操作、个人笔记与句子/文件回流；不新增 AI 自动补根。",
+      "added": ["root-atlas", "root-entity", "personal-root-map", "context-to-root", "root-search", "root-aliases"],
+      "changed": ["roots-tab", "root-index", "root-detail", "root-review", "root-versions", "entry", "sentence", "doc-view", "store", "ids", "i18n", "tests", "preview"] },
     { "version": "7.2.1", "summary": "修复词根复习范围死开关、5 词根×3 阶段进度、无同根词跳过、实时根链接、版本切换、统计去重、无障碍、预热提示与文档漂移。",
       "added": [],
       "changed": ["root-review", "root-scope", "root-memory", "root-session", "root-versions", "root-distractors", "root-index", "root-detail", "roots-tab", "store", "i18n", "preview", "tests"] },
@@ -167,6 +170,18 @@
       "summary": "A root keyed by source language keeps separate explanation-language versions; default output language wins and cached versions switch without requests." },
     { "id": "refresh-events", "layer": "feature", "label": "Catalog refresh", "zh": "即时刷新", "files": ["js/app.js", "js/store.js", "js/roots.js"],
       "summary": "One catalog:changed event invalidates roots and refreshes History, Starred and wordbook views after stars, deletes, Undo and root answers." },
+    { "id": "root-atlas", "layer": "feature", "label": "Root Atlas", "zh": "词根图谱", "files": ["js/roots.js", "js/view-roots.js"],
+      "summary": "Derived public root knowledge layer with search, origin filters, families and confidence; no new model request." },
+    { "id": "root-entity", "layer": "feature", "label": "RootEntity", "zh": "词根实体", "files": ["js/roots.js"],
+      "summary": "Stable root IDs, variants, meanings, entries, families, confidence and local sources derived from etymology data." },
+    { "id": "personal-root-map", "layer": "feature", "label": "Personal Root Map", "zh": "个人词根地图", "files": ["js/roots.js", "js/view-roots.js"],
+      "summary": "Cards and lightweight relationships for encountered roots, notes, weak roots, mastery and review eligibility." },
+    { "id": "context-to-root", "layer": "feature", "label": "Context to root", "zh": "语境回流", "files": ["js/view-word.js", "js/view-document.js", "js/roots.js"],
+      "summary": "Sentence words and document vocabulary link to locally indexed roots; missing roots offer a lookup CTA without silent AI calls." },
+    { "id": "root-search", "layer": "feature", "label": "Root search", "zh": "词根搜索", "files": ["js/view-roots.js", "js/roots.js"],
+      "summary": "Search by root form, variant, family word, meaning and origin family, with language filtering." },
+    { "id": "root-aliases", "layer": "feature", "label": "Root aliases", "zh": "词根别名迁移", "files": ["js/roots.js", "js/store.js"],
+      "summary": "Maps old morpheme keys to stable root IDs while preserving root progress and old backups." },
     { "id": "packaging", "layer": "feature", "label": "Desktop & mobile (other assistants)", "zh": "桌面与移动端（其他助手）", "files": ["README.md", "DEPLOY.md"],
       "summary": "Packaging is not part of 7.0 web work; exe, apk and Apple targets are handed to other assistants." }
   ],
@@ -206,6 +221,9 @@
     ["roots-tab", "root-scope"], ["root-scope", "root-review"], ["roots-tab", "root-sort"],
     ["roots-tab", "root-memory"], ["root-memory", "root-session"], ["root-session", "root-review"],
     ["root-review", "root-distractors"], ["root-index", "root-versions"], ["entry", "root-versions"],
-    ["refresh-events", "store"], ["refresh-events", "roots-tab"], ["refresh-events", "starred"], ["refresh-events", "history"]
+    ["refresh-events", "store"], ["refresh-events", "roots-tab"], ["refresh-events", "starred"], ["refresh-events", "history"],
+    ["roots-tab", "root-atlas"], ["root-atlas", "root-entity"], ["root-atlas", "root-search"], ["root-atlas", "root-aliases"],
+    ["root-atlas", "personal-root-map"], ["personal-root-map", "root-review"], ["context-to-root", "root-atlas"],
+    ["context-to-root", "sentence"], ["context-to-root", "doc-view"], ["root-aliases", "store"]
   ]
 }
