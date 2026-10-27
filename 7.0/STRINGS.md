@@ -1,6 +1,6 @@
-# Linguist 7.2.0 — 界面文案对照表
+# Linguist 7.2.1 — 界面文案对照表
 
-这份表是 `web/js/strings.js` 的直接产物（`node tools/strings-md.mjs` 重新生成），供你或母语者复核。共 **476 条 × 5 种语言**。
+这份表是 `web/js/strings.js` 的直接产物（`node tools/strings-md.mjs` 重新生成），供你或母语者复核。共 **479 条 × 5 种语言**。
 
 **怎么用**：切到某一语言后，可能觉得某句不像该语言的人会说的话——直接在表里指出 key 与建议改法即可，我会改 `strings.js`（改一行，五个语言各自独立）。
 
@@ -29,7 +29,7 @@
 | `roots.stat.known` | Known | 已掌握 | Maîtrisées | Gelernt | 習得済み |
 | `roots.stat.words` | Words covered | 覆盖词数 | Mots couverts | Abgedeckte Wörter | 対象語数 |
 | `roots.emptyTitle` | No roots yet | 还没有词根 | Pas encore de racines | Noch keine Wurzeln | 語根はまだありません |
-| `roots.emptyText` | Look up a word with an etymology card, then come back. | 先查一个已经生成词源卡片的词，再回来。 | Cherchez un mot avec une carte étymologique, puis revenez. | Schlage ein Wort mit Etymologiekarte nach und komm zurück. | 語源カードのある語を調べてから戻ってください。 |
+| `roots.emptyText` | Only roots from starred words enter review. Star a word with an etymology card, then come back. | 只有已星标单词产生的词根会进入复习。先收藏一个带词源卡片的词，再回来。 | Seules les racines de mots favoris entrent en révision. Ajoutez un mot avec une carte étymologique, puis revenez. | Nur Wurzeln markierter Wörter kommen in die Wiederholung. Markiere ein Wort mit Etymologiekarte und komm zurück. | 復習に入るのは星付き単語の語根だけです。語源カードのある単語を星付きにして戻ってください。 |
 | `roots.review` | Review {n} roots | 复习 {n} 个词根 | Revoir {n} racines | {n} Wurzeln wiederholen | {n} 個の語根を復習 |
 | `roots.sort` | Sort | 排序 | Tri | Sortierung | 並び順 |
 | `roots.sort.learning` | Learning groups | 学习分组 | Groupes d’apprentissage | Lerngruppen | 学習グループ |
@@ -44,6 +44,7 @@
 | `roots.dueToday` | Due today | 今天复习 | À revoir aujourd’hui | Heute fällig | 今日復習 |
 | `roots.dueIn` | Due in {n} days | {n} 天后复习 | À revoir dans {n} jours | In {n} Tagen fällig | {n} 日後に復習 |
 | `roots.lapses` | {n} misses in review | 复习中错过 {n} 次 | {n} erreurs en révision | {n} Fehler in der Wiederholung | 復習で {n} 回間違い |
+| `roots.aiNote` | AI analysis — a learning aid, not a cited source. | AI 推演，仅供学习参考，不是引证来源。 | Analyse IA — aide à l’apprentissage, pas une source citée. | KI-Analyse — Lernhilfe, keine zitierte Quelle. | AI による推論です。学習の参考であり、出典ではありません。 |
 | `roots.all` | All roots | 全部词根 | Toutes les racines | Alle Wurzeln | すべての語根 |
 | `roots.state.new` | New | 新词根 | Nouvelle | Neu | 新規 |
 | `roots.state.learning` | Learning | 在学 | En cours | Im Lernen | 学習中 |
@@ -56,6 +57,7 @@
 | `roots.sources` | Words in your history | 历史中的词 | Mots de votre historique | Wörter aus deinem Verlauf | 履歴の語 |
 | `roots.reviewTitle` | Root review | 词根复习 | Révision des racines | Wurzelwiederholung | 語根の復習 |
 | `roots.question` | Question {n} of {total} | 第 {n} / {total} 题 | Question {n} sur {total} | Frage {n} von {total} | 第 {n} / {total} 問 |
+| `roots.stage` | Stage {n} of {total} | 第 {n} / {total} 阶段 | Étape {n} sur {total} | Stufe {n} von {total} | 第 {n} / {total} 段階 |
 | `roots.inputRoot` | Type the root | 输入词根 | Écrivez la racine | Wurzel eingeben | 語根を入力 |
 | `roots.inputWord` | Type one word from this root family | 输入一个同根词 | Écrivez un mot de cette famille | Ein Wort dieser Familie eingeben | この語根の語を一つ入力 |
 | `roots.choiceMeaning` | Choose the meaning | 选择含义 | Choisissez le sens | Bedeutung wählen | 意味を選ぶ |
@@ -70,6 +72,7 @@
 | `roots.resetDone` | Root progress reset. | 词根进度已重置。 | Progression des racines réinitialisée. | Wurzelfortschritt zurückgesetzt. | 語根の進捗をリセットしました。 |
 | `profile.section.roots` | Roots & surprise | 词根与随机词 | Racines et hasard | Wurzeln & Überraschung | 語根とおまかせ |
 | `profile.poolStats` | Surprise pool: {ready} of {total} words ready | 随机词池：{total} 个中还有 {ready} 个可用 | Réserve Au hasard : {ready} mots prêts sur {total} | Überraschungsvorrat: {ready} von {total} Wörtern bereit | おまかせ語彙：{total} 語中 {ready} 語が利用可能 |
+| `pool.warmupNotice` | Preparing the Surprise pool in the background uses a few API requests. | 后台准备随机词池会消耗少量 API 请求。 | La préparation de la réserve Au hasard en arrière-plan utilise quelques requêtes API. | Das Vorbereiten des Überraschungsvorrats im Hintergrund verbraucht einige API-Anfragen. | おまかせ語彙をバックグラウンドで準備すると、API リクエストを少し消費します。 |
 | `discovery.core` | Core meaning | 核心义 | Sens central | Kernbedeutung | 核心義 |
 | `discovery.examples` | Examples | 例句 | Exemples | Beispiele | 例文 |
 | `discovery.rootNote` | Root note | 词根注 | Note de racine | Wurzelnotiz | 語根メモ |

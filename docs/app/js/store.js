@@ -878,7 +878,7 @@ window.LINGUIST = window.LINGUIST || {};
          the history but reset the explanation language, the interface language
          or the card preferences would be a backup of half a setup. */
       ['outputLang', 'outputLangBySource', 'model', 'theme', 'thinking',
-        'uiLang', 'queryLang', 'queryMode', 'cardPrefs', 'rootSort', 'tourDone'].forEach(function (key) {
+        'uiLang', 'queryLang', 'queryMode', 'cardPrefs', 'rootSort', 'poolWarmupNotice', 'tourDone'].forEach(function (key) {
         if (Object.prototype.hasOwnProperty.call(payload.settings, key)) safe[key] = payload.settings[key];
       });
       patchSettings(safe);

@@ -269,7 +269,13 @@ window.LINGUIST = window.LINGUIST || {};
        background job: a missing key or offline state simply leaves it alone. */
     window.setTimeout(function () {
       var current = store.getSettings();
-      if (current.apiKey && ns.pool) ns.pool.warmup(current).catch(function () {});
+      if (current.apiKey && ns.pool) {
+        if (!current.poolWarmupNotice) {
+          store.patchSettings({ poolWarmupNotice: true });
+          ui.toast(ui.t('pool.warmupNotice'), { ms: 7000 });
+        }
+        ns.pool.warmup(current).catch(function () {});
+      }
     }, 1500);
   }
 

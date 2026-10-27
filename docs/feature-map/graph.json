@@ -5,6 +5,9 @@
     { "id": "module", "label": "模块", "colour": "#8E8E93" }
   ],
   "changes": [
+    { "version": "7.2.1", "summary": "修复词根复习范围死开关、5 词根×3 阶段进度、无同根词跳过、实时根链接、版本切换、统计去重、无障碍、预热提示与文档漂移。",
+      "added": [],
+      "changed": ["root-review", "root-scope", "root-memory", "root-session", "root-versions", "root-distractors", "root-index", "root-detail", "roots-tab", "store", "i18n", "preview", "tests"] },
     { "version": "7.2.0", "summary": "词根艾宾浩斯周期与今日复习；三阶段滚动队列（释义、拼写、同根词）；相似干扰项；词根解释语言版本合并；词根详情补来源演化；星标/删除/答题即时刷新。",
       "added": ["root-memory", "root-session", "root-distractors", "root-versions", "refresh-events"],
       "changed": ["roots-tab", "root-index", "root-review", "root-scope", "root-sort", "store", "i18n", "practice", "tests", "preview"] },
@@ -133,7 +136,7 @@
     { "id": "root-mastery", "layer": "feature", "label": "Root mastery", "zh": "词根掌握度", "files": ["js/roots.js", "js/practice.js"],
       "summary": "Strength 0–5 with a 10m/1d/3d/7d/21d/60d ladder; spelling outcomes update the root." },
     { "id": "root-review", "layer": "feature", "label": "Root review", "zh": "词根复习", "files": ["js/root-review.js", "js/view-roots.js"],
-      "summary": "Five questions: three choices and two objective typed answers; updates mastery and returns focus." },
+      "summary": "At most five roots × three fixed stages: meaning choice, spelling and same-root word meaning; progress is root/stage, not a growing question count." },
     { "id": "surprise-pool", "layer": "feature", "label": "Surprise pool", "zh": "随机词池", "files": ["js/pool.js", "js/api.js", "js/prompts.js"],
       "summary": "200 words in two 100-word batches, persisted used flags, local anti-repeat and a 100-word language top-up." },
     { "id": "discovery-card", "layer": "feature", "label": "Discovery card", "zh": "异语发现卡", "files": ["js/view-discovery.js", "js/api.js", "js/prompts.js"],
@@ -151,7 +154,7 @@
     { "id": "entry-versions", "layer": "feature", "label": "Explanation versions", "zh": "解释语言版本", "files": ["js/store.js", "js/view-word.js"],
       "summary": "One history group per content and source language; generated explanation-language payloads are switchable versions." },
     { "id": "root-scope", "layer": "feature", "label": "Root review scope", "zh": "词根复习范围", "files": ["js/roots.js", "js/root-review.js"],
-      "summary": "Only starred English/French/German roots with a real root part; review is grouped by source and explanation language." },
+      "summary": "Due / all / new scopes are applied to the same queue; only starred English/French/German roots with a real root part are eligible." },
     { "id": "root-sort", "layer": "feature", "label": "Root sorting", "zh": "词根排序", "files": ["js/view-roots.js", "js/roots.js", "js/strings.js"],
       "summary": "Fixed language groups; user switches learning groups, latest, alphabetical or family size, persisted in settings." },
     { "id": "root-memory", "layer": "feature", "label": "Root memory curve", "zh": "词根记忆曲线", "files": ["js/roots.js", "js/view-roots.js"],

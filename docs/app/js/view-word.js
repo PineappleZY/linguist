@@ -471,7 +471,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     var items = line && Array.isArray(line.components) ? line.components.filter(Boolean) : [];
     if (!items.length) return '';
     return '<div class="morph-formula">' + items.map(function (item, i) {
-      var rootKey = ns.roots && item.part
+      var rootKey = ns.roots && item.part && state.entry && ['en', 'fr', 'de'].indexOf(state.entry.language) > -1
         ? ns.roots._keyOf('component', item.origin || (state.entry && state.entry.language) || 'han', item.part)
         : '';
       var open = rootKey
@@ -1969,6 +1969,13 @@ window.LINGUIST.views = window.LINGUIST.views || {};
   /* Everything inside the card region, wired separately so the region can be
      repainted on its own without touching the header or the shell. */
   function wireRegion(root, entry) {
+    root.querySelectorAll('[data-root-link]').forEach(function (button) {
+      button.addEventListener('click', function (event) {
+        event.stopPropagation();
+        location.hash = '#/root/' + encodeURIComponent(button.getAttribute('data-root-link'));
+      });
+    });
+
     root.querySelectorAll('[data-toggle]').forEach(function (button) {
       button.addEventListener('click', function () {
         var key = button.getAttribute('data-toggle');
@@ -2229,13 +2236,6 @@ window.LINGUIST.views = window.LINGUIST.views || {};
         location.hash = '#/dictionary';
       });
     }
-
-    container.querySelectorAll('[data-root-link]').forEach(function (button) {
-      button.addEventListener('click', function (event) {
-        event.stopPropagation();
-        location.hash = '#/root/' + encodeURIComponent(button.getAttribute('data-root-link'));
-      });
-    });
 
     wireRegion(container, entry);
 

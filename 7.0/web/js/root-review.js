@@ -14,10 +14,11 @@ window.LINGUIST = window.LINGUIST || {};
   var queue = [];
   var sessionRoots = [];
   var current = null;
-  var completed = 0;
+  var completedRoots = 0;
   var correct = 0;
   var wrong = 0;
   var answered = false;
+  var returnFocus = null;
 
   function shuffle(list) {
     var copy = list.slice();
@@ -68,6 +69,7 @@ window.LINGUIST = window.LINGUIST || {};
           options: optionsFor(root, all, family), answer: family.gloss
         };
       }
+      return null;
     }
     return {
       root: root, stage: 1, type: 'choice',
@@ -92,6 +94,13 @@ window.LINGUIST = window.LINGUIST || {};
     });
     layer.addEventListener('keydown', function (event) {
       if (event.key === 'Escape') close();
+      if (event.key !== 'Tab') return;
+      var focusable = [].slice.call(layer.querySelectorAll('button:not([disabled]),input:not([disabled])'));
+      if (!focusable.length) return;
+      event.preventDefault();
+      var index = focusable.indexOf(document.activeElement);
+      var step = event.shiftKey ? -1 : 1;
+      focusable[(index + step + focusable.length) % focusable.length].focus();
     });
   }
 
@@ -101,13 +110,15 @@ window.LINGUIST = window.LINGUIST || {};
     queue = [];
     sessionRoots = [];
     current = null;
-    completed = 0;
+    completedRoots = 0;
     correct = 0;
     wrong = 0;
     answered = false;
+    if (returnFocus && typeof returnFocus.focus === 'function') returnFocus.focus();
+    returnFocus = null;
   }
 
-  function total() { return completed + queue.length + (current ? 1 : 0); }
+  function total() { return sessionRoots.length; }
 
   function render() {
     if (!layer) return;
@@ -123,22 +134,24 @@ window.LINGUIST = window.LINGUIST || {};
     }
     var q = current;
     var body = '<div class="root-review-card"><div class="root-review-top"><span>' +
-      ui.esc(ui.t('roots.question', { n: completed + 1, total: total() })) + '</span>' +
+      ui.esc(ui.t('roots.question', { n: Math.min(total(), completedRoots + 1), total: total() })) + '</span>' +
       '<button type="button" class="icon-btn" data-root-close aria-label="' +
       ui.esc(ui.t('practice.close')) + '">' + ui.icon('close') + '</button></div>' +
       '<div class="root-review-prompt mono" dir="auto">' + ui.esc(q.prompt) + '</div>' +
-      '<p class="hint">' + ui.esc(q.hint) + '</p>';
+      '<p class="hint">' + ui.esc(ui.t('roots.stage', { n: q.stage, total: 3 })) + ' · ' +
+      ui.esc(q.hint) + '</p>';
     if (q.type === 'choice') {
       body += '<div class="root-options">' + q.options.map(function (option) {
         return '<button type="button" class="row" data-root-answer="' + ui.esc(option) + '">' +
           '<span class="row-main">' + ui.esc(option) + '</span></button>';
       }).join('') + '</div>';
     } else {
-      body += '<input class="input" data-root-input autocomplete="off" autocapitalize="off" ' +
+      body += '<input class="input" data-root-input aria-label="' + ui.esc(ui.t('roots.inputRoot')) +
+        '" autocomplete="off" autocapitalize="off" ' +
         'autocorrect="off" spellcheck="false"><button type="button" class="btn btn-primary" ' +
         'data-root-submit>' + ui.esc(ui.t('practice.check')) + '</button>';
     }
-    body += '<div class="root-feedback" hidden></div></div>';
+    body += '<div class="root-feedback" aria-live="polite" hidden></div></div>';
     layer.innerHTML = body;
     if (q.type === 'input') {
       var input = layer.querySelector('[data-root-input]');
@@ -163,9 +176,16 @@ window.LINGUIST = window.LINGUIST || {};
     var ok = q.type === 'choice' ? given === q.answer : ns.roots.answerMatches(given, q.answers);
     if (ok) {
       correct += 1;
-      completed += 1;
       ns.roots.recordStage(q.root.key, q.stage, true);
-      if (q.stage < 3) queue.push(stageQuestion(q.root, q.stage + 1, sessionRoots));
+      if (q.stage < 3) {
+        var next = stageQuestion(q.root, q.stage + 1, sessionRoots);
+        if (next) queue.push(next);
+        else {
+          ns.roots.recordStage(q.root.key, 3, true);
+          completedRoots += 1;
+        }
+      }
+      if (q.stage === 3) completedRoots += 1;
     } else {
       wrong += 1;
       ns.roots.recordStage(q.root.key, q.stage, false);
@@ -183,10 +203,15 @@ window.LINGUIST = window.LINGUIST || {};
   function open(onlyKey, options) {
     close();
     build();
+    returnFocus = document.activeElement;
     options = options || {};
-    var due = ns.roots.todayQueue
-      ? ns.roots.todayQueue(options.language || 'en', options.outputLang || ns.store.outputLangFor(options.language || 'en'))
-      : ns.roots.dueQueue(999);
+    var language = options.language || 'en';
+    var outputLang = options.outputLang || ns.store.outputLangFor(language);
+    var scope = options.scope || 'due';
+    var due = ns.roots.reviewRoots
+      ? ns.roots.reviewRoots(language, outputLang, scope)
+      : ns.roots.dueQueue(ns.CONFIG.limits.rootReviewRound);
+    due = due.slice(0, ns.CONFIG.limits.rootReviewRound);
     if (onlyKey) {
       var one = ns.roots.getRoot(onlyKey);
       due = one ? [one] : [];
@@ -199,6 +224,8 @@ window.LINGUIST = window.LINGUIST || {};
     sessionRoots = due.slice();
     queue = due.map(function (root) { return stageQuestion(root, 1, sessionRoots); });
     render();
+    var first = layer.querySelector('button,input');
+    if (first) first.focus();
   }
 
   ns.rootReview = {

@@ -1,11 +1,11 @@
-# Linguist 7.2 — web app
+# Linguist 7.2.1 — web app
 
 ## What 7.0 changed
 
-- **Roots is now a fourth tab.** Words expose clickable roots, the index is
-  built from existing etymology/components, mastery uses a 10m/1d/3d/7d/21d/60d
-  ladder, and a five-question mixed review (three choices, two objective typed
-  answers) updates it.
+- **Roots is now a fourth tab.** Words expose clickable English/French/German
+  roots, the index uses existing etymology, mastery uses
+  0/1/2/4/7/15/30/60/120-day intervals, and a round is at most five roots with
+  three fixed stages each.
 - **Surprise uses a persistent 200-word pool.** Two 100-word batches, 80/20
   live/exotic mix, local anti-repeat, and a 100-word top-up when a selected
   language runs low. It no longer asks the model on every tap.
@@ -40,9 +40,9 @@
   with the stored starred rows until `leave()` runs (route change or reload),
   so the row turns into a hollow star and can be re-starred on the spot.
 
-`node tools/strings-md.mjs` regenerates `../STRINGS.md` (420 keys × 5 languages).
+`node tools/strings-md.mjs` regenerates `../STRINGS.md` (479 keys × 5 languages).
 `node web/tests/smoke.js` is the 800-assertion suite; `node tools/build.mjs`
-writes `dist/linguist_7.2.0.html`.
+writes `dist/linguist_7.2.1.html`.
 
 ## What 6.1 changed
 

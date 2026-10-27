@@ -377,8 +377,8 @@ function testConfig(env) {
   const C = env.ns.CONFIG;
   const S = env.ns.strings;
   const locales = Object.keys(S);
-  check('version reads 7.2.0', C.version === '7.2.0', C.version);
-  check('the stored entry shape was bumped', C.schemaVersion === 8, String(C.schemaVersion));
+  check('version reads 7.2.1', C.version === '7.2.1', C.version);
+  check('the stored entry shape was bumped', C.schemaVersion === 9, String(C.schemaVersion));
   check('the product name is not translated', C.appName === 'Linguist', C.appName);
   check('and the name every interface language shows is the same string',
     locales.every((lang) => S[lang]['app.name'] === 'Linguist'),
@@ -4239,7 +4239,7 @@ async function testDistribution() {
   /* 6.0 additions. The single file is what a file:// reader (and, later, a
      desktop shell) actually opens, so what is inside it is asserted. */
   check('the offline bundle is named after this release',
-    path.basename(offlinePath) === 'linguist_7.2.0.html', path.basename(offlinePath));
+    path.basename(offlinePath) === 'linguist_7.2.1.html', path.basename(offlinePath));
   check('it inlines the vendored pdf.js rather than linking to it',
     /pdfjsLib/.test(offline) && offline.indexOf('vendor/pdfjs/pdf.min.js') === -1);
   check('and carries the worker source for the blob URL',
@@ -4249,7 +4249,7 @@ async function testDistribution() {
 
   const sw = fs.readFileSync(path.join(WEB_DIR, 'sw.js'), 'utf8');
   check('the cache is named after the product and this release',
-    /CACHE_VERSION = 'v7\.2\.0'/.test(sw) && /linguist-' \+ CACHE_VERSION/.test(sw));
+    /CACHE_VERSION = 'v7\.2\.1'/.test(sw) && /linguist-' \+ CACHE_VERSION/.test(sw));
   ['js/extract.js', 'js/view-document.js', 'vendor/pdfjs/pdf.min.js', 'vendor/pdfjs/pdf.worker.min.js']
     .forEach((file) => {
       check('the shell precaches ' + file, sw.indexOf("'./" + file + "'") > -1);

@@ -6,7 +6,8 @@ window.LINGUIST = window.LINGUIST || {};
   'use strict';
 
   var DAY = 86400000;
-  var INTERVALS = [0, 1 * DAY, 2 * DAY, 4 * DAY, 7 * DAY, 15 * DAY, 30 * DAY, 60 * DAY, 120 * DAY];
+  var INTERVALS = (ns.CONFIG.limits.rootIntervals || [0, 1, 2, 4, 7, 15, 30, 60, 120])
+    .map(function (days) { return days * DAY; });
   var indexCache = null;
 
   function norm(text) {
@@ -333,7 +334,18 @@ window.LINGUIST = window.LINGUIST || {};
       familiar: list.filter(function (p) { return p.state === 'familiar'; }).length,
       known: list.filter(function (p) { return p.state === 'known'; }).length,
       due: list.filter(function (p) { return p.state === 'new' || !p.dueAt || p.dueAt <= Date.now(); }).length,
-      words: list.reduce(function (sum, p) { return sum + (p.wordIds ? p.wordIds.length : 0); }, 0)
+      words: (function () {
+        var seen = {};
+        list.forEach(function (p) {
+          (p.wordIds || []).forEach(function (id) {
+            var row = ns.store.findRow(id);
+            if (!row) return;
+            var key = (row.word || '') + '|' + (row.language || '');
+            seen[key] = true;
+          });
+        });
+        return Object.keys(seen).length;
+      })()
     };
   }
 
@@ -390,6 +402,13 @@ window.LINGUIST = window.LINGUIST || {};
     return all[rootKey + '|' + outputLang];
   }
 
+  function rootVersionOptions(rootKey) {
+    var all = ns.store.readAux('rootVersions', {});
+    return Object.keys(all).filter(function (key) {
+      return key.indexOf(rootKey + '|') === 0;
+    }).map(function (key) { return key.slice(rootKey.length + 1); });
+  }
+
   function recordRootAnswer(key, correct) {
     return correct ? recordStage(key, 3, true) : recordStage(key, 1, false);
   }
@@ -444,6 +463,7 @@ window.LINGUIST = window.LINGUIST || {};
     recordStage: recordStage,
     rootVersion: rootVersion,
     addRootVersion: addRootVersion,
+    rootVersionOptions: rootVersionOptions,
     rootGroups: rootGroups,
     reviewRoots: reviewRoots,
     stats: stats,

@@ -1,7 +1,7 @@
 {
-  "generated": "2026-10-27T10:54:37.130Z",
+  "generated": "2026-10-27T11:47:48.958Z",
   "counts": {
-    "version": "7.2.0",
+    "version": "7.2.1",
     "languages": 7,
     "liveLanguages": 5,
     "retiredLanguages": [
@@ -12,7 +12,7 @@
     "sentenceCards": 9,
     "documentCards": 4,
     "uiLanguages": 5,
-    "strings": 476,
+    "strings": 479,
     "timeoutMs": 45000,
     "documentTimeoutMs": 90000,
     "chunkChars": 20000,
@@ -44,27 +44,45 @@
     }
   ],
   "latest": {
-    "version": "7.2.0",
-    "summary": "词根艾宾浩斯周期与今日复习；三阶段滚动队列（释义、拼写、同根词）；相似干扰项；词根解释语言版本合并；词根详情补来源演化；星标/删除/答题即时刷新。"
+    "version": "7.2.1",
+    "summary": "修复词根复习范围死开关、5 词根×3 阶段进度、无同根词跳过、实时根链接、版本切换、统计去重、无障碍、预热提示与文档漂移。"
   },
   "badges": {
-    "roots-tab": "updated",
-    "root-index": "updated",
     "root-review": "updated",
     "root-scope": "updated",
-    "root-sort": "updated",
+    "root-memory": "updated",
+    "root-session": "updated",
+    "root-versions": "updated",
+    "root-distractors": "updated",
+    "root-index": "updated",
+    "root-detail": "updated",
+    "roots-tab": "updated",
     "store": "updated",
     "i18n": "updated",
-    "practice": "updated",
-    "tests": "updated",
     "preview": "updated",
-    "root-memory": "new",
-    "root-session": "new",
-    "root-distractors": "new",
-    "root-versions": "new",
-    "refresh-events": "new"
+    "tests": "updated"
   },
   "changes": [
+    {
+      "version": "7.2.1",
+      "summary": "修复词根复习范围死开关、5 词根×3 阶段进度、无同根词跳过、实时根链接、版本切换、统计去重、无障碍、预热提示与文档漂移。",
+      "added": [],
+      "changed": [
+        "root-review",
+        "root-scope",
+        "root-memory",
+        "root-session",
+        "root-versions",
+        "root-distractors",
+        "root-index",
+        "root-detail",
+        "roots-tab",
+        "store",
+        "i18n",
+        "preview",
+        "tests"
+      ]
+    },
     {
       "version": "7.2.0",
       "summary": "词根艾宾浩斯周期与今日复习；三阶段滚动队列（释义、拼写、同根词）；相似干扰项；词根解释语言版本合并；词根详情补来源演化；星标/删除/答题即时刷新。",
@@ -648,7 +666,7 @@
       "files": [
         "js/strings.js"
       ],
-      "summary": "476 keys in 5 languages, written per language rather than translated word for word; a missing key falls back to English, then to the key itself."
+      "summary": "479 keys in 5 languages, written per language rather than translated word for word; a missing key falls back to English, then to the key itself."
     },
     {
       "id": "api",
@@ -785,7 +803,7 @@
         "js/root-review.js",
         "js/view-roots.js"
       ],
-      "summary": "Five questions: three choices and two objective typed answers; updates mastery and returns focus."
+      "summary": "At most five roots × three fixed stages: meaning choice, spelling and same-root word meaning; progress is root/stage, not a growing question count."
     },
     {
       "id": "surprise-pool",
@@ -887,7 +905,7 @@
         "js/roots.js",
         "js/root-review.js"
       ],
-      "summary": "Only starred English/French/German roots with a real root part; review is grouped by source and explanation language."
+      "summary": "Due / all / new scopes are applied to the same queue; only starred English/French/German roots with a real root part are eligible."
     },
     {
       "id": "root-sort",

@@ -33,7 +33,10 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     if (!all.length) {
       return html + '<div class="empty"><div class="empty-icon">' + ui.icon('branch') + '</div>' +
         '<div class="empty-title">' + ui.esc(ui.t('roots.emptyTitle')) + '</div>' +
-        '<div class="empty-text">' + ui.esc(ui.t('roots.emptyText')) + '</div></div>';
+        '<div class="empty-text">' + ui.esc(ui.t('roots.emptyText')) + '</div>' +
+        '<div class="empty-actions"><button type="button" class="btn btn-primary" data-roots-dictionary>' +
+        ui.esc(ui.t('nav.dictionary')) + '</button><button type="button" class="btn" data-roots-starred>' +
+        ui.esc(ui.t('nav.starred')) + '</button></div></div>';
     }
     var sortOptions = [
       { id: 'learning', label: ui.t('roots.sort.learning') },
@@ -49,7 +52,8 @@ window.LINGUIST.views = window.LINGUIST.views || {};
         } }) + '</div>';
     var reviewLang = ns.session.rootReviewLang || 'en';
     var reviewScope = ns.session.rootReviewScope || 'due';
-    var reviewPool = roots.reviewRoots(reviewLang, ns.store.outputLangFor(reviewLang), reviewScope);
+    var reviewPool = roots.reviewRoots(reviewLang, ns.store.outputLangFor(reviewLang), reviewScope)
+      .slice(0, ns.CONFIG.limits.rootReviewRound);
     html += '<div class="settings-row"><span class="settings-key">' + ui.esc(ui.t('roots.reviewLanguage')) + '</span>' +
       ui.picker({ id: 'root-review-lang', value: reviewLang, compact: true, label: ui.t('roots.reviewLanguage'),
         options: [
@@ -86,15 +90,30 @@ window.LINGUIST.views = window.LINGUIST.views || {};
   function detail(key) {
     var root = roots.getRoot(key);
     if (!root) return '<div class="empty"><div class="empty-title">' + ui.esc(ui.t('roots.notFound')) + '</div></div>';
+    var versionLangs = [ns.store.outputLangFor(root.language)].concat(roots.rootVersionOptions(key));
+    versionLangs = versionLangs.filter(function (value, i, list) { return value && list.indexOf(value) === i; });
+    var versionLang = ns.session.rootVersionLang || versionLangs[0];
+    var version = roots.rootVersion(key, versionLang);
+    if (version) root = Object.assign({}, root, {
+      meaning: version.meaning || root.meaning, origin: version.origin || root.origin,
+      evolution: version.evolution || root.evolution, variants: version.variants || root.variants
+    });
     var family = roots.familyWords(key);
     var html = '<div class="root-detail-head"><div class="root-glyph mono" dir="auto">' +
       ui.esc(root.display) + '</div><div><div class="root-meaning">' + ui.esc(root.meaning || '') +
       '</div><div class="hint">' + ui.esc(root.origin || '') + ' · ' +
       ui.esc(ui.t('roots.state.' + root.state)) + ' · ' + ui.esc(dueLabel(root.dueAt)) +
       '</div><div class="hint">' + ui.esc(ui.t('roots.lapses', { n: root.lapses || 0 })) + '</div></div></div>';
+    html += '<p class="hint">' + ui.esc(ui.t('roots.aiNote')) + '</p>';
     if (root.variants && root.variants.length) {
       html += '<p class="hint">' + ui.esc(ui.t('roots.variants')) + ': ' +
         ui.esc(root.variants.join(' · ')) + '</p>';
+    }
+    if (versionLangs.length > 1) {
+      html += '<div class="settings-row"><span class="settings-key">' + ui.esc(ui.t('entry.explainIn')) + '</span>' +
+        ui.picker({ id: 'root-version', value: versionLang, compact: true, label: ui.t('entry.explainIn'),
+          options: versionLangs.map(function (lang) { return { id: lang, label: ui.langName(lang) }; }),
+          onPick: function (next) { ns.session.rootVersionLang = next; ns.router.refresh(); } }) + '</div>';
     }
     var sourceEntry = root.wordIds && root.wordIds.length ? ns.store.getEntry(root.wordIds[0]) : null;
     var chain = sourceEntry && sourceEntry.lines && sourceEntry.lines.etymology &&
@@ -144,6 +163,10 @@ window.LINGUIST.views = window.LINGUIST.views || {};
         scope: ns.session.rootReviewScope || 'due'
       });
     });
+    var toDictionary = container.querySelector('[data-roots-dictionary]');
+    if (toDictionary) toDictionary.addEventListener('click', function () { location.hash = '#/dictionary'; });
+    var toStarred = container.querySelector('[data-roots-starred]');
+    if (toStarred) toStarred.addEventListener('click', function () { location.hash = '#/favorites'; });
     var one = container.querySelector('#root-review-one');
     if (one) one.addEventListener('click', function () { ns.rootReview.open(params.key); });
     container.querySelectorAll('[data-root]').forEach(function (row) {

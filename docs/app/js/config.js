@@ -500,10 +500,10 @@ window.LINGUIST = window.LINGUIST || {};
        below it IS translated — see strings.js. */
     taglineKey: 'app.tagline',
     descriptionKey: 'app.description',
-    version: '7.2.0',
+    version: '7.2.1',
 
     /* Bumped whenever the stored entry shape changes. */
-    schemaVersion: 8,
+    schemaVersion: 9,
 
     api: {
       endpoint: 'https://api.deepseek.com/chat/completions',
@@ -774,6 +774,7 @@ window.LINGUIST = window.LINGUIST || {};
        "exactly what the app ships with" — see CONFIG.resolveCardPrefs. */
     cardPrefs: {},
     rootSort: 'learning',
+    poolWarmupNotice: false,
     model: ns.CONFIG.defaultModel,
     theme: ns.CONFIG.defaultTheme
   };
