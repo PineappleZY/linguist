@@ -821,6 +821,7 @@ window.LINGUIST = window.LINGUIST || {};
       rootIndex: readJSON(STORAGE.rootIndex, null),
       rootNotes: readJSON(STORAGE.rootNotes, {}),
       rootStars: readJSON(STORAGE.rootStars, {}),
+      rootContexts: readJSON(STORAGE.rootContexts, {}),
       /* Wordbooks are the user's own curation; leaving them out meant a backup
          round-trip silently threw them away. */
       wordbooks: payload.wordbooks
@@ -894,6 +895,17 @@ window.LINGUIST = window.LINGUIST || {};
     }
     if (payload.rootStars && typeof payload.rootStars === 'object') {
       writeJSON(STORAGE.rootStars, Object.assign(readJSON(STORAGE.rootStars, {}), payload.rootStars));
+    }
+    if (payload.rootContexts && typeof payload.rootContexts === 'object') {
+      var contexts = readJSON(STORAGE.rootContexts, {});
+      Object.keys(payload.rootContexts).forEach(function (rootId) {
+        var old = contexts[rootId] || [];
+        (payload.rootContexts[rootId] || []).forEach(function (item) {
+          if (!old.some(function (x) { return x.entryId === item.entryId && x.contextKind === item.contextKind; })) old.push(item);
+        });
+        contexts[rootId] = old.slice(-20);
+      });
+      writeJSON(STORAGE.rootContexts, contexts);
     }
 
     if (payload.settings && typeof payload.settings === 'object') {

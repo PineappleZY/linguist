@@ -1,4 +1,4 @@
-# Linguist 8.1.2 — web app
+# Linguist 8.1.3 — web app
 
 ## What 7.0 changed
 
@@ -40,9 +40,9 @@
   with the stored starred rows until `leave()` runs (route change or reload),
   so the row turns into a hollow star and can be re-starred on the spot.
 
-`node tools/strings-md.mjs` regenerates `../STRINGS.md` (492 keys × 5 languages).
+`node tools/strings-md.mjs` regenerates `../STRINGS.md` (493 keys × 5 languages).
 `node web/tests/smoke.js` is the 806-assertion suite; `node tools/build.mjs`
-writes `dist/linguist_8.1.2.html`.
+writes `dist/linguist_8.1.3.html`.
 
 ## What 6.1 changed
 

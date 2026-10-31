@@ -76,10 +76,13 @@ window.LINGUIST.views = window.LINGUIST.views || {};
 
   function personalView() {
     var rows = roots.personalRoots();
-    var html = stats() + '<div class="section-head"><span class="card-title">' + ui.esc(ui.t('roots.personal')) +
+    var html = '<div class="section-head"><span class="card-title">' + ui.esc(ui.t('roots.personal')) +
       ' · ' + rows.length + '</span></div>';
     if (!rows.length) return html + '<div class="empty"><div class="empty-text">' +
       ui.esc(ui.t('roots.personalEmpty')) + '</div></div>';
+    html += '<div class="chips root-network" aria-hidden="true">' + rows.slice(0, 12).map(function (root) {
+      return '<span class="chip">' + ui.esc(root.form) + '</span>';
+    }).join('<span class="morph-op">·</span>') + '</div>';
     html += '<div class="list">' + rows.map(function (root) {
       var note = roots.rootNote(root.id);
       return '<button type="button" class="row" data-root="' + ui.esc(root.id) + '">' +
@@ -213,6 +216,13 @@ window.LINGUIST.views = window.LINGUIST.views || {};
             ui.esc(row.word) + '</a>';
         }).join('') + '</div>';
     }
+    var contexts = roots.contextFor(roots.atlasId(root));
+    if (contexts.length) {
+      html += '<div class="section-head"><span class="card-title">' + ui.esc(ui.t('roots.sources')) +
+        '</span></div><div class="chips">' + contexts.map(function (item) {
+          return '<span class="chip" dir="auto">' + ui.esc(item.title || item.contextKind) + '</span>';
+        }).join('') + '</div>';
+    }
     return html;
   }
 
@@ -220,7 +230,8 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     if (!roots.allRoots().length) roots.rebuildIndex();
     var active = ns.session.rootsView || 'atlas';
     var html = tabs(active) + (params && params.key ? detail(decodeURIComponent(params.key)) :
-      (active === 'personal' ? personalView() : (active === 'review' ? list() : atlasView())));
+      (active === 'personal' ? stats() + personalView() :
+        (active === 'review' ? list() : atlasView() + personalView())));
     ui.setHTML(container, html);
     container.querySelectorAll('[data-roots-view]').forEach(function (button) {
       button.addEventListener('click', function () {

@@ -318,6 +318,10 @@ window.LINGUIST.views = window.LINGUIST.views || {};
         var meta = languageMeta(lang);
         if (meta && meta.script === 'latin') { runReverse(text, lang); return; }
       }
+      if (lang !== CONFIG.autoLang && !isNonLatin(text)) {
+        var nonLatinTarget = languageMeta(lang);
+        if (nonLatinTarget && nonLatinTarget.script !== 'latin') { runReverse(text, lang); return; }
+      }
 
       /* Accented language typed without diacritics: check before spending a
          full lookup. */

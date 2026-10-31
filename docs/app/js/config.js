@@ -500,7 +500,7 @@ window.LINGUIST = window.LINGUIST || {};
        below it IS translated — see strings.js. */
     taglineKey: 'app.tagline',
     descriptionKey: 'app.description',
-    version: '8.1.2',
+    version: '8.1.3',
 
     /* Bumped whenever the stored entry shape changes. */
     schemaVersion: 11,
@@ -737,6 +737,7 @@ window.LINGUIST = window.LINGUIST || {};
     rootNotes: ns.STORAGE_PREFIX + '.rootNotes',
     rootAtlas: ns.STORAGE_PREFIX + '.rootAtlas',
     rootStars: ns.STORAGE_PREFIX + '.rootStars',
+    rootContexts: ns.STORAGE_PREFIX + '.rootContexts',
     surprisePool: ns.STORAGE_PREFIX + '.surprisePool',
     surpriseSeen: ns.STORAGE_PREFIX + '.surpriseSeen',
     /* Set once an older version's data has been offered for import, so the prompt never

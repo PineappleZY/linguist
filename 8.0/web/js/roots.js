@@ -301,6 +301,7 @@ window.LINGUIST = window.LINGUIST || {};
       var id = atlasId(root);
       var p = progress[root.key] || {};
       var note = rootNote(id);
+      var contexts = contextFor(id);
       var explicit = isRootStarred(id);
       var sourceStarred = (root.entries || []).some(function (entry) { return ns.store.isStarred(entry.entryId); });
       return {
@@ -308,10 +309,11 @@ window.LINGUIST = window.LINGUIST || {};
         language: root.language, origin: root.origin, state: p.state || 'new',
         strength: p.strength || 0, dueAt: p.dueAt || 0, lapses: p.lapses || 0,
         familyCount: (root.family || []).length, entries: root.entries || [],
-        rootStarred: explicit, sourceStarred: sourceStarred, note: note
+        rootStarred: explicit, sourceStarred: sourceStarred, note: note, contexts: contexts
       };
     }).filter(function (root) {
-      return root.rootStarred || root.sourceStarred || root.state !== 'new' || !!root.note;
+      return root.rootStarred || root.sourceStarred || root.state !== 'new' || !!root.note ||
+        (root.contexts || []).length > 0;
     });
   }
 
@@ -321,6 +323,21 @@ window.LINGUIST = window.LINGUIST || {};
     notes[rootId] = String(note || '');
     ns.store.writeAux('rootNotes', notes);
   }
+
+  function addContext(rootId, context) {
+    if (!rootId || !context) return;
+    var all = ns.store.readAux('rootContexts', {}) || {};
+    var list = all[rootId] || [];
+    if (!list.some(function (item) {
+      return item.entryId === context.entryId && item.contextKind === context.contextKind;
+    })) {
+      list.push(Object.assign({ ts: Date.now() }, context));
+      all[rootId] = list.slice(-20);
+      ns.store.writeAux('rootContexts', all);
+    }
+  }
+
+  function contextFor(rootId) { return (ns.store.readAux('rootContexts', {}) || {})[rootId] || []; }
 
   function readProgress() {
     var progress = ns.store.readAux('rootProgress', {});
@@ -631,6 +648,8 @@ window.LINGUIST = window.LINGUIST || {};
     migrateAliases: migrateAliases,
     rootNote: rootNote,
     setRootNote: setRootNote,
+    addContext: addContext,
+    contextFor: contextFor,
     dueQueue: dueQueue,
     todayQueue: todayQueue,
     nextInterval: nextInterval,

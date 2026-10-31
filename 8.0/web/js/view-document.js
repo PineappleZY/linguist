@@ -65,8 +65,8 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     var summary = Object.keys(rootMap).length
       ? '<div class="chips">' + Object.keys(rootMap).map(function (key) {
         var root = rootMap[key];
-        return '<a class="chip chip-button" href="#/root/' + encodeURIComponent(root.key) + '">' +
-          ui.esc(root.display) + '</a>';
+        return '<button type="button" class="chip chip-button" data-root-link="' +
+          ui.esc(root.key) + '">' + ui.esc(root.display) + '</button>';
       }).join('') + '</div>'
       : '';
     return summary + '<ul class="deflist">' + items.map(function (item) {
@@ -74,8 +74,8 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       return '<li>' +
         '<div class="def-term">' + ui.esc(item.term || '') +
         (item.reading ? '<span class="mono muted-3"> ' + ui.esc(item.reading) + '</span>' : '') +
-        (root ? '<a class="chip chip-button" href="#/root/' + encodeURIComponent(root.key) + '">' +
-          ui.esc(root.display) + '</a>' :
+        (root ? '<button type="button" class="chip chip-button" data-root-link="' +
+          ui.esc(root.key) + '">' + ui.esc(root.display) + '</button>' :
           '<button type="button" class="chip chip-button" data-context-word="' +
           ui.esc(item.term || '') + '" data-context-lang="' + ui.esc(doc.language || '') + '">' +
           ui.esc(ui.t('roots.lookupForRoot')) + '</button>') +

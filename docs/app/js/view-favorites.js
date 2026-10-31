@@ -344,7 +344,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       return;
     }
     var round = roundQueue(shuffled(pool).slice(0, CONFIG.limits.practiceRound));
-    ns.practice.open(toItem(round.current(), round.progress()), {
+    ns.practice.openWithMeaning(toItem(round.current(), round.progress()), {
       onAdvance: function (result) {
         var next = round.advance(result && result.outcome);
         return next ? toItem(next, round.progress()) : null;
@@ -726,7 +726,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
         if (button.disabled) return;
         var id = button.getAttribute('data-practice-one');
         var row = store.findRow(id);
-        if (row) ns.practice.open(toItem(row));
+        if (row) ns.practice.openWithMeaning(toItem(row));
       });
     });
 

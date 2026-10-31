@@ -1995,7 +1995,14 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     root.querySelectorAll('[data-root-link]').forEach(function (button) {
       button.addEventListener('click', function (event) {
         event.stopPropagation();
-        location.hash = '#/root/' + encodeURIComponent(button.getAttribute('data-root-link'));
+        var rootId = ns.roots.resolveRootId(button.getAttribute('data-root-link'));
+        if (ns.roots && entry && (entry.kind === 'sentence' || entry.kind === 'document')) {
+          ns.roots.addContext(rootId, {
+            contextKind: entry.kind === 'sentence' ? 'sentence' : 'document',
+            entryId: entry.id, title: entry.text || entry.name || entry.word
+          });
+        }
+        location.hash = '#/root/' + encodeURIComponent(rootId);
       });
     });
 
@@ -2186,7 +2193,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     if (practiceBtn && !practiceBtn.disabled) {
       practiceBtn.addEventListener('click', function () {
         var item = practiceItemFor(entry);
-        if (item) ns.practice.open(item);
+        if (item) ns.practice.openWithMeaning(item);
       });
     }
 

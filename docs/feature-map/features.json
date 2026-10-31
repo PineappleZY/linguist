@@ -1,7 +1,7 @@
 {
-  "generated": "2026-10-31T09:20:20.000Z",
+  "generated": "2026-10-31T09:44:22.531Z",
   "counts": {
-    "version": "8.1.2",
+    "version": "8.1.3",
     "languages": 7,
     "liveLanguages": 5,
     "retiredLanguages": [
@@ -12,7 +12,7 @@
     "sentenceCards": 9,
     "documentCards": 4,
     "uiLanguages": 5,
-    "strings": 492,
+    "strings": 493,
     "timeoutMs": 45000,
     "documentTimeoutMs": 90000,
     "chunkChars": 20000,
@@ -44,8 +44,8 @@
     }
   ],
   "latest": {
-    "version": "8.1.2",
-    "summary": "星标与默认单词本闭环；同根词可查；解释缓存命中；反查/句子翻译入口；提示收敛；Roots 只留图标收藏与笔记。"
+    "version": "8.1.3",
+    "summary": "练习默认解释语言补全、锁定目标语言的句子翻译、提示去重、My Map 主页面卡片与轻量关系、Context 来源持久化、星标/同根词/缓存闭环。"
   },
   "badges": {
     "star-sync": "updated",
@@ -57,9 +57,37 @@
     "context-to-root": "updated",
     "i18n": "updated",
     "tests": "updated",
-    "preview": "updated"
+    "preview": "updated",
+    "practice-meaning-completion": "new",
+    "lookup-hints": "new",
+    "reverse-translate": "new",
+    "personal-network": "new",
+    "context-sources": "new"
   },
   "changes": [
+    {
+      "version": "8.1.3",
+      "summary": "练习默认解释语言补全、锁定目标语言的句子翻译、提示去重、My Map 主页面卡片与轻量关系、Context 来源持久化、星标/同根词/缓存闭环。",
+      "added": [
+        "practice-meaning-completion",
+        "lookup-hints",
+        "reverse-translate",
+        "personal-network",
+        "context-sources"
+      ],
+      "changed": [
+        "star-sync",
+        "default-wordbook",
+        "root-word-links",
+        "explanation-cache",
+        "root-star",
+        "root-atlas",
+        "context-to-root",
+        "i18n",
+        "tests",
+        "preview"
+      ]
+    },
     {
       "version": "8.1.2",
       "summary": "星标与默认单词本闭环；同根词可查；解释缓存命中；反查/句子翻译入口；提示收敛；Roots 只留图标收藏与笔记。",
@@ -746,7 +774,7 @@
       "files": [
         "js/strings.js"
       ],
-      "summary": "492 keys in 5 languages, written per language rather than translated word for word; a missing key falls back to English, then to the key itself."
+      "summary": "493 keys in 5 languages, written per language rather than translated word for word; a missing key falls back to English, then to the key itself."
     },
     {
       "id": "api",
@@ -1185,6 +1213,63 @@
         "DEPLOY.md"
       ],
       "summary": "Packaging is not part of 7.0 web work; exe, apk and Apple targets are handed to other assistants."
+    },
+    {
+      "id": "practice-meaning-completion",
+      "layer": "feature",
+      "label": "Practice meaning completion",
+      "zh": "练习默认释义补全",
+      "files": [
+        "js/practice.js",
+        "js/view-favorites.js"
+      ],
+      "summary": "Resolves the configured default explanation language and fills a missing overview version before practice, with fallback."
+    },
+    {
+      "id": "lookup-hints",
+      "layer": "feature",
+      "label": "Lookup hints",
+      "zh": "查询提示",
+      "files": [
+        "js/view-dictionary.js",
+        "js/strings.js"
+      ],
+      "summary": "One mode-specific, localized lookup hint instead of duplicated auto/word placeholders."
+    },
+    {
+      "id": "reverse-translate",
+      "layer": "feature",
+      "label": "Reverse and translate",
+      "zh": "反查与翻译",
+      "files": [
+        "js/view-dictionary.js",
+        "js/api.js",
+        "js/prompts.js"
+      ],
+      "summary": "Fixed target language detection routes mismatched words to reverse candidates and sentences to translation."
+    },
+    {
+      "id": "personal-network",
+      "layer": "feature",
+      "label": "Personal root network",
+      "zh": "个人词根网络",
+      "files": [
+        "js/roots.js",
+        "js/view-roots.js"
+      ],
+      "summary": "Card-first personal map with a lightweight top-root relation strip."
+    },
+    {
+      "id": "context-sources",
+      "layer": "feature",
+      "label": "Context sources",
+      "zh": "语境来源",
+      "files": [
+        "js/roots.js",
+        "js/view-word.js",
+        "js/view-document.js"
+      ],
+      "summary": "Records sentence/document context on roots and merges it through backup."
     }
   ],
   "edges": [
@@ -1723,6 +1808,34 @@
     [
       "explanation-cache",
       "entry"
+    ],
+    [
+      "practice",
+      "practice-meaning-completion"
+    ],
+    [
+      "practice-meaning-completion",
+      "explanation-cache"
+    ],
+    [
+      "lookup-hints",
+      "i18n"
+    ],
+    [
+      "reverse-translate",
+      "api"
+    ],
+    [
+      "personal-root-map",
+      "personal-network"
+    ],
+    [
+      "context-to-root",
+      "context-sources"
+    ],
+    [
+      "context-sources",
+      "store"
     ]
   ]
 }

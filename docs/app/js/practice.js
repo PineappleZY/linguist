@@ -347,6 +347,49 @@ window.LINGUIST = window.LINGUIST || {};
     return text ? String(text) : fallback;
   }
 
+  /* Prepare the meaning in the configured default explanation language. If
+     that version is not on the device, fetch a tiny overview version and merge
+     it into the same group. Practice still opens on a fallback if no key or
+     the request fails. */
+  function ensureDefaultMeaning(item) {
+    if (!item || !item.language || !ns.store) return Promise.resolve(item);
+    var wanted = ns.store.outputLangFor(item.language);
+    if (!wanted || item.outputLang === wanted) return Promise.resolve(item);
+    var id = ns.store.entryId(item.word || '', item.language, item.model, wanted);
+    var sibling = ns.store.getEntry(id);
+    if (sibling && sibling.overview) return Promise.resolve(item);
+    var settings = ns.store.getSettings();
+    if (!settings.apiKey || (typeof navigator !== 'undefined' && navigator.onLine === false)) {
+      item.meaningFallback = true;
+      return Promise.resolve(item);
+    }
+    return ns.api.overview({
+      apiKey: settings.apiKey, model: item.model || settings.model,
+      sourceLang: item.language, outputLang: wanted, input: item.word
+    }).then(function (overview) {
+      if (overview && overview.quick_meaning) {
+        ns.store.saveEntry({
+          id: id, kind: 'word', word: item.word, language: item.language,
+          model: item.model || settings.model, outputLang: wanted,
+          overview: overview, lines: {}, ts: Date.now(), starred: false
+        });
+      }
+      return item;
+    }).catch(function () {
+      item.meaningFallback = true;
+      return item;
+    });
+  }
+
+  function openWithMeaning(item, options) {
+    ensureDefaultMeaning(item).then(function (prepared) {
+      open(prepared, options);
+      if (prepared.meaningFallback && refs.prompt) {
+        ns.ui.toast(ns.ui.t('practice.meaningFallback'), { ms: 5000 });
+      }
+    });
+  }
+
   /* The tone of every pinyin syllable, deduced from the tone marks themselves:
      a syllable carries at most one marked vowel, so walking the marks gives the
      pattern without needing a syllable splitter. Neutral tone stays 5. */
@@ -607,7 +650,7 @@ window.LINGUIST = window.LINGUIST || {};
          wrong, even though the word was eventually spelled right: it belongs
          in the next pass just as a skipped word does. */
       var next = onAdvance({ outcome: outcome });
-      if (next) { open(next); return; }
+      if (next) { ensureDefaultMeaning(next).then(function (prepared) { open(prepared); }); return; }
     }
     close();
   }
@@ -835,6 +878,7 @@ window.LINGUIST = window.LINGUIST || {};
     applySubmit: applySubmit,
     applyHint: applyHint,
     meaningFor: meaningFor,
+    ensureDefaultMeaning: ensureDefaultMeaning,
     firstHint: firstHint,
     tonePatternOf: tonePatternOf,
     moraCount: moraCount,
@@ -844,6 +888,7 @@ window.LINGUIST = window.LINGUIST || {};
       onSkip = options && options.onSkip ? options.onSkip : null;
       open(item);
     },
+    openWithMeaning: openWithMeaning,
     close: close,
     isOpen: function () { return !!current; },
     current: function () { return current; }

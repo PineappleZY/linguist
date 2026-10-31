@@ -1,6 +1,6 @@
-# Linguist 8.1.2 — 界面文案对照表
+# Linguist 8.1.3 — 界面文案对照表
 
-这份表是 `web/js/strings.js` 的直接产物（`node tools/strings-md.mjs` 重新生成），供你或母语者复核。共 **492 条 × 5 种语言**。
+这份表是 `web/js/strings.js` 的直接产物（`node tools/strings-md.mjs` 重新生成），供你或母语者复核。共 **493 条 × 5 种语言**。
 
 **怎么用**：切到某一语言后，可能觉得某句不像该语言的人会说的话——直接在表里指出 key 与建议改法即可，我会改 `strings.js`（改一行，五个语言各自独立）。
 
@@ -423,6 +423,7 @@
 | `profile.key.ok` | Connection works. The model replied “{sample}”. | 连接正常，模型的回复是「{sample}」。 | La connexion fonctionne. Le modèle a répondu « {sample} ». | Die Verbindung funktioniert. Das Modell antwortete „{sample}“. | 接続できました。モデルの返答は「{sample}」です。 |
 | `profile.model.hint` | Switching the model or the explanation language makes the next lookup of the same word regenerate. | 换模型或换解释语言后，同一个词下次查询会重新生成。 | Changer de modèle ou de langue d'explication fait régénérer la prochaine recherche du même mot. | Ein Wechsel des Modells oder der Erklärungssprache lässt die nächste Suche desselben Wortes neu erzeugen. | モデルや説明言語を変えると、同じ語の次回の検索は作り直されます。 |
 | `practice.replayLocked` | Show a hint first, then you can hear it | 先用一次提示，之后可以播放 | Affichez d'abord un indice, puis écoutez | Zeige zuerst einen Hinweis, dann kannst du es hören | まずヒントを表示すると再生できます |
+| `practice.meaningFallback` | Default-language meaning could not be generated; using the stored version. | 默认解释语言未能生成，暂时使用已有版本。 | La version par défaut n’a pas pu être générée ; la version existante est utilisée. | Die Standardsprache konnte nicht erzeugt werden; die vorhandene Version wird verwendet. | 既定の説明言語を生成できませんでした。既存の版を使用します。 |
 | `theme.auto` | Auto | 自动 | Auto | Automatisch | 自動 |
 | `theme.light` | Light | 浅色 | Clair | Hell | ライト |
 | `theme.dark` | Dark | 深色 | Sombre | Dunkel | ダーク |
