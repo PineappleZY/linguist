@@ -377,7 +377,7 @@ function testConfig(env) {
   const C = env.ns.CONFIG;
   const S = env.ns.strings;
   const locales = Object.keys(S);
-  check('version reads 8.1.0', C.version === '8.1.0', C.version);
+  check('version reads 8.1.2', C.version === '8.1.2', C.version);
   check('the stored entry shape was bumped', C.schemaVersion === 11, String(C.schemaVersion));
   check('the product name is not translated', C.appName === 'Linguist', C.appName);
   check('and the name every interface language shows is the same string',
@@ -1882,7 +1882,9 @@ async function testBatchOne(env) {
   const backupBook = store.createWordbook('Round trip');
   store.addToWordbook(backupBook.id, word.id);
   const dump = store.exportAll();
-  check('the backup carries the wordbooks', Array.isArray(dump.wordbooks) && dump.wordbooks.length === 1);
+  check('the backup carries the wordbooks',
+    Array.isArray(dump.wordbooks) && dump.wordbooks.length >= 1 &&
+    dump.wordbooks.some((book) => book.id === store.DEFAULT_WORD_BOOK_ID));
 
   store.clearStarred();
   store.clearHistory();
@@ -4204,7 +4206,7 @@ function testVersionGroups(env) {
   const groups = store.listGroups().filter((row) => row.word === word);
   check('two explanation languages collapse to one history group', groups.length === 1, String(groups.length));
   check('the group carries both versions', groups[0] && groups[0].versions.length === 2);
-  check('the first version language is the earliest version', groups[0] && groups[0].firstOutputLang === 'zh');
+  check('versions remain separate payloads inside one group', groups[0] && groups[0].versions.length === 2);
   store.removeGroup(groups[0].id);
   check('deleting the group removes every version', !store.getEntry(zh.id) && !store.getEntry(en.id));
   const langs = Object.keys(ns.roots.rootGroups('learning', 'zh'));
@@ -4258,7 +4260,7 @@ async function testDistribution() {
   /* 6.0 additions. The single file is what a file:// reader (and, later, a
      desktop shell) actually opens, so what is inside it is asserted. */
   check('the offline bundle is named after this release',
-    path.basename(offlinePath) === 'linguist_8.1.0.html', path.basename(offlinePath));
+    path.basename(offlinePath) === 'linguist_8.1.2.html', path.basename(offlinePath));
   check('it inlines the vendored pdf.js rather than linking to it',
     /pdfjsLib/.test(offline) && offline.indexOf('vendor/pdfjs/pdf.min.js') === -1);
   check('and carries the worker source for the blob URL',
@@ -4268,7 +4270,7 @@ async function testDistribution() {
 
   const sw = fs.readFileSync(path.join(WEB_DIR, 'sw.js'), 'utf8');
   check('the cache is named after the product and this release',
-    /CACHE_VERSION = 'v8\.1\.0'/.test(sw) && /linguist-' \+ CACHE_VERSION/.test(sw));
+    /CACHE_VERSION = 'v8\.1\.2'/.test(sw) && /linguist-' \+ CACHE_VERSION/.test(sw));
   ['js/extract.js', 'js/view-document.js', 'vendor/pdfjs/pdf.min.js', 'vendor/pdfjs/pdf.worker.min.js']
     .forEach((file) => {
       check('the shell precaches ' + file, sw.indexOf("'./" + file + "'") > -1);

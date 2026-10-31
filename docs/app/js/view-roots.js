@@ -166,14 +166,6 @@ window.LINGUIST.views = window.LINGUIST.views || {};
   function detail(key) {
     var root = roots.getRoot(key);
     if (!root) return '<div class="empty"><div class="empty-title">' + ui.esc(ui.t('roots.notFound')) + '</div></div>';
-    var versionLangs = [ns.store.outputLangFor(root.language)].concat(roots.rootVersionOptions(key));
-    versionLangs = versionLangs.filter(function (value, i, list) { return value && list.indexOf(value) === i; });
-    var versionLang = ns.session.rootVersionLang || versionLangs[0];
-    var version = roots.rootVersion(key, versionLang);
-    if (version) root = Object.assign({}, root, {
-      meaning: version.meaning || root.meaning, origin: version.origin || root.origin,
-      evolution: version.evolution || root.evolution, variants: version.variants || root.variants
-    });
     var family = roots.familyWords(key);
     var html = '<div class="root-detail-head"><div class="root-glyph mono" dir="auto">' +
       ui.esc(root.display) + '</div><div><div class="root-meaning">' + ui.esc(root.meaning || '') +
@@ -181,28 +173,15 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       ui.esc(ui.t('roots.state.' + root.state)) + ' · ' + ui.esc(dueLabel(root.dueAt)) +
       '</div><div class="hint">' + ui.esc(ui.t('roots.lapses', { n: root.lapses || 0 })) + '</div></div></div>';
     html += '<p class="hint">' + ui.esc(ui.t('roots.aiNote')) + '</p>';
-    html += '<div class="notice-actions"><button type="button" class="btn btn-sm" data-root-star="' +
-      ui.esc(roots.atlasId(root)) + '">' + ui.esc(roots.isRootStarred(roots.atlasId(root)) ?
-        ui.t('roots.rootStarred') : ui.t('roots.starRoot')) + '</button></div>';
-    html += '<div class="notice-actions"><button type="button" class="btn btn-sm" data-root-note="' +
-      ui.esc(roots.atlasId(root)) + '">' + ui.esc(ui.t('roots.note')) + '</button></div>';
-    html += '<div class="notice-actions"><button type="button" class="btn btn-sm" data-save-family="' +
-      ui.esc(roots.atlasId(root)) + '">' + ui.esc(ui.t(roots.familySaved(roots.atlasId(root)) ?
-        'roots.familySaved' : 'roots.saveFamily')) + '</button></div>';
+    html += '<div class="notice-actions"><button type="button" class="icon-btn' +
+      (roots.isRootStarred(roots.atlasId(root)) ? ' is-starred' : '') + '" data-root-star="' +
+      ui.esc(roots.atlasId(root)) + '" aria-label="' + ui.esc(ui.t('roots.starRoot')) + '">' +
+      (roots.isRootStarred(roots.atlasId(root)) ? ui.iconFilled('star') : ui.icon('star')) + '</button>' +
+      '<button type="button" class="icon-btn" data-root-note="' + ui.esc(roots.atlasId(root)) +
+      '" aria-label="' + ui.esc(ui.t('roots.note')) + '">' + ui.icon('pencil') + '</button></div>';
     if (root.variants && root.variants.length) {
       html += '<p class="hint">' + ui.esc(ui.t('roots.variants')) + ': ' +
         ui.esc(root.variants.join(' · ')) + '</p>';
-    }
-    if (versionLangs.length > 1) {
-      html += '<div class="settings-row"><span class="settings-key">' + ui.esc(ui.t('entry.explainIn')) + '</span>' +
-        ui.picker({ id: 'root-version', value: versionLang, compact: true, label: ui.t('entry.explainIn'),
-          options: versionLangs.map(function (lang) { return { id: lang, label: ui.langName(lang) }; }),
-          onPick: function (next) { ns.session.rootVersionLang = next; ns.router.refresh(); } }) + '</div>';
-    } else if (!version) {
-      html += '<div class="notice-actions"><button type="button" class="btn btn-sm" data-root-generate="' +
-        ui.esc(roots.atlasId(root)) + '" data-root-lang="' + ui.esc(root.language || 'en') +
-        '" data-root-out="' + ui.esc(versionLang || '') + '">' + ui.esc(ui.t('roots.generateVersion')) +
-        '</button></div>';
     }
     var sourceEntry = root.wordIds && root.wordIds.length ? ns.store.getEntry(root.wordIds[0]) : null;
     var chain = sourceEntry && sourceEntry.lines && sourceEntry.lines.etymology &&
@@ -216,8 +195,6 @@ window.LINGUIST.views = window.LINGUIST.views || {};
             (node.meaning ? '<div class="etym-meaning">' + ui.esc(node.meaning) + '</div>' : '') + '</li>';
         }).join('') + '</ol>';
     }
-    html += '<div class="notice-actions"><button type="button" class="btn btn-primary" id="root-review-one">' +
-      ui.icon('branch') + ui.esc(ui.t('roots.reviewOne')) + '</button></div>';
     if (family.length) {
       html += '<div class="section-head"><span class="card-title">' + ui.esc(ui.t('roots.family')) +
         '</span></div><div class="list">' + family.map(function (word) {
@@ -280,38 +257,12 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     if (toDictionary) toDictionary.addEventListener('click', function () { location.hash = '#/dictionary'; });
     var toStarred = container.querySelector('[data-roots-starred]');
     if (toStarred) toStarred.addEventListener('click', function () { location.hash = '#/favorites'; });
-    var one = container.querySelector('#root-review-one');
-    if (one) one.addEventListener('click', function () { ns.rootReview.open(params.key); });
     var note = container.querySelector('[data-root-note]');
     if (note) note.addEventListener('click', function () {
       var id = note.getAttribute('data-root-note');
       var value = window.prompt(ui.t('roots.note'), roots.rootNote(id));
       if (value == null) return;
       roots.setRootNote(id, value);
-      ns.router.refresh();
-    });
-    var generate = container.querySelector('[data-root-generate]');
-    if (generate) generate.addEventListener('click', function () {
-      var settings = ns.store.getSettings();
-      if (!settings.apiKey) { ui.toast(ui.t('error.kind.no_key')); return; }
-      var id = generate.getAttribute('data-root-generate');
-      var source = generate.getAttribute('data-root-lang') || 'en';
-      var out = generate.getAttribute('data-root-out') || ns.store.outputLangFor(source);
-      generate.disabled = true;
-      ns.api.rootDetail({ apiKey: settings.apiKey, model: settings.model,
-        root: roots.getRoot(id).display, sourceLang: source, outputLang: out })
-        .then(function (data) {
-          if (data) roots.addRootVersion(id, out, data);
-          ns.router.refresh();
-        }).catch(function (err) {
-          ui.toast(err && err.message ? err.message : ui.t('roots.noDue'));
-          generate.disabled = false;
-        });
-    });
-    var saveFamily = container.querySelector('[data-save-family]');
-    if (saveFamily) saveFamily.addEventListener('click', function () {
-      roots.saveFamily(saveFamily.getAttribute('data-save-family'));
-      ui.toast(ui.t('roots.familySaved'));
       ns.router.refresh();
     });
     bindRootRows(container);

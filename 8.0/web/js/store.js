@@ -303,7 +303,6 @@ window.LINGUIST = window.LINGUIST || {};
       var group = JSON.parse(JSON.stringify(primary));
       group.id = primary.id;
       group.groupKey = key;
-      group.firstOutputLang = primary.outputLang || '';
       group.outputLang = primary.outputLang || '';
       group.ts = latest.ts || primary.ts || 0;
       group.starred = versions.some(function (row) { return !!row.starred; });
@@ -425,6 +424,7 @@ window.LINGUIST = window.LINGUIST || {};
      anything, and deleting a book never deletes a word. */
 
   var SURPRISE_BOOK_ID = 'surprise';
+  var DEFAULT_WORD_BOOK_ID = 'my-words';
 
   function listWordbooks() {
     if (!cache.wordbooks) {
@@ -469,7 +469,7 @@ window.LINGUIST = window.LINGUIST || {};
   }
 
   function renameWordbook(id, name) {
-    if (id === SURPRISE_BOOK_ID) return false;
+    if (id === SURPRISE_BOOK_ID || id === DEFAULT_WORD_BOOK_ID) return false;
     var clean = cleanName(name);
     if (!clean) return false;
     var books = listWordbooks();
@@ -483,7 +483,7 @@ window.LINGUIST = window.LINGUIST || {};
 
   /* Removes the book only. Its words stay in the favourites. */
   function removeWordbook(id) {
-    if (id === SURPRISE_BOOK_ID) return false;
+    if (id === SURPRISE_BOOK_ID || id === DEFAULT_WORD_BOOK_ID) return false;
     var books = listWordbooks();
     var next = books.filter(function (book) { return book.id !== id; });
     if (next.length === books.length) return false;
@@ -534,6 +534,16 @@ window.LINGUIST = window.LINGUIST || {};
     if (book) return book;
     var books = listWordbooks();
     book = { id: SURPRISE_BOOK_ID, name: 'Surprise me', ts: Date.now(), entries: [] };
+    books.push(book);
+    saveWordbooks(books);
+    return book;
+  }
+
+  function ensureDefaultWordbook() {
+    var book = findWordbook(DEFAULT_WORD_BOOK_ID);
+    if (book) return book;
+    var books = listWordbooks();
+    book = { id: DEFAULT_WORD_BOOK_ID, name: 'My words', ts: Date.now(), entries: [] };
     books.push(book);
     saveWordbooks(books);
     return book;
@@ -671,6 +681,12 @@ window.LINGUIST = window.LINGUIST || {};
       else listWordbooks().forEach(function (book) {
         group.forEach(function (item) { removeFromWordbook(book.id, item.id); });
       });
+    } else if (row && starred) {
+      addToWordbook(ensureDefaultWordbook().id, row.id);
+    } else if (row && !starred) {
+      listWordbooks().forEach(function (book) {
+        group.forEach(function (item) { removeFromWordbook(book.id, item.id); });
+      });
     }
     if (ns.events) ns.events.emit('catalog:changed');
     return starred;
@@ -805,7 +821,6 @@ window.LINGUIST = window.LINGUIST || {};
       rootIndex: readJSON(STORAGE.rootIndex, null),
       rootNotes: readJSON(STORAGE.rootNotes, {}),
       rootStars: readJSON(STORAGE.rootStars, {}),
-      rootFamilies: readJSON(STORAGE.rootFamilies, {}),
       /* Wordbooks are the user's own curation; leaving them out meant a backup
          round-trip silently threw them away. */
       wordbooks: payload.wordbooks
@@ -879,9 +894,6 @@ window.LINGUIST = window.LINGUIST || {};
     }
     if (payload.rootStars && typeof payload.rootStars === 'object') {
       writeJSON(STORAGE.rootStars, Object.assign(readJSON(STORAGE.rootStars, {}), payload.rootStars));
-    }
-    if (payload.rootFamilies && typeof payload.rootFamilies === 'object') {
-      writeJSON(STORAGE.rootFamilies, Object.assign(readJSON(STORAGE.rootFamilies, {}), payload.rootFamilies));
     }
 
     if (payload.settings && typeof payload.settings === 'object') {
@@ -1077,7 +1089,9 @@ window.LINGUIST = window.LINGUIST || {};
     removeFromWordbook: removeFromWordbook,
     wordbooksFor: wordbooksFor,
     ensureSurpriseBook: ensureSurpriseBook,
+    ensureDefaultWordbook: ensureDefaultWordbook,
     saveDiscovery: saveDiscovery,
-    SURPRISE_BOOK_ID: SURPRISE_BOOK_ID
+    SURPRISE_BOOK_ID: SURPRISE_BOOK_ID,
+    DEFAULT_WORD_BOOK_ID: DEFAULT_WORD_BOOK_ID
   };
 })(window.LINGUIST);

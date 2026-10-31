@@ -1,6 +1,6 @@
-# Linguist 8.1.0 — 界面文案对照表
+# Linguist 8.1.2 — 界面文案对照表
 
-这份表是 `web/js/strings.js` 的直接产物（`node tools/strings-md.mjs` 重新生成），供你或母语者复核。共 **494 条 × 5 种语言**。
+这份表是 `web/js/strings.js` 的直接产物（`node tools/strings-md.mjs` 重新生成），供你或母语者复核。共 **492 条 × 5 种语言**。
 
 **怎么用**：切到某一语言后，可能觉得某句不像该语言的人会说的话——直接在表里指出 key 与建议改法即可，我会改 `strings.js`（改一行，五个语言各自独立）。
 
@@ -56,10 +56,7 @@
 | `roots.note` | Personal note | 个人笔记 | Note personnelle | Persönliche Notiz | 個人メモ |
 | `roots.starRoot` | Star this root | 收藏这个词根 | Ajouter cette racine | Diese Wurzel markieren | この語根をスター |
 | `roots.rootStarred` | Root starred | 词根已收藏 | Racine ajoutée | Wurzel markiert | 語根をスター済み |
-| `roots.generateVersion` | Generate this explanation version | 生成这个解释版本 | Générer cette version d’explication | Diese Erklärungsversion erzeugen | この説明バージョンを生成 |
 | `roots.lookupForRoot` | Look up to build its root | 查词建立词根 | Chercher pour créer sa racine | Nachschlagen, um die Wurzel anzulegen | 調べて語根を作成 |
-| `roots.saveFamily` | Save family to my map | 保存词族到我的地图 | Enregistrer la famille dans ma carte | Wortfamilie in meiner Karte speichern | 語族をマイマップに保存 |
-| `roots.familySaved` | Family saved | 词族已保存 | Famille enregistrée | Wortfamilie gespeichert | 語族を保存しました |
 | `roots.all` | All roots | 全部词根 | Toutes les racines | Alle Wurzeln | すべての語根 |
 | `roots.state.new` | New | 新词根 | Nouvelle | Neu | 新規 |
 | `roots.state.learning` | Learning | 在学 | En cours | Im Lernen | 学習中 |
@@ -111,6 +108,7 @@
 | `dict.search.placeholder` | Word, phrase or sentence | 单词、短语或句子 | Un mot, une expression ou une phrase | Wort, Wendung oder Satz | 単語・成句・文 |
 | `dict.search.placeholder.sentence` | Paste a sentence to analyse | 粘贴一个句子来分析 | Collez une phrase à analyser | Satz zum Analysieren einfügen | 分析したい文を貼り付けてください |
 | `dict.search.label` | Look up | 查询 | Chercher | Nachschlagen | 調べる |
+| `dict.translate.title` | Translation | 翻译 | Traduction | Übersetzung | 翻訳 |
 | `dict.surprise` | Surprise me | 随便看看 | Au hasard | Überrasch mich | おまかせ |
 | `dict.surprise.thinking` | Thinking… | 正在想… | Recherche… | Denke nach… | 考えています… |
 | `dict.surprise.empty` | Could not think of one — try again. | 没想到合适的，再试一次。 | Rien trouvé — réessayez. | Nichts gefunden — versuch es nochmal. | 見つかりませんでした。もう一度お試しください。 |

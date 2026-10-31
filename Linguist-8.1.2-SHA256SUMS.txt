@@ -1,0 +1,2 @@
+15e11c62dc2faa634fd840960e99cf57cbc392fc7688c927d0aebe04d1c4718e  linguist_8.1.2.html
+cb8f7c4f5d3d7cebc5eab22ab7f2faa46accfea90571cb11fa365b7408a9720c  Linguist-8.1.2-web.zip

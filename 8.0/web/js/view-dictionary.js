@@ -87,7 +87,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     var id = store.entryId(word, lang || 'auto', settings.model, out);
     var cached = store.getEntry(id);
 
-    if (cached && cached.lines) {
+    if (cached) {
       ns.session.pending = null;
       location.hash = '#/word/' + encodeURIComponent(id);
       ns.router.refresh();
@@ -107,7 +107,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     var out = outputLang || store.outputLangFor(lang || CONFIG.autoLang);
     var id = store.sentenceId(text, lang || 'auto', settings.model, out);
     var cached = store.getEntry(id);
-    if (cached && cached.lines) {
+    if (cached) {
       ns.session.pending = null;
       location.hash = '#/word/' + encodeURIComponent(id);
       ns.router.refresh();
@@ -133,7 +133,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     var out = outputLang || store.outputLangFor(lang || CONFIG.autoLang);
     var id = store.documentId(name, text, lang, settings.model, out);
     var cached = store.getEntry(id);
-    if (cached && cached.lines) {
+    if (cached) {
       ns.session.pending = null;
       location.hash = '#/word/' + encodeURIComponent(id);
       ns.router.refresh();
@@ -305,28 +305,46 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     if (result.error) { ui.toast(ui.t(result.error, result.vars)); return; }
     ns.session.candidates = null;
 
-    if (mode === 'sentence') { openSentence(result.value); return; }
-
     var lang = currentLang();
 
-    /* Reverse lookup only makes sense when the target is a Latin-script
-       language and the query is not: you pinned English and typed a meaning.
-       In Auto a non-Latin query is simply a headword in Japanese or Chinese,
-       which the overview prompt identifies. */
-    if (lang !== CONFIG.autoLang && isNonLatin(text)) {
-      var meta = languageMeta(lang);
-      if (meta && meta.script === 'latin') { runReverse(text, lang); return; }
+    function normalSubmit() {
+      if (mode === 'sentence') { openSentence(text, lang === CONFIG.autoLang ? null : lang); return; }
+
+      /* Reverse lookup only makes sense when the target is a Latin-script
+         language and the query is not: you pinned English and typed a meaning.
+         In Auto a non-Latin query is simply a headword in Japanese or Chinese,
+         which the overview prompt identifies. */
+      if (lang !== CONFIG.autoLang && isNonLatin(text)) {
+        var meta = languageMeta(lang);
+        if (meta && meta.script === 'latin') { runReverse(text, lang); return; }
+      }
+
+      /* Accented language typed without diacritics: check before spending a
+         full lookup. */
+      var target = lang === CONFIG.autoLang ? null : languageMeta(lang);
+      if (target && target.accents && !hasAccent(text)) {
+        runAccentCheck(text, lang);
+        return;
+      }
+
+      openWord(text, lang === CONFIG.autoLang ? null : lang, selected === 'auto');
     }
 
-    /* Accented language typed without diacritics: check before spending a
-       full lookup. */
-    var target = lang === CONFIG.autoLang ? null : languageMeta(lang);
-    if (target && target.accents && !hasAccent(text)) {
-      runAccentCheck(text, lang);
+    var settings = store.getSettings();
+    if (lang !== CONFIG.autoLang && settings.apiKey && mode === 'sentence') {
+      ns.api.detectLanguage({ apiKey: settings.apiKey, model: settings.model, input: text })
+        .then(function (result) {
+          var detected = CONFIG.languageByAnyName(result && result.language);
+          if (detected && detected !== lang) {
+            if (mode === 'sentence') runTranslate(text, lang, detected);
+            else runReverse(text, lang);
+            return;
+          }
+          normalSubmit();
+        }).catch(function () { normalSubmit(); });
       return;
     }
-
-    openWord(text, lang === CONFIG.autoLang ? null : lang, selected === 'auto');
+    normalSubmit();
   }
 
   /* ---------- Candidate panels ---------- */
@@ -512,6 +530,23 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     });
   }
 
+  function runTranslate(input, targetLang, sourceLang) {
+    var settings = store.getSettings();
+    panelState({ state: 'loading', input: input, kind: 'translation', targetLang: targetLang });
+    ns.api.translateText({
+      apiKey: settings.apiKey, model: settings.model,
+      sourceLang: sourceLang, targetLang: targetLang, input: input
+    }).then(function (data) {
+      panelState({
+        state: data && data.translation ? 'ready' : 'empty',
+        kind: 'translation', input: input, targetLang: targetLang,
+        translation: data ? data.translation : ''
+      });
+    }).catch(function (err) {
+      panelState({ state: 'error', kind: 'translation', input: input, error: ns.api.toErrorShape(err) });
+    });
+  }
+
   /* Case-insensitive but diacritic-SENSITIVE: cote and côte are precisely the
      pair this panel exists to tell apart. */
   function sameWord(a, b) {
@@ -591,12 +626,13 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     var state = ns.session.candidates;
     if (!state) return '';
     var accent = state.kind === 'accent';
-    var heading = accent
-      ? ui.t('dict.candidates.accentTitle')
-      : ui.t('dict.candidates.title', { input: state.input });
+    var translation = state.kind === 'translation';
+    var heading = translation
+      ? ui.t('dict.translate.title')
+      : (accent ? ui.t('dict.candidates.accentTitle') : ui.t('dict.candidates.title', { input: state.input }));
 
     var html = '<section class="card fade-in" id="candidate-panel" style="margin-bottom:16px">' +
-      '<div class="card-head">' + ui.icon(accent ? 'pencil' : 'search') +
+      '<div class="card-head">' + ui.icon(translation ? 'quote' : (accent ? 'pencil' : 'search')) +
       '<span class="card-title">' + heading + '</span><span class="topbar-spacer"></span>' +
       '<button type="button" class="btn-quiet btn" data-clear-candidates>' +
       ui.esc(ui.t('dict.candidates.cancel')) + '</button></div>';
@@ -608,6 +644,8 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       html += '<p class="muted small">' + ui.esc(ui.t('dict.candidates.empty')) + '</p>';
     } else if (state.state === 'error') {
       html += errorNotice(state.error, { compact: true });
+    } else if (state.kind === 'translation') {
+      html += '<p class="core-metaphor" dir="auto">' + ui.esc(state.translation || '') + '</p>';
     } else {
       html += '<ol class="deflist">' + state.items.map(function (item) {
         return '<li><button type="button" class="row" style="padding:8px 0;border-radius:12px" ' +
@@ -795,7 +833,7 @@ window.LINGUIST.views = window.LINGUIST.views || {};
           value: lang,
           label: ui.t('dict.language'),
           title: ui.t('dict.language'),
-          options: [{ id: CONFIG.autoLang, label: ui.t('mode.auto'), note: ui.t('dict.language.autoNote') }]
+          options: [{ id: CONFIG.autoLang, label: ui.t('mode.auto') }]
             .concat(CONFIG.queryLanguages.map(function (item) {
               return { id: item.id, label: item.native };
             })),

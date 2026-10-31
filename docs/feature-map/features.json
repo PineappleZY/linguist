@@ -1,7 +1,7 @@
 {
-  "generated": "2026-10-27T13:31:25.768Z",
+  "generated": "2026-10-31T09:20:20.000Z",
   "counts": {
-    "version": "8.1.0",
+    "version": "8.1.2",
     "languages": 7,
     "liveLanguages": 5,
     "retiredLanguages": [
@@ -12,7 +12,7 @@
     "sentenceCards": 9,
     "documentCards": 4,
     "uiLanguages": 5,
-    "strings": 494,
+    "strings": 492,
     "timeoutMs": 45000,
     "documentTimeoutMs": 90000,
     "chunkChars": 20000,
@@ -44,33 +44,65 @@
     }
   ],
   "latest": {
-    "version": "8.1.0",
-    "summary": "Root Atlas 统一 rootId、词根级星标、Personal Map 并集、词族关系、Context 回流、root version 生成、Atlas 缓存与搜索修复。"
+    "version": "8.1.2",
+    "summary": "星标与默认单词本闭环；同根词可查；解释缓存命中；反查/句子翻译入口；提示收敛；Roots 只留图标收藏与笔记。"
   },
   "badges": {
+    "star-sync": "updated",
+    "default-wordbook": "updated",
+    "root-word-links": "updated",
+    "explanation-cache": "updated",
+    "root-star": "updated",
     "root-atlas": "updated",
-    "root-entity": "updated",
-    "root-aliases": "updated",
-    "personal-root-map": "updated",
     "context-to-root": "updated",
-    "root-search": "updated",
-    "root-versions": "updated",
-    "roots-tab": "updated",
-    "store": "updated",
     "i18n": "updated",
     "tests": "updated",
-    "preview": "updated",
-    "root-star": "new",
-    "family-relations": "new",
-    "root-migration": "new"
+    "preview": "updated"
   },
   "changes": [
+    {
+      "version": "8.1.2",
+      "summary": "星标与默认单词本闭环；同根词可查；解释缓存命中；反查/句子翻译入口；提示收敛；Roots 只留图标收藏与笔记。",
+      "added": [],
+      "changed": [
+        "star-sync",
+        "default-wordbook",
+        "root-word-links",
+        "explanation-cache",
+        "root-star",
+        "root-atlas",
+        "context-to-root",
+        "i18n",
+        "tests",
+        "preview"
+      ]
+    },
+    {
+      "version": "8.1.1",
+      "summary": "词条星标统一并进入默认单词本；同根词可查；解释缓存命中默认语言；清理保存词族/根版本生成/旧结构；Roots 收藏与笔记图标化。",
+      "added": [
+        "star-sync",
+        "default-wordbook",
+        "root-word-links",
+        "explanation-cache"
+      ],
+      "changed": [
+        "root-star",
+        "root-atlas",
+        "root-detail",
+        "context-to-root",
+        "personal-root-map",
+        "store",
+        "i18n",
+        "tests",
+        "preview"
+      ]
+    },
     {
       "version": "8.1.0",
       "summary": "Root Atlas 统一 rootId、词根级星标、Personal Map 并集、词族关系、Context 回流、root version 生成、Atlas 缓存与搜索修复。",
       "added": [
         "root-star",
-        "family-relations",
         "root-migration"
       ],
       "changed": [
@@ -80,7 +112,6 @@
         "personal-root-map",
         "context-to-root",
         "root-search",
-        "root-versions",
         "roots-tab",
         "store",
         "i18n",
@@ -104,7 +135,6 @@
         "root-index",
         "root-detail",
         "root-review",
-        "root-versions",
         "entry",
         "sentence",
         "doc-view",
@@ -124,7 +154,6 @@
         "root-scope",
         "root-memory",
         "root-session",
-        "root-versions",
         "root-distractors",
         "root-index",
         "root-detail",
@@ -142,7 +171,6 @@
         "root-memory",
         "root-session",
         "root-distractors",
-        "root-versions",
         "refresh-events"
       ],
       "changed": [
@@ -718,7 +746,7 @@
       "files": [
         "js/strings.js"
       ],
-      "summary": "494 keys in 5 languages, written per language rather than translated word for word; a missing key falls back to English, then to the key itself."
+      "summary": "492 keys in 5 languages, written per language rather than translated word for word; a missing key falls back to English, then to the key itself."
     },
     {
       "id": "api",
@@ -833,7 +861,7 @@
         "js/view-roots.js",
         "js/view-word.js"
       ],
-      "summary": "Clickable Word DNA roots open meaning, origin, variants, family words and source entries."
+      "summary": "Root identity, meaning, variants, source family, etymology, confidence and clickable family words; no review or version-generation actions here."
     },
     {
       "id": "root-mastery",
@@ -1004,17 +1032,6 @@
       "summary": "Four distinct, same-language explanation options whose distractors are similar in meaning but clearly different."
     },
     {
-      "id": "root-versions",
-      "layer": "feature",
-      "label": "Root versions",
-      "zh": "词根解释版本",
-      "files": [
-        "js/roots.js",
-        "js/store.js"
-      ],
-      "summary": "A root keyed by source language keeps separate explanation-language versions; default output language wins and cached versions switch without requests."
-    },
-    {
       "id": "refresh-events",
       "layer": "feature",
       "label": "Catalog refresh",
@@ -1104,17 +1121,6 @@
       "summary": "Explicit root stars join the personal map and review; source-word stars still contribute inherited eligibility."
     },
     {
-      "id": "family-relations",
-      "layer": "feature",
-      "label": "Saved family relations",
-      "zh": "词族关系",
-      "files": [
-        "js/roots.js",
-        "js/view-roots.js"
-      ],
-      "summary": "Saves root families to the personal map without bulk-starring words or changing wordbook membership."
-    },
-    {
       "id": "root-migration",
       "layer": "feature",
       "label": "Root progress migration",
@@ -1124,6 +1130,50 @@
         "js/app.js"
       ],
       "summary": "Idempotently merges old root keys into canonical rootId while preserving aliases, notes, counters and due dates."
+    },
+    {
+      "id": "star-sync",
+      "layer": "feature",
+      "label": "Star sync",
+      "zh": "星标同步",
+      "files": [
+        "js/store.js",
+        "js/view-word.js"
+      ],
+      "summary": "One group-aware star state for entry header, History and Starred; all explanation versions stay in sync."
+    },
+    {
+      "id": "default-wordbook",
+      "layer": "feature",
+      "label": "Default wordbook",
+      "zh": "默认单词本",
+      "files": [
+        "js/store.js",
+        "js/view-favorites.js"
+      ],
+      "summary": "Starring a word keeps it in the localized My words book; custom wordbooks remain separate."
+    },
+    {
+      "id": "root-word-links",
+      "layer": "feature",
+      "label": "Clickable root words",
+      "zh": "同根词可查",
+      "files": [
+        "js/view-word.js",
+        "js/view-roots.js"
+      ],
+      "summary": "Every complete family word links back to the dictionary in its source language."
+    },
+    {
+      "id": "explanation-cache",
+      "layer": "feature",
+      "label": "Explanation version cache",
+      "zh": "解释版本缓存",
+      "files": [
+        "js/view-dictionary.js",
+        "js/view-word.js"
+      ],
+      "summary": "Any stored payload is a cache hit even when deep lines are empty; switching existing output languages makes no request."
     },
     {
       "id": "packaging",
@@ -1571,14 +1621,6 @@
       "root-distractors"
     ],
     [
-      "root-index",
-      "root-versions"
-    ],
-    [
-      "entry",
-      "root-versions"
-    ],
-    [
       "refresh-events",
       "store"
     ],
@@ -1655,8 +1697,32 @@
       "store"
     ],
     [
-      "family-relations",
-      "personal-root-map"
+      "star-sync",
+      "store"
+    ],
+    [
+      "star-sync",
+      "entry"
+    ],
+    [
+      "star-sync",
+      "starred"
+    ],
+    [
+      "default-wordbook",
+      "wordbooks"
+    ],
+    [
+      "root-word-links",
+      "entry"
+    ],
+    [
+      "root-word-links",
+      "dictionary"
+    ],
+    [
+      "explanation-cache",
+      "entry"
     ]
   ]
 }

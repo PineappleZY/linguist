@@ -12,7 +12,7 @@
  * Bump CACHE_VERSION on every release; there is no server-side invalidation.
  */
 
-var CACHE_VERSION = 'v8.1.0';
+var CACHE_VERSION = 'v8.1.2';
 var CACHE_NAME = 'linguist-' + CACHE_VERSION;
 
 var PRECACHE = [

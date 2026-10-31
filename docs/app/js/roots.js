@@ -125,7 +125,7 @@ window.LINGUIST = window.LINGUIST || {};
         ts: row.ts || entry.ts || 0,
         word: row.word || entry.word || '',
         language: row.language || entry.language || '',
-        outputLang: entry.outputLang || row.firstOutputLang || '',
+        outputLang: entry.outputLang || '',
         roots: roots
       };
     });
@@ -315,34 +315,12 @@ window.LINGUIST = window.LINGUIST || {};
     });
   }
 
-  function addFamilyToWordbook(rootId, bookId) {
-    var root = readAtlas().roots.filter(function (item) { return item.id === rootId; })[0];
-    if (!root) return 0;
-    var added = 0;
-    (root.entries || []).forEach(function (entry) {
-      if (ns.store.findRow(entry.entryId) && ns.store.addToWordbook(bookId, entry.entryId)) added += 1;
-    });
-    return added;
-  }
-
   function rootNote(rootId) { return (ns.store.readAux('rootNotes', {}) || {})[rootId] || ''; }
   function setRootNote(rootId, note) {
     var notes = ns.store.readAux('rootNotes', {}) || {};
     notes[rootId] = String(note || '');
     ns.store.writeAux('rootNotes', notes);
   }
-
-  function saveFamily(rootId) {
-    var entity = readAtlas().roots.filter(function (root) { return root.id === rootId; })[0];
-    if (!entity) return false;
-    var families = ns.store.readAux('rootFamilies', {}) || {};
-    families[rootId] = { rootId: rootId, words: entity.derivedWords || [], ts: Date.now() };
-    ns.store.writeAux('rootFamilies', families);
-    if (ns.events) ns.events.emit('catalog:changed');
-    return true;
-  }
-
-  function familySaved(rootId) { return !!(ns.store.readAux('rootFamilies', {}) || {})[rootId]; }
 
   function readProgress() {
     var progress = ns.store.readAux('rootProgress', {});
@@ -580,25 +558,6 @@ window.LINGUIST = window.LINGUIST || {};
     return reviewRoots(language, outputLang, 'due');
   }
 
-  function rootVersion(rootKey, outputLang) {
-    var all = ns.store.readAux('rootVersions', {});
-    return all[rootKey + '|' + outputLang] || null;
-  }
-
-  function addRootVersion(rootKey, outputLang, value) {
-    var all = ns.store.readAux('rootVersions', {});
-    all[rootKey + '|' + outputLang] = Object.assign({ ts: Date.now() }, value || {});
-    ns.store.writeAux('rootVersions', all);
-    return all[rootKey + '|' + outputLang];
-  }
-
-  function rootVersionOptions(rootKey) {
-    var all = ns.store.readAux('rootVersions', {});
-    return Object.keys(all).filter(function (key) {
-      return key.indexOf(rootKey + '|') === 0;
-    }).map(function (key) { return key.slice(rootKey.length + 1); });
-  }
-
   function recordRootAnswer(key, correct) {
     return correct ? recordStage(key, 3, true) : recordStage(key, 1, false);
   }
@@ -670,18 +629,12 @@ window.LINGUIST = window.LINGUIST || {};
     toggleRootStar: toggleRootStar,
     resolveRootId: resolveRootId,
     migrateAliases: migrateAliases,
-    addFamilyToWordbook: addFamilyToWordbook,
     rootNote: rootNote,
     setRootNote: setRootNote,
-    saveFamily: saveFamily,
-    familySaved: familySaved,
     dueQueue: dueQueue,
     todayQueue: todayQueue,
     nextInterval: nextInterval,
     recordStage: recordStage,
-    rootVersion: rootVersion,
-    addRootVersion: addRootVersion,
-    rootVersionOptions: rootVersionOptions,
     rootGroups: rootGroups,
     reviewRoots: reviewRoots,
     stats: stats,

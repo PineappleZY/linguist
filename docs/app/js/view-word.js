@@ -557,7 +557,9 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     if (direct.length) {
       html += subLabel(ui.t('entry.directDerivatives'));
       html += '<ul class="family-list">' + direct.map(function (item) {
-        return '<li><div class="family-head"><b>' + ui.esc(item.word || '') + '</b>' +
+        return '<li><div class="family-head"><button type="button" class="link-btn family-word" data-context-word="' +
+          ui.esc(item.word || '') + '" data-context-lang="' + ui.esc(state.entry && state.entry.language || '') +
+          '">' + ui.esc(item.word || '') + '</button>' +
           (item.pos ? '<span class="pos">' + ui.esc(item.pos) + '</span>' : '') +
           (item.formula ? '<span class="family-formula">' + ui.esc(item.formula) + '</span>' : '') +
           '</div>' +
@@ -568,7 +570,9 @@ window.LINGUIST.views = window.LINGUIST.views || {};
     if (shared.length) {
       html += subLabel(ui.t('entry.sharedRoot'));
       html += '<ul class="family-list is-compact">' + shared.map(function (item) {
-        return '<li><div class="family-head"><b>' + ui.esc(item.word || '') + '</b></div>' +
+        return '<li><div class="family-head"><button type="button" class="link-btn family-word" data-context-word="' +
+          ui.esc(item.word || '') + '" data-context-lang="' + ui.esc(state.entry && state.entry.language || '') +
+          '">' + ui.esc(item.word || '') + '</button></div>' +
           (item.gloss ? '<div class="family-gloss">' + ui.esc(item.gloss) + '</div>' : '') +
           (item.formula ? '<div class="family-formula is-block">' + ui.esc(item.formula) + '</div>' : '') +
           '</li>';

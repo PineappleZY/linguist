@@ -492,6 +492,24 @@ window.LINGUIST = window.LINGUIST || {};
       });
   }
 
+  function translateText(options) {
+    var key;
+    try { key = requireKey(options.apiKey); } catch (err) { return Promise.reject(err); }
+    var messages = [
+      { role: 'system', content: prompts.translate(options.sourceLang, options.targetLang) },
+      { role: 'user', content: options.input }
+    ];
+    return request(key, basePayload(options.model, messages, CONFIG.maxTokens.translate), options.signal)
+      .then(extractJSON)
+      .then(function (data) {
+        return data && data.translation ? {
+          translation: String(data.translation),
+          sourceLang: String(data.source_language || options.sourceLang),
+          targetLang: String(data.target_language || options.targetLang)
+        } : null;
+      });
+  }
+
   function testConnection(options) {
     var key;
     try { key = requireKey(options.apiKey); } catch (err) { return Promise.reject(err); }
@@ -594,27 +612,6 @@ window.LINGUIST = window.LINGUIST || {};
       });
   }
 
-  function rootDetail(options) {
-    var key;
-    try { key = requireKey(options.apiKey); } catch (err) { return Promise.reject(err); }
-    var messages = [
-      { role: 'system', content: prompts.rootDetail(options.root, options.sourceLang, options.outputLang) },
-      { role: 'user', content: 'Return the root detail JSON.' }
-    ];
-    return request(key, basePayload(options.model, messages, CONFIG.maxTokens.rootDetail), options.signal)
-      .then(extractJSON)
-      .then(function (data) {
-        if (!data) return null;
-        return {
-          meaning: String(data.meaning || '').trim(),
-          origin: String(data.origin || '').trim(),
-          evolution: String(data.evolution || '').trim(),
-          variants: (Array.isArray(data.variants) ? data.variants : []).filter(Boolean),
-          family: (Array.isArray(data.family) ? data.family : []).filter(Boolean).slice(0, 8)
-        };
-      });
-  }
-
   ns.api = {
     ApiError: ApiError,
     isApiError: isApiError,
@@ -631,11 +628,11 @@ window.LINGUIST = window.LINGUIST || {};
     detectLanguage: detectLanguage,
     accentCandidates: accentCandidates,
     reverseCandidates: reverseCandidates,
+    translateText: translateText,
     testConnection: testConnection,
     surprise: surprise,
     surprisePool: surprisePool,
     discoveryCard: discoveryCard,
-    rootDetail: rootDetail,
     errorText: ERROR_TEXT
   };
 })(window.LINGUIST);
