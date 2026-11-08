@@ -10,14 +10,14 @@
 
 <p align="center">
   <img alt="web version" src="https://img.shields.io/badge/web-8.2.0-0071E3">
-  <img alt="native version" src="https://img.shields.io/badge/native-6.5.0-6E6E73">
+  <img alt="native platforms" src="https://img.shields.io/badge/native-Android_8.2%20%7C%20Windows_6.5-6E6E73">
   <img alt="license" src="https://img.shields.io/badge/license-MIT-34A853">
 </p>
 
 <p align="center">
   <a href="https://pineapplezy.github.io/linguist/"><strong>打开网页版</strong></a>
   ·
-  <a href="https://github.com/PineappleZY/linguist/releases/download/v6.5.0/Linguist-6.5.0.apk"><strong>下载 Android 6.5 APK</strong></a>
+  <a href="https://github.com/PineappleZY/linguist/releases/download/v8.2.0/Linguist-8.2.0.apk"><strong>下载 Android 8.2 APK</strong></a>
   ·
   <a href="https://github.com/PineappleZY/linguist/releases/download/v6.5.0/Linguist-6.5.0-portable.exe"><strong>下载 Windows 6.5 版</strong></a>
   ·
@@ -58,7 +58,7 @@ flowchart LR
 - **轻量关系展示**：Personal Root Map 保留来源关系，但不会混入复习入口。
 - **既有闭环延续**：星标同步、同根词查询、解释缓存和 Context 回流保持有效。
 
-Android APK 与 Windows EXE 仍为 **6.5.0**，尚未包含 8.x 新功能。网页版、PWA 与鸿蒙 NEXT 使用最新 8.2.0。
+Android APK 已更新到 **8.2.0**；Windows EXE 仍为 **6.5.0**。网页版、PWA 与鸿蒙 NEXT 使用最新 8.2.0。
 
 - [下载 8.2.0 单文件 HTML](https://github.com/PineappleZY/linguist/releases/download/v8.2.0/linguist_8.2.0.html)
 - [下载 8.2.0 PWA 网站 ZIP](https://github.com/PineappleZY/linguist/releases/download/v8.2.0/Linguist-8.2.0-web.zip)
@@ -73,22 +73,22 @@ Android APK 与 Windows EXE 仍为 **6.5.0**，尚未包含 8.x 新功能。网�
 - iPhone / iPad：在 Safari 中点“分享” → “添加到主屏幕”。
 - Windows / macOS：在浏览器地址栏右侧选择“安装”。安装后以独立窗口运行，并缓存应用外壳。
 
-### Android APK · 6.5.0
+### Android APK · 8.2.0
 
-[下载 Linguist 6.5.0 for Android](https://github.com/PineappleZY/linguist/releases/download/v6.5.0/Linguist-6.5.0.apk)
+[下载 Linguist 8.2.0 for Android](https://github.com/PineappleZY/linguist/releases/download/v8.2.0/Linguist-8.2.0.apk)
 
-APK 是一个通用 Android WebView 包，支持 Android 6.0 及以上系统，体积约 616 KiB。应用正文、样式和 PDF 工具全部内置，不需要从网络加载界面；模型查询仍需要联网。
+APK 是一个通用 Android WebView 包，支持 Android 6.0 及以上系统，体积约 645 KiB。应用正文、样式和 PDF 工具全部内置，不需要从网络加载界面；模型查询仍需要联网。
 
-1. 下载 `Linguist-6.5.0.apk`。
+1. 下载 `Linguist-8.2.0.apk`。
 2. 点击文件安装；如果系统拦截，允许当前文件管理器“安装未知应用”。
 3. 从桌面打开 Linguist，在 Profile 中填入自己的 DeepSeek API Key。
 
-APK 使用项目自签名证书，没有 Google Play 的分发背书。后续同签名版本可以直接覆盖升级。
+APK 与此前 Android 版本使用同一自签名证书，可直接覆盖安装 6.5.0，并保留本地历史、收藏和设置。它没有 Google Play 的分发背书。
 
 SHA-256：
 
 ```text
-9706ba8fcd9dedb273ada09bb0efc7f5e3ff82fbbb1db24eee7f4f501e13436b
+c5ef8e98069bb7aa5dab0288ab0a4f7ddb6c1f50b43ff13b0eca297463b15bbc
 ```
 
 ### HarmonyOS / 鸿蒙
@@ -96,7 +96,7 @@ SHA-256：
 鸿蒙设备按系统版本选择安装方式：
 
 - **HarmonyOS NEXT**：不直接运行 Android APK。请使用系统浏览器打开[网页版](https://pineapplezy.github.io/linguist/app/)，再从浏览器菜单中选择“添加到桌面”。安装后从桌面图标进入，数据保存在当前设备。
-- **HarmonyOS 4.x 及更早的安卓兼容版本**：可以使用上面的 Android 6.5 APK。安装方法与普通 Android 设备相同，并需要在系统中允许当前文件管理器安装未知应用。
+- **HarmonyOS 4.x 及更早的安卓兼容版本**：可以使用上面的 Android 8.2 APK。安装方法与普通 Android 设备相同，并需要在系统中允许当前文件管理器安装未知应用。
 
 当前没有发布原生 HarmonyOS HAP。网页版在鸿蒙 NEXT 上使用同一套功能和本地存储，但不享有 Android APK 的独立安装包入口。
 
@@ -115,7 +115,7 @@ c74489950f6bb90e258d3d3912cd675f232e49fb472a415c1bab8396413a068d
 ## 第一次使用
 
 1. 在 [DeepSeek 开放平台](https://platform.deepseek.com/) 创建自己的 API Key。
-2. 打开 8.2 网页版、Android 6.5、Windows 6.5，或在鸿蒙 NEXT 的浏览器中打开网页版，进入 **Profile / 个人**。
+2. 打开 8.2 网页版、Android 8.2、Windows 6.5，或在鸿蒙 NEXT 的浏览器中打开网页版，进入 **Profile / 个人**。
 3. 粘贴 Key，点击保存与连接测试。
 4. 回到 **Dictionary / 词典**，输入单词、句子，或切换到“文件”读取本地文本、Markdown、字幕、HTML、DOCX、PDF。
 
@@ -164,6 +164,7 @@ Linguist 的“图谱”首先服务于学习者，而不是数据库展示。�
 │   ├── app/               当前网页应用成品
 │   └── feature-map/       交互式功能知识图谱
 ├── 8.0/                   Linguist 8.2.0 网页源码、测试与构建（目录沿用 8.0）
+│   └── Android8.2.0/      Android 8.2 WebView 壳与 APK 构建脚本
 ├── 7.0/                   Linguist 7.2.1 已冻结
 ├── 6.0/                   Linguist 6.5 已冻结；其 android 工具链与 6.5 产物保持不动
 │   └── android/           Android WebView 壳与 APK 构建脚本
@@ -201,8 +202,7 @@ npm run dist
 Android APK：
 
 ```powershell
-cd 6.0/android
-powershell -ExecutionPolicy Bypass -File .\build.ps1
+powershell -ExecutionPolicy Bypass -File ".\8.0\Android8.2.0\build.ps1"
 ```
 
 ## 已知限制
@@ -210,7 +210,7 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1
 - 查询与文件分析需要联网；安装后的 PWA 只有静态界面可以离线打开。
 - 文件图片、扫描版 PDF 和旧版 `.doc` 暂不支持。扫描版 PDF 没有文字层时无法抽取正文。
 - Android 版通过侧载安装，目前不通过 Google Play 发布；系统安全提示属于未上架应用的正常行为。
-- Android 与 Windows 当前仍是 6.5.0，不包含 8.x 的 Root Atlas、个人词根地图与 Context-to-Root；最新网页功能以网页版为准。
+- Android 为 8.2.0，已包含当前 Root Atlas 网页功能；Windows 仍为 6.5.0，尚未包含 8.x 的 Root Atlas、个人词根地图与 Context-to-Root。
 - HarmonyOS NEXT 目前通过网页版使用，不提供原生 HAP；Android APK 仅适用于仍兼容 Android 应用的鸿蒙版本。
 - Windows 版目前为 x64 免安装包，不含自动更新、ARM64 或代码签名。
 - Electron 环境通常没有可用的系统语音合成音色，因此桌面版的朗读按钮可能隐藏。

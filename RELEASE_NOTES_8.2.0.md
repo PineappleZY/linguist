@@ -17,17 +17,18 @@
 | --- | --- |
 | `linguist_8.2.0.html` | 单文件自包含网页版 |
 | `Linguist-8.2.0-web.zip` | 可部署的 PWA 网站文件 |
-| `Linguist-8.2.0-SHA256SUMS.txt` | 网页产物 SHA-256 |
+| `Linguist-8.2.0.apk` | Android 6.0+ 通用 WebView 安装包 |
+| `Linguist-8.2.0-SHA256SUMS.txt` | 网页与 Android 产物 SHA-256 |
 
 在线版本：https://pineapplezy.github.io/linguist/
 
 ## 平台状态
 
 - Web / PWA / HarmonyOS NEXT：**8.2.0**
-- Android APK：仍为 **6.5.0**
+- Android APK：**8.2.0**，支持覆盖升级 6.5.0
 - Windows EXE：仍为 **6.5.0**
 
-本版没有生成 Android 或 Windows 8.2 安装包。原生包链接固定指向 `v6.5.0`。
+Android APK 与网页共用 8.2.0 内容，包名 `app.linguist.dictionary`，versionCode `8200`。Windows 仍为 6.5.0。
 
 ## 验证
 
