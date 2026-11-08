@@ -311,10 +311,7 @@ window.LINGUIST = window.LINGUIST || {};
         familyCount: (root.family || []).length, entries: root.entries || [],
         rootStarred: explicit, sourceStarred: sourceStarred, note: note, contexts: contexts
       };
-    }).filter(function (root) {
-      return root.rootStarred || root.sourceStarred || root.state !== 'new' || !!root.note ||
-        (root.contexts || []).length > 0;
-    });
+    }).filter(function (root) { return root.rootStarred; });
   }
 
   function rootNote(rootId) { return (ns.store.readAux('rootNotes', {}) || {})[rootId] || ''; }
@@ -452,7 +449,7 @@ window.LINGUIST = window.LINGUIST || {};
     var now = Date.now();
     var starred = {};
     allRoots().forEach(function (root) {
-      if (root.starred || isRootStarred(atlasId(root))) starred[root.key] = true;
+      if (isRootStarred(atlasId(root))) starred[root.key] = true;
     });
     return Object.keys(progress).map(function (key) { return progress[key]; })
       .filter(function (p) {
@@ -469,9 +466,7 @@ window.LINGUIST = window.LINGUIST || {};
 
   function rootGroups(sort, uiLang) {
     var progress = ensureAllProgress();
-    var roots = allRoots().filter(function (root) {
-      return !!root.starred || isRootStarred(atlasId(root));
-    });
+    var roots = allRoots().filter(function (root) { return isRootStarred(atlasId(root)); });
     var collator = null;
     try { collator = new Intl.Collator(uiLang || 'en'); } catch (err) { collator = null; }
     var byLanguage = { en: [], fr: [], de: [] };
@@ -549,7 +544,7 @@ window.LINGUIST = window.LINGUIST || {};
     var index = readIndex();
     var now = Date.now();
     return allRoots().filter(function (root) {
-      if ((!root.starred && !isRootStarred(atlasId(root))) || root.language !== language) return false;
+      if (!isRootStarred(atlasId(root)) || root.language !== language) return false;
       return root.entries.some(function (entry) { return entry.outputLang === outputLang; });
     }).map(function (root) {
       var entry = root.entries.filter(function (item) { return item.outputLang === outputLang; })[0];

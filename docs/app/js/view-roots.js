@@ -176,6 +176,10 @@ window.LINGUIST.views = window.LINGUIST.views || {};
       ui.esc(ui.t('roots.state.' + root.state)) + ' · ' + ui.esc(dueLabel(root.dueAt)) +
       '</div><div class="hint">' + ui.esc(ui.t('roots.lapses', { n: root.lapses || 0 })) + '</div></div></div>';
     html += '<p class="hint">' + ui.esc(ui.t('roots.aiNote')) + '</p>';
+    var sourceStarred = (root.wordIds || []).some(function (id) { return ns.store.isStarred(id); });
+    if (sourceStarred && !roots.isRootStarred(roots.atlasId(root))) {
+      html += '<p class="hint">' + ui.esc(ui.t('roots.sourceStarredHint')) + '</p>';
+    }
     html += '<div class="notice-actions"><button type="button" class="icon-btn' +
       (roots.isRootStarred(roots.atlasId(root)) ? ' is-starred' : '') + '" data-root-star="' +
       ui.esc(roots.atlasId(root)) + '" aria-label="' + ui.esc(ui.t('roots.starRoot')) + '">' +
@@ -229,9 +233,10 @@ window.LINGUIST.views = window.LINGUIST.views || {};
   function render(container, params) {
     if (!roots.allRoots().length) roots.rebuildIndex();
     var active = ns.session.rootsView || 'atlas';
-    var html = tabs(active) + (params && params.key ? detail(decodeURIComponent(params.key)) :
-      (active === 'personal' ? stats() + personalView() :
-        (active === 'review' ? list() : atlasView() + personalView())));
+    var html = params && params.key
+      ? detail(decodeURIComponent(params.key))
+      : tabs(active) + (active === 'personal' ? stats() + personalView() :
+        (active === 'review' ? list() : atlasView() + personalView()));
     ui.setHTML(container, html);
     container.querySelectorAll('[data-roots-view]').forEach(function (button) {
       button.addEventListener('click', function () {

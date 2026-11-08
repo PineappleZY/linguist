@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img alt="web version" src="https://img.shields.io/badge/web-8.1.3-0071E3">
+  <img alt="web version" src="https://img.shields.io/badge/web-8.2.0-0071E3">
   <img alt="native version" src="https://img.shields.io/badge/native-6.5.0-6E6E73">
   <img alt="license" src="https://img.shields.io/badge/license-MIT-34A853">
 </p>
@@ -48,21 +48,20 @@ flowchart LR
 
 支持英语、法语、德语、日语与中文，并覆盖单词、整句和文件三种阅读尺度。
 
-## 8.1.3 网页版更新
+## 8.2.0 网页版更新
 
-当前网页版已升级到 **Linguist 8.1.3**：
+当前网页版已升级到 **Linguist 8.2.0**：
 
-- **默认释义补全**：练习中缺失的默认解释语言释义会自动补全。
-- **锁定语言翻译**：句子翻译明确锁定目标语言，避免输出语言漂移。
-- **My Map 主页面**：个人词根图以主页面卡片和轻量关系呈现。
-- **Context 来源持久化**：句子与文件的上下文来源会保留在词根关系中。
-- **提示去重**：查询与翻译入口不再重复堆叠提示。
-- **词根闭环**：星标、同根词查询和解释缓存继续保持同步。
+- **页面层级收敛**：Root Detail 隐藏重复的子视图状态栏，主页面与详情页职责更清楚。
+- **显式词根星标**：My Map 与 Review 只接受明确收藏的词根。
+- **复习范围稳定**：普通来源词的星标只作为提示，不再自动扩大复习范围。
+- **轻量关系展示**：Personal Root Map 保留来源关系，但不会混入复习入口。
+- **既有闭环延续**：星标同步、同根词查询、解释缓存和 Context 回流保持有效。
 
-Android APK 与 Windows EXE 仍为 **6.5.0**，尚未包含 8.x 新功能。网页版、PWA 与鸿蒙 NEXT 使用最新 8.1.3。
+Android APK 与 Windows EXE 仍为 **6.5.0**，尚未包含 8.x 新功能。网页版、PWA 与鸿蒙 NEXT 使用最新 8.2.0。
 
-- [下载 8.1.3 单文件 HTML](https://github.com/PineappleZY/linguist/releases/download/v8.1.3/linguist_8.1.3.html)
-- [下载 8.1.3 PWA 网站 ZIP](https://github.com/PineappleZY/linguist/releases/download/v8.1.3/Linguist-8.1.3-web.zip)
+- [下载 8.2.0 单文件 HTML](https://github.com/PineappleZY/linguist/releases/download/v8.2.0/linguist_8.2.0.html)
+- [下载 8.2.0 PWA 网站 ZIP](https://github.com/PineappleZY/linguist/releases/download/v8.2.0/Linguist-8.2.0-web.zip)
 
 ## 立即使用
 
@@ -116,7 +115,7 @@ c74489950f6bb90e258d3d3912cd675f232e49fb472a415c1bab8396413a068d
 ## 第一次使用
 
 1. 在 [DeepSeek 开放平台](https://platform.deepseek.com/) 创建自己的 API Key。
-2. 打开 8.1.3 网页版、Android 6.5、Windows 6.5，或在鸿蒙 NEXT 的浏览器中打开网页版，进入 **Profile / 个人**。
+2. 打开 8.2 网页版、Android 6.5、Windows 6.5，或在鸿蒙 NEXT 的浏览器中打开网页版，进入 **Profile / 个人**。
 3. 粘贴 Key，点击保存与连接测试。
 4. 回到 **Dictionary / 词典**，输入单词、句子，或切换到“文件”读取本地文本、Markdown、字幕、HTML、DOCX、PDF。
 
@@ -164,7 +163,7 @@ Linguist 的“图谱”首先服务于学习者，而不是数据库展示。�
 ├── docs/                  GitHub Pages 落地页与可安装 PWA（含鸿蒙 NEXT）
 │   ├── app/               当前网页应用成品
 │   └── feature-map/       交互式功能知识图谱
-├── 8.0/                   Linguist 8.1.3 网页源码、测试与构建（目录沿用 8.0）
+├── 8.0/                   Linguist 8.2.0 网页源码、测试与构建（目录沿用 8.0）
 ├── 7.0/                   Linguist 7.2.1 已冻结
 ├── 6.0/                   Linguist 6.5 已冻结；其 android 工具链与 6.5 产物保持不动
 │   └── android/           Android WebView 壳与 APK 构建脚本

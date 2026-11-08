@@ -1,7 +1,7 @@
 {
-  "generated": "2026-10-31T09:44:22.531Z",
+  "generated": "2026-11-08T09:00:33.490Z",
   "counts": {
-    "version": "8.1.3",
+    "version": "8.2.0",
     "languages": 7,
     "liveLanguages": 5,
     "retiredLanguages": [
@@ -12,13 +12,13 @@
     "sentenceCards": 9,
     "documentCards": 4,
     "uiLanguages": 5,
-    "strings": 493,
+    "strings": 494,
     "timeoutMs": 45000,
     "documentTimeoutMs": 90000,
     "chunkChars": 20000,
     "maxFileChars": 200000,
     "practiceRound": 5,
-    "assertions": 806
+    "assertions": 809
   },
   "cardLists": {
     "latin": 25,
@@ -44,27 +44,39 @@
     }
   ],
   "latest": {
-    "version": "8.1.3",
-    "summary": "练习默认解释语言补全、锁定目标语言的句子翻译、提示去重、My Map 主页面卡片与轻量关系、Context 来源持久化、星标/同根词/缓存闭环。"
+    "version": "8.2.0",
+    "summary": "Root Detail 隐藏子视图状态栏；My Map 与 Review 只接受显式词根星标；来源词星标只作提示。"
   },
   "badges": {
-    "star-sync": "updated",
-    "default-wordbook": "updated",
-    "root-word-links": "updated",
-    "explanation-cache": "updated",
+    "roots-tab": "updated",
+    "root-detail": "updated",
     "root-star": "updated",
-    "root-atlas": "updated",
-    "context-to-root": "updated",
+    "personal-root-map": "updated",
+    "root-review": "updated",
+    "root-scope": "updated",
+    "store": "updated",
     "i18n": "updated",
     "tests": "updated",
-    "preview": "updated",
-    "practice-meaning-completion": "new",
-    "lookup-hints": "new",
-    "reverse-translate": "new",
-    "personal-network": "new",
-    "context-sources": "new"
+    "preview": "updated"
   },
   "changes": [
+    {
+      "version": "8.2.0",
+      "summary": "Root Detail 隐藏子视图状态栏；My Map 与 Review 只接受显式词根星标；来源词星标只作提示。",
+      "added": [],
+      "changed": [
+        "roots-tab",
+        "root-detail",
+        "root-star",
+        "personal-root-map",
+        "root-review",
+        "root-scope",
+        "store",
+        "i18n",
+        "tests",
+        "preview"
+      ]
+    },
     {
       "version": "8.1.3",
       "summary": "练习默认解释语言补全、锁定目标语言的句子翻译、提示去重、My Map 主页面卡片与轻量关系、Context 来源持久化、星标/同根词/缓存闭环。",
@@ -774,7 +786,7 @@
       "files": [
         "js/strings.js"
       ],
-      "summary": "493 keys in 5 languages, written per language rather than translated word for word; a missing key falls back to English, then to the key itself."
+      "summary": "494 keys in 5 languages, written per language rather than translated word for word; a missing key falls back to English, then to the key itself."
     },
     {
       "id": "api",
@@ -820,7 +832,7 @@
     {
       "id": "tests",
       "layer": "module",
-      "label": "806 assertions",
+      "label": "809 assertions",
       "zh": "测试",
       "files": [
         "web/tests/smoke.js"
@@ -889,7 +901,7 @@
         "js/view-roots.js",
         "js/view-word.js"
       ],
-      "summary": "Root identity, meaning, variants, source family, etymology, confidence and clickable family words; no review or version-generation actions here."
+      "summary": "Root identity, meaning, variants, source family, etymology, confidence and clickable family words; tabs are hidden on this detail screen."
     },
     {
       "id": "root-mastery",
@@ -911,7 +923,7 @@
         "js/root-review.js",
         "js/view-roots.js"
       ],
-      "summary": "At most five roots × three fixed stages: meaning choice, spelling and same-root word meaning; progress is root/stage, not a growing question count."
+      "summary": "Review uses only explicitly root-starred English/French/German roots; source-word stars do not grant eligibility."
     },
     {
       "id": "surprise-pool",
@@ -1101,7 +1113,7 @@
         "js/roots.js",
         "js/view-roots.js"
       ],
-      "summary": "Cards and lightweight relationships for encountered roots, notes, weak roots, mastery and review eligibility."
+      "summary": "Only explicitly root-starred entries appear in My Map; notes and progress do not add roots automatically."
     },
     {
       "id": "context-to-root",
@@ -1146,7 +1158,7 @@
         "js/roots.js",
         "js/view-roots.js"
       ],
-      "summary": "Explicit root stars join the personal map and review; source-word stars still contribute inherited eligibility."
+      "summary": "Explicit root stars alone enter My Map and Review; source-word stars are only a hint."
     },
     {
       "id": "root-migration",

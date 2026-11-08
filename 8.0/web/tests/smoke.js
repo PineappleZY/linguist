@@ -377,7 +377,7 @@ function testConfig(env) {
   const C = env.ns.CONFIG;
   const S = env.ns.strings;
   const locales = Object.keys(S);
-  check('version reads 8.1.3', C.version === '8.1.3', C.version);
+  check('version reads 8.2.0', C.version === '8.2.0', C.version);
   check('the stored entry shape was bumped', C.schemaVersion === 11, String(C.schemaVersion));
   check('the product name is not translated', C.appName === 'Linguist', C.appName);
   check('and the name every interface language shows is the same string',
@@ -4111,11 +4111,20 @@ function testRoots(env) {
   check('a root can be starred directly from the Atlas',
     roots.isRootStarred('root:latin:tend') === true &&
     roots.personalRoots().some((item) => item.id === 'root:latin:tend' && item.rootStarred));
+  check('only explicitly starred roots enter review',
+    roots.reviewRoots('en', 'zh', 'all').some((item) => item.key === found[0].key));
   roots.setRootNote('root:latin:tend', 'personal tend note');
   check('a root note makes a root part of the personal map',
     roots.rootNote('root:latin:tend') === 'personal tend note' &&
     roots.personalRoots().some((item) => item.note === 'personal tend note'));
   roots.toggleRootStar('root:latin:tend');
+  check('unstarring removes the root from My Map while keeping its note',
+    roots.rootNote('root:latin:tend') === 'personal tend note' &&
+    !roots.personalRoots().some((item) => item.id === 'root:latin:tend'));
+  const rootDetail = container();
+  env.ns.views.roots.render(rootDetail, { key: 'root:latin:tend' });
+  check('root detail does not render the Atlas/My Map/Review tabs',
+    rootDetail.innerHTML.indexOf('data-roots-view') === -1);
   env.ns.store.writeAux('rootProgress', {});
   roots.recordWordOutcome({ roots: found }, 'known');
   const progress = env.ns.store.readAux('rootProgress', {});
@@ -4260,7 +4269,7 @@ async function testDistribution() {
   /* 6.0 additions. The single file is what a file:// reader (and, later, a
      desktop shell) actually opens, so what is inside it is asserted. */
   check('the offline bundle is named after this release',
-    path.basename(offlinePath) === 'linguist_8.1.3.html', path.basename(offlinePath));
+    path.basename(offlinePath) === 'linguist_8.2.0.html', path.basename(offlinePath));
   check('it inlines the vendored pdf.js rather than linking to it',
     /pdfjsLib/.test(offline) && offline.indexOf('vendor/pdfjs/pdf.min.js') === -1);
   check('and carries the worker source for the blob URL',
@@ -4270,7 +4279,7 @@ async function testDistribution() {
 
   const sw = fs.readFileSync(path.join(WEB_DIR, 'sw.js'), 'utf8');
   check('the cache is named after the product and this release',
-    /CACHE_VERSION = 'v8\.1\.3'/.test(sw) && /linguist-' \+ CACHE_VERSION/.test(sw));
+    /CACHE_VERSION = 'v8\.2\.0'/.test(sw) && /linguist-' \+ CACHE_VERSION/.test(sw));
   ['js/extract.js', 'js/view-document.js', 'vendor/pdfjs/pdf.min.js', 'vendor/pdfjs/pdf.worker.min.js']
     .forEach((file) => {
       check('the shell precaches ' + file, sw.indexOf("'./" + file + "'") > -1);

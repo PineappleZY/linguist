@@ -500,7 +500,7 @@ window.LINGUIST = window.LINGUIST || {};
        below it IS translated — see strings.js. */
     taglineKey: 'app.tagline',
     descriptionKey: 'app.description',
-    version: '8.1.3',
+    version: '8.2.0',
 
     /* Bumped whenever the stored entry shape changes. */
     schemaVersion: 11,

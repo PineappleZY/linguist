@@ -18,6 +18,23 @@
   ],
   "changes": [
     {
+      "version": "8.2.0",
+      "summary": "Root Detail 隐藏子视图状态栏；My Map 与 Review 只接受显式词根星标；来源词星标只作提示。",
+      "added": [],
+      "changed": [
+        "roots-tab",
+        "root-detail",
+        "root-star",
+        "personal-root-map",
+        "root-review",
+        "root-scope",
+        "store",
+        "i18n",
+        "tests",
+        "preview"
+      ]
+    },
+    {
       "version": "8.1.3",
       "summary": "练习默认解释语言补全、锁定目标语言的句子翻译、提示去重、My Map 主页面卡片与轻量关系、Context 来源持久化、星标/同根词/缓存闭环。",
       "added": [
@@ -841,7 +858,7 @@
         "js/view-roots.js",
         "js/view-word.js"
       ],
-      "summary": "Root identity, meaning, variants, source family, etymology, confidence and clickable family words; no review or version-generation actions here."
+      "summary": "Root identity, meaning, variants, source family, etymology, confidence and clickable family words; tabs are hidden on this detail screen."
     },
     {
       "id": "root-mastery",
@@ -863,7 +880,7 @@
         "js/root-review.js",
         "js/view-roots.js"
       ],
-      "summary": "At most five roots × three fixed stages: meaning choice, spelling and same-root word meaning; progress is root/stage, not a growing question count."
+      "summary": "Review uses only explicitly root-starred English/French/German roots; source-word stars do not grant eligibility."
     },
     {
       "id": "surprise-pool",
@@ -1053,7 +1070,7 @@
         "js/roots.js",
         "js/view-roots.js"
       ],
-      "summary": "Cards and lightweight relationships for encountered roots, notes, weak roots, mastery and review eligibility."
+      "summary": "Only explicitly root-starred entries appear in My Map; notes and progress do not add roots automatically."
     },
     {
       "id": "context-to-root",
@@ -1098,7 +1115,7 @@
         "js/roots.js",
         "js/view-roots.js"
       ],
-      "summary": "Explicit root stars join the personal map and review; source-word stars still contribute inherited eligibility."
+      "summary": "Explicit root stars alone enter My Map and Review; source-word stars are only a hint."
     },
     {
       "id": "root-migration",
