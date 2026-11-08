@@ -4,392 +4,438 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#F5F5F7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
-  <meta name="description" content="Linguist 8.2.0 智能辞典：以 Root Atlas 和个人词根地图解释单词、句子和整份文件，并把查询连成长期学习闭环。">
-  <title>Linguist · 智能辞典</title>
+  <meta name="description" content="Linguist 8.2.0：从核心义、词源、构词、同根词族与语境理解一个词。支持单词、整句、文件、词根图谱与复习。">
+  <meta property="og:title" content="Linguist 8.2.0 · 从一个词根，读懂一族词">
+  <meta property="og:description" content="以词根知识图谱为核心的智能辞典。Web、Android、Windows 均可使用。">
+  <meta property="og:type" content="website">
+  <title>Linguist 8.2.0 · 从一个词根，读懂一族词</title>
   <link rel="icon" href="app/icons/icon-192.png">
   <link rel="stylesheet" href="landing.css">
 </head>
 <body>
-  <header class="shell nav">
-    <a class="brand" href="./">
-      <img src="app/icons/icon-192.png" alt="">
-      <span>Linguist</span>
-    </a>
-    <nav class="nav-links" aria-label="主导航">
-      <a href="#idea">应用理念</a>
-      <a href="#install">安装</a>
-      <a href="#harmonyos">鸿蒙</a>
-      <a href="feature-map/feature-map.html">功能图谱</a>
-      <a href="https://github.com/PineappleZY/linguist">GitHub</a>
-    </nav>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <header class="site-header">
+    <div class="shell nav-bar">
+      <a class="brand" href="#top" aria-label="Linguist 首页">
+        <img src="app/icons/icon-192.png" alt="">
+        <span>Linguist</span>
+      </a>
+      <nav class="nav-links" aria-label="主导航">
+        <a href="#method">词根方法</a>
+        <a href="#features">功能</a>
+        <a href="#roots">Roots</a>
+        <a href="#install">安装</a>
+        <a href="#feedback">意见反馈</a>
+        <a href="https://github.com/PineappleZY/linguist">GitHub</a>
+      </nav>
+    </div>
   </header>
 
-  <main>
-    <section class="shell hero">
-      <div>
-        <p class="eyebrow">Linguist 8.2 · Root Atlas</p>
-        <h1>看见一个词<br>从哪里来。</h1>
-        <p class="lead">
-          不只给出译义。Linguist 把词源、词根、构词、同根词族、语境与文化内涵连成一张学习地图。
+  <main id="main">
+    <section class="hero shell" id="top">
+      <div class="hero-copy">
+        <p class="eyebrow"><span></span>Linguist 8.2.0 · Root Atlas</p>
+        <h1>从一个词根，<br>读懂一族词。</h1>
+        <p class="hero-lead">
+          不是多背一个释义，而是看见核心义、词源、构词、同根词族与语境之间的联系。
         </p>
-        <div class="actions">
-          <a class="button" href="app/">打开 8.2 网页版</a>
-          <a class="button secondary" href="https://github.com/PineappleZY/linguist/releases/download/v8.2.0/Linguist-8.2.0.apk">Android 8.2 APK</a>
-          <a class="button secondary" href="https://github.com/PineappleZY/linguist/releases/download/v8.2.0/Linguist-8.2.0-Setup.exe">Windows 8.2</a>
+        <div class="hero-actions">
+          <a class="button primary" href="app/">打开 8.2 网页版</a>
+          <a class="button secondary" href="https://github.com/PineappleZY/linguist/releases/download/v8.2.0/Linguist-8.2.0.apk">Android APK</a>
+          <a class="button secondary" href="https://github.com/PineappleZY/linguist/releases/download/v8.2.0/Linguist-8.2.0-Setup.exe">Windows 安装版</a>
         </div>
-        <p class="meta">
-          <span>英语 · 法语 · 德语 · 日语 · 中文</span>
-          <span>网页 8.2 · 原生包 6.5</span>
-          <span>MIT 开源</span>
-        </p>
+        <p class="hero-meta">Web · Android · Windows 均为 8.2.0 · 五种在用语言</p>
       </div>
 
-      <aside class="map-card" aria-label="词根知识图谱示意">
-        <div class="map-title">
-          <span>Word knowledge map</span>
-          <span>one lookup</span>
-        </div>
-        <div class="word">contend</div>
-        <div class="graph">
-          <div class="node root">
-            <strong>词根 tend</strong>
-            <span>伸展、拉向；从历史形态建立语义线索</span>
-          </div>
-          <div class="node">
-            <strong>Core meaning</strong>
-            <span>努力与对手争夺同一目标</span>
-          </div>
-          <div class="node">
-            <strong>词源路径</strong>
-            <span>PIE → Latin → Old French → English</span>
-          </div>
-          <div class="node">
-            <strong>同根词族</strong>
-            <span>extend · intend · attention · tension</span>
-          </div>
-          <div class="node">
-            <strong>语境用法</strong>
-            <span>搭配、语体、变位与整句结构</span>
-          </div>
-          <div class="node">
-            <strong>个人学习</strong>
-            <span>星标、单词本、提示式拼写练习</span>
+      <div class="hero-product" aria-label="Linguist 真实词条界面">
+        <div class="device device-hero">
+          <div class="device-island"></div>
+          <div class="device-screen">
+            <img src="showcase/word-dna.png" alt="Linguist 8.2.0 contend 词条，显示核心义、词源和构词" fetchpriority="high" decoding="async">
           </div>
         </div>
-      </aside>
-    </section>
-
-    <section class="showcase" id="experience">
-      <div class="shell showcase-intro">
-        <p class="showcase-kicker">Look inside</p>
-        <h2>一次查询，<br>七层线索。</h2>
-        <p>
-          从输入一个词开始，先把它的核心义放到最前，再沿着词源、词根与构词一路展开。界面不催促你读完，只把下一步放在需要的位置。
-        </p>
-      </div>
-
-      <div class="phone-rail" aria-label="Linguist 手机界面示意">
-        <article class="phone phone-left" aria-label="词典主页">
-          <div class="phone-frame">
-            <div class="phone-island"></div>
-            <div class="phone-screen">
-              <div class="mock-status"><span>9:41</span><span>● ◒ ▰</span></div>
-              <div class="mock-apphead">
-                <div><strong>Linguist</strong><small>以词根为纲</small></div>
-                <span class="mock-avatar">P</span>
-              </div>
-              <div class="mock-segments">
-                <span class="active">Auto</span><span>Word</span><span>Sentence</span><span>File</span>
-              </div>
-              <div class="mock-search">◎ 单词、短语或句子 <b>↑</b></div>
-              <div class="mock-label-row"><strong>History</strong><span>Collapse all</span></div>
-              <div class="mock-history">
-                <div><b>contend</b><small>EN · 刚刚</small><span>★</span></div>
-                <div><b>flâner</b><small>FR · 2 小时前</small><span>☆</span></div>
-                <div><b>成功</b><small>JA · 昨天</small><span>★</span></div>
-                <div><b>木漏れ日</b><small>JA · 昨天</small><span>★</span></div>
-              </div>
-              <div class="mock-tabs"><span>◆<small>Dictionary</small></span><span>⌘<small>Roots</small></span><span>☆<small>Starred</small></span><span>○<small>Profile</small></span></div>
-            </div>
-          </div>
-        </article>
-
-        <article class="phone phone-center" aria-label="词条界面">
-          <div class="phone-frame">
-            <div class="phone-island"></div>
-            <div class="phone-screen">
-              <div class="mock-status"><span>9:41</span><span>● ◒ ▰</span></div>
-              <div class="mock-entry-head">
-                <div><strong>contend</strong><span>EN</span><small>/kənˈtend/</small></div>
-                <span>☆</span>
-              </div>
-              <p class="mock-core">努力与对手争夺同一目标，或在分歧中坚持自己的说法。</p>
-              <div class="mock-section">WORD DNA</div>
-              <div class="mock-dna">
-                <div class="dna-root"><small>ROOT</small><strong>tend</strong><span>伸展 · 拉向</span></div>
-                <div class="dna-line"></div>
-                <div class="dna-branches">
-                  <span>extend<small>向外伸展</small></span>
-                  <span>intend<small>把注意力拉向</small></span>
-                  <span>tension<small>被拉紧的状态</small></span>
-                </div>
-              </div>
-              <div class="mock-section">ETYMOLOGY</div>
-              <div class="mock-etymology">
-                <span>PIE</span><b>*ten-</b><i></i>
-                <span>LATIN</span><b>tendere</b><i></i>
-                <span>ENGLISH</span><b>contend</b>
-              </div>
-              <div class="mock-card-preview">
-                <small>MORPHOLOGY</small>
-                <strong>con- + tend → 把力量一起拉向目标</strong>
-              </div>
-              <div class="mock-tabs"><span>◆<small>Dictionary</small></span><span>⌘<small>Roots</small></span><span>☆<small>Starred</small></span><span>○<small>Profile</small></span></div>
-            </div>
-          </div>
-        </article>
-
-        <article class="phone phone-right" aria-label="练习界面">
-          <div class="phone-frame">
-            <div class="phone-island"></div>
-            <div class="phone-screen practice-screen">
-              <div class="mock-status"><span>9:41</span><span>● ◒ ▰</span></div>
-              <div class="mock-practice-top"><span>×</span><b>1 / 5</b><span>→</span></div>
-              <div class="mock-dots"><i class="done"></i><i class="current"></i><i></i><i></i><i></i></div>
-              <p class="mock-overline">VERB · FORMAL</p>
-              <h3>努力与对手争夺同一目标。</h3>
-              <p class="mock-caption">根据释义拼出这个词</p>
-              <div class="mock-answer"><span>c o</span><i>_</i><i>_</i><i>_</i><i>_</i></div>
-              <div class="mock-hint"><span>◉</span><small>先看提示，再听读音</small></div>
-              <div class="mock-keypad">
-                <span>Q</span><span>W</span><span>E</span><span>R</span><span>T</span>
-                <span>Y</span><span>U</span><span>I</span><span>O</span><span>P</span>
-              </div>
-              <div class="mock-skip">Skip this word</div>
-            </div>
-          </div>
-        </article>
-      </div>
-      <p class="showcase-note">Dictionary · Word DNA · Practice — 同一套安静、紧凑、可操作的界面。</p>
-    </section>
-
-    <section class="shell roots-spotlight" id="roots">
-      <div class="roots-copy">
-        <p class="section-label">New in 8.2</p>
-        <h2>从一个词根，<br>走到一整座地图。</h2>
-        <p>
-          8.2 收敛 Root Detail 的页面层级，My Map 与 Review 只接受显式词根星标；普通来源词的星标只作为提示，不再悄悄改变复习范围。
-        </p>
-        <div class="roots-points">
-          <span>清晰的页面层级</span>
-          <span>显式词根星标</span>
-          <span>稳定的复习范围</span>
-          <span>轻量来源提示</span>
+        <div class="float-note float-root">
+          <small>ROOT</small>
+          <strong>tend</strong>
+          <span>伸展 · 拉向</span>
         </div>
-      </div>
-      <div class="roots-board">
-        <div class="roots-board-head">
-          <span>PERSONAL ROOT MAP</span>
-          <b>tend</b>
-          <small>4 个词族成员 · 词根已星标</small>
+        <div class="float-note float-family">
+          <small>ROOT FAMILY</small>
+          <strong>extend · intend · tension</strong>
         </div>
-        <div class="root-orbit">
-          <div class="orbit-core"><small>LATIN</small><strong>tendere</strong><span>伸展 · 拉向</span></div>
-          <div class="orbit-word one">contend<small>竞争 · 主张</small></div>
-          <div class="orbit-word two">extend<small>向外伸展</small></div>
-          <div class="orbit-word three">intend<small>把注意拉向</small></div>
-          <div class="orbit-word four">tension<small>被拉紧的状态</small></div>
-        </div>
-        <div class="mastery-panel">
-          <div><span>个人图谱</span><strong>3 / 9</strong></div>
-          <div class="mastery-track"><i class="lit"></i><i class="lit"></i><i class="lit"></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          <small>0 · 1 · 2 · 4 · 7 · 15 · 30 · 60 · 120 天</small>
-        </div>
-        <div class="review-row"><span>打开 Root Atlas</span><b>→</b></div>
       </div>
     </section>
 
-    <section class="shell feature-story" id="word-dna">
-      <div class="story-copy">
-        <p class="section-label">Word DNA</p>
-        <h2>不止知道意思。<br>还知道它为什么。</h2>
-        <p class="story-lead">
-          词源是一条路径，构词是一种结构，词族是一张关系网。Linguist 把它们放在同一次阅读里，让你从“记住这个答案”走向“理解这个系统”。
-        </p>
-        <div class="story-points">
-          <div><span>01</span><p><strong>核心义先行</strong><small>先用一句话说明词的语义中心，再进入细节。</small></p></div>
-          <div><span>02</span><p><strong>词源按阶段展开</strong><small>历史路径、证据强度与不确定处分别标注。</small></p></div>
-          <div><span>03</span><p><strong>词根连到词族</strong><small>派生词、同根词和假朋友在同一张关系图里。</small></p></div>
+    <section class="method section-light" id="method">
+      <div class="shell method-grid">
+        <div class="section-copy">
+          <p class="kicker">Why roots</p>
+          <h2>一次查词，<br>看见五层联系。</h2>
+          <p>
+            Linguist 把词典从“对应关系”变成“解释系统”。它先给核心义，再沿着词源与构词展开，让同根词、语境和文化线索彼此照亮。
+          </p>
+          <div class="text-links">
+            <a href="feature-map/feature-map.html">查看交互式功能知识图谱 <span>↗</span></a>
+          </div>
         </div>
-      </div>
-      <div class="detail-board">
-        <div class="detail-toolbar">
-          <span>Entry</span><b>contend</b><span>来源 EN · 解释中文</span>
-        </div>
-        <div class="detail-focus">
-          <div class="detail-word">
-            <small>EN · VERB</small>
+
+        <div class="word-map" aria-label="contend 的词根关系示意">
+          <div class="word-map-head">
+            <span>WORD KNOWLEDGE MAP</span>
             <strong>contend</strong>
-            <span>/kənˈtend/</span>
           </div>
-          <div class="detail-meaning">
+          <div class="word-map-core">
             <small>CORE MEANING</small>
             <p>努力与对手争夺同一目标，或在分歧中坚持自己的说法。</p>
           </div>
-          <div class="root-diagram">
-            <span>con-<small>一起</small></span><i>+</i><span>tend<small>伸展 · 拉向</small></span><i>→</i><span class="result">contend<small>共同拉向一个目标</small></span>
+          <div class="word-map-path">
+            <div><small>词源</small><strong>PIE *ten-</strong><span>拉紧 · 伸展</span></div>
+            <i></i>
+            <div><small>构词</small><strong>con- + tend</strong><span>把力量拉向目标</span></div>
+            <i></i>
+            <div><small>词族</small><strong>extend · intend</strong><span>同一词根的不同方向</span></div>
           </div>
-          <div class="detail-grid">
-            <div><small>词源</small><b>PIE *ten-</b><span>伸展</span></div>
-            <div><small>拉丁</small><b>tendere</b><span>拉紧</span></div>
-            <div><small>现代英语</small><b>contend</b><span>争夺</span></div>
-          </div>
-          <div class="family-cloud">
-            <span>extend</span><span>intend</span><span>attention</span><span>tension</span>
+          <div class="word-map-foot">
+            <span>语境</span><span>搭配</span><span>文化</span><span>易混词</span>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="modes-section">
+    <section class="showcase section-dark" id="experience">
       <div class="shell">
-        <div class="section-head modes-head">
-          <h2>词、句、文件。<br>切换一次就够。</h2>
-          <p>同一个知识框架覆盖三种阅读尺度。输入框会自动判断，也可以手动指定，避免让模型猜你的意图。</p>
+        <div class="section-heading centered">
+          <p class="kicker">A quiet, focused workspace</p>
+          <h2>真正的界面，<br>为长时间阅读而做。</h2>
+          <p>没有装饰性的仪表盘。信息按学习顺序展开，需要时出现，不需要时收好。</p>
         </div>
-        <div class="mode-grid">
-          <article class="mode-card blue">
-            <span class="mode-icon">A</span>
-            <p class="section-label">Word</p>
-            <h3>拆开一个词</h3>
-            <p>核心义、词源、形态、词族、搭配和文化内涵。</p>
-            <div class="mode-visual word-visual"><span>tend</span><span>extend</span><span>intend</span></div>
-          </article>
-          <article class="mode-card violet">
-            <span class="mode-icon">¶</span>
-            <p class="section-label">Sentence</p>
-            <h3>读完一整句</h3>
-            <p>翻译、逐词对应、结构、语法点和容易误解的表达。</p>
-            <div class="mode-visual sentence-visual"><span>Le sens</span><span>La structure</span><span>Le contexte</span></div>
-          </article>
-          <article class="mode-card graphite">
-            <span class="mode-icon">↗</span>
-            <p class="section-label">File</p>
-            <h3>读懂整份文件</h3>
-            <p>PDF、DOCX、字幕与文本：概要、译文、词汇表和文体判断。</p>
-            <div class="mode-visual file-visual"><span>PDF</span><span>DOCX</span><span>TXT</span></div>
-          </article>
+
+        <div class="product-gallery">
+          <figure class="product-shot">
+            <div class="device device-small">
+              <div class="device-island"></div>
+              <div class="device-screen">
+                <img src="showcase/dictionary.png" alt="Linguist 真实词典主页，包含查询类型、语言和历史" loading="lazy" decoding="async">
+              </div>
+            </div>
+            <figcaption>
+              <span>01 · Dictionary</span>
+              <strong>查词、历史与语言，一眼就位。</strong>
+              <p>Auto、Word、Sentence、File 四种入口；历史按日期折叠与搜索。</p>
+            </figcaption>
+          </figure>
+
+          <figure class="product-shot product-shot-raised">
+            <div class="device device-small">
+              <div class="device-island"></div>
+              <div class="device-screen">
+                <img src="showcase/word-dna.png" alt="Linguist 真实词条界面，显示核心义、词源、构词和词族" loading="lazy" decoding="async">
+              </div>
+            </div>
+            <figcaption>
+              <span>02 · Word DNA</span>
+              <strong>词根不是标签，是阅读顺序。</strong>
+              <p>核心义、词源时间线、构词公式和同根词族在同一套卡片中展开。</p>
+            </figcaption>
+          </figure>
+
+          <figure class="product-shot">
+            <div class="device device-small">
+              <div class="device-island"></div>
+              <div class="device-screen device-screen-practice">
+                <img src="showcase/practice.png" alt="Linguist 真实练习界面，展示英语拼写、中文拼音与日语假名" loading="lazy" decoding="async">
+              </div>
+            </div>
+            <figcaption>
+              <span>03 · Practice</span>
+              <strong>练习，但不提前泄露答案。</strong>
+              <p>拼写、拼音与假名；词性和释义先出现，读音只在主动操作后播放。</p>
+            </figcaption>
+          </figure>
         </div>
       </div>
     </section>
 
-    <section class="shell sections" id="idea">
-      <div class="section-head">
-        <h2>从“查词”到<br>理解一张网</h2>
-        <p>
-          词典的功能是消除未知，Linguist 还想建立联系。每一次查询都同时回答：它是什么、为什么长成这样、从哪里来，以及它如何在语言中活动。
-        </p>
-      </div>
-      <div class="cards">
-        <article class="card">
-          <span class="number">01</span>
-          <h3>词根先行</h3>
-          <p>先读 Word DNA，再进入义项。构词关系与语义线索在同一屏上彼此印证。</p>
-        </article>
-        <article class="card">
-          <span class="number">02</span>
-          <h3>证据有层次</h3>
-          <p>词源按历史阶段展开，区分有据可查的路径、可能的联系与只是相似的假朋友。</p>
-        </article>
-        <article class="card">
-          <span class="number">03</span>
-          <h3>从词走到句</h3>
-          <p>同一个知识框架也用于整句和长文件：结构、语义、翻译、词汇表与文体判断。</p>
-        </article>
-        <article class="card">
-          <span class="number">04</span>
-          <h3>解释语言自由</h3>
-          <p>查德语可以用中文理解，也可以用英语、法语、德语或日语重新解释同一条词。</p>
-        </article>
-        <article class="card">
-          <span class="number">05</span>
-          <h3>练习不泄露答案</h3>
-          <p>题目先给词性和释义；音标、声调或拍数是提示，只有主动播放时才出现读音。</p>
-        </article>
-        <article class="card">
-          <span class="number">06</span>
-          <h3>数据各归各人</h3>
-          <p>历史、星标和 API Key 留在当前设备，不建立公共账户，也不互相共享。</p>
-        </article>
+    <section class="roots section-light" id="roots">
+      <div class="shell roots-grid">
+        <div class="section-copy">
+          <p class="kicker">Roots · Atlas · Memory</p>
+          <h2>查过的词根，<br>留在你的地图里。</h2>
+          <p>
+            Root Atlas 从词源资料建立词根实体、别名、词族和可信度；Personal Root Map 只接收你明确收藏的词根，来源词的星标只作为提示。
+          </p>
+          <ul class="proof-list">
+            <li><span>01</span><p><strong>RootEntity</strong><small>稳定 rootId、别名迁移、来源与词族关系。</small></p></li>
+            <li><span>02</span><p><strong>Root Atlas</strong><small>按词根、变体、词族词、含义和来源筛选。</small></p></li>
+            <li><span>03</span><p><strong>Context-to-Root</strong><small>句子和文件中的词汇可回流到本地词根索引。</small></p></li>
+            <li><span>04</span><p><strong>滚动复习</strong><small>释义、拼写、同根词三阶段，错误回到队尾。</small></p></li>
+          </ul>
+        </div>
+
+        <div class="root-console">
+          <div class="console-head">
+            <div><small>ROOT ATLAS</small><strong>tend</strong></div>
+            <span class="live-dot">已星标</span>
+          </div>
+          <div class="root-symbol">
+            <small>LATIN</small>
+            <strong>tendere</strong>
+            <span>伸展 · 拉紧 · 朝向</span>
+          </div>
+          <div class="root-links">
+            <span>contend<small>争夺</small></span>
+            <span>extend<small>延伸</small></span>
+            <span>intend<small>意图</small></span>
+            <span>tension<small>张力</small></span>
+          </div>
+          <div class="memory-schedule">
+            <div><span>复习周期</span><strong>0 · 1 · 2 · 4 · 7 · 15 · 30 · 60 · 120 天</strong></div>
+            <div class="memory-track" aria-hidden="true">
+              <i class="done"></i><i class="done"></i><i class="done"></i><i class="current"></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+          </div>
+          <div class="console-footer">
+            <span>5 个词根 × 3 个阶段</span>
+            <b>My Map</b><b>Review</b>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="shell sections" id="install">
-      <div class="section-head">
-        <h2>安装到你的<br>每一块屏幕</h2>
-        <p>
-          网页版就是完整的应用。安装后可从桌面图标直接进入，不必每次打开浏览器网址；查询仍需要联网和 DeepSeek API Key。
+    <section class="features section-light" id="features">
+      <div class="shell">
+        <div class="section-heading">
+          <p class="kicker">Complete capability guide</p>
+          <h2>该有的细节，<br>都在这里。</h2>
+          <p>按真实使用路径整理，不按版本更新记录堆叠。每一项都对应 8.2.0 的现有功能。</p>
+        </div>
+
+        <div class="capability-grid">
+          <article class="capability">
+            <span class="cap-index">01</span>
+            <h3>Word · 单词</h3>
+            <p>五种在用语言：英语、法语、德语、日语、中文。</p>
+            <ul>
+              <li>40 张词条卡，按 Word DNA / Meaning / Forms / Context 分组</li>
+              <li>意大利语、西班牙语已从在用选择器撤下；本地旧词条仍可打开</li>
+              <li>核心义、词源时间线、构词拆分、词根变体、同根词族</li>
+              <li>义项、搭配、语体、文化、易混词、助记与综合</li>
+              <li>发音、变位、变格、形容词词尾与介词支配</li>
+              <li>单个词条的暂定解释语言切换，回到已生成版本可命中缓存</li>
+              <li>卡片显隐、排序、置顶和恢复默认</li>
+            </ul>
+          </article>
+
+          <article class="capability">
+            <span class="cap-index">02</span>
+            <h3>Roots · 词根</h3>
+            <p>从一次查询走向可持续维护的词根网络。</p>
+            <ul>
+              <li>Root Atlas 搜索、来源筛选、词族与可信度</li>
+              <li>稳定词根实体、别名、版本组与旧进度迁移</li>
+              <li>显式词根星标进入 My Map 与 Review</li>
+              <li>词根详情、来源演化、关联词、笔记与掌握度</li>
+              <li>0–120 天记忆周期和释义 / 拼写 / 同根词复习；当前复习面向英/法/德词根</li>
+              <li>无同根词自动跳过；普通来源词星标不会扩大复习范围</li>
+            </ul>
+          </article>
+
+          <article class="capability">
+            <span class="cap-index">03</span>
+            <h3>Sentence · 句子</h3>
+            <p>一句话的语义与语法由两条并行线索解释。</p>
+            <ul>
+              <li>翻译、逐词对应和语义分块</li>
+              <li>句子结构、语法点、语体、易错点与句式模板</li>
+              <li>文化语境与母语解释对照</li>
+              <li>9 张专用句子卡，可按界面语言梳理</li>
+              <li>句子可星标、进入单词本和导出备份</li>
+            </ul>
+          </article>
+
+          <article class="capability">
+            <span class="cap-index">04</span>
+            <h3>File · 文件</h3>
+            <p>先读文件、确认语言与请求数，再决定是否分析。</p>
+            <ul>
+              <li>文本、Markdown、CSV、字幕、HTML、PDF、DOCX</li>
+              <li>概要、完整译文、去重词汇表、语体与体裁判断</li>
+              <li>约 20,000 字一块，最高 200,000 字；可停止和续跑</li>
+              <li>保留换行、空行、缩进和段落对应关系</li>
+              <li>扫描版 PDF 与旧版 <code>.doc</code> 会明确提示</li>
+              <li>文件可星标，但不会进入普通单词练习池</li>
+            </ul>
+          </article>
+
+          <article class="capability">
+            <span class="cap-index">05</span>
+            <h3>Practice · 练习</h3>
+            <p>提示应该帮助回忆，而不是替用户回答。</p>
+            <ul>
+              <li>英语 / 法语 / 德语拼写、中文拼音、日语假名</li>
+              <li>先显示语种、词性和释义，再显示答案格</li>
+              <li>首级提示给音标、声调或拍数；第二级才给首字母</li>
+              <li>跳过和首次拼错都会在组末回环</li>
+              <li>看过提示后才可手动播放读音</li>
+              <li>练习来源可按全部星标、语言或单词本筛选</li>
+            </ul>
+          </article>
+
+          <article class="capability">
+            <span class="cap-index">06</span>
+            <h3>Library · 学习库</h3>
+            <p>查询、收藏和整理在同一套本地数据中闭环。</p>
+            <ul>
+              <li>按日期分组、可搜索和折叠的历史</li>
+              <li>星标自动进入默认单词本，自定义单词本支持跨语言</li>
+              <li>Words / Sentences / Files 分类与单行删除</li>
+              <li>删除后可撤销；取消星标先留在当前页</li>
+              <li>发现词使用独立“随便看看”单词本</li>
+              <li>200 词随机池、预热与去重</li>
+            </ul>
+          </article>
+
+          <article class="capability">
+            <span class="cap-index">07</span>
+            <h3>Profile · 个人化</h3>
+            <p>界面语言、解释语言和学习偏好彼此独立。</p>
+            <ul>
+              <li>五种界面语言、五种解释语言</li>
+              <li>为每种源语言设置默认解释语言</li>
+              <li>Card 分组偏好、数据占用与存储状态</li>
+              <li>完整 JSON 备份、导入和旧版本数据迁移</li>
+              <li>DeepSeek Key 管理与连接测试</li>
+              <li>可重放的新手引导</li>
+            </ul>
+          </article>
+
+          <article class="capability">
+            <span class="cap-index">08</span>
+            <h3>Privacy · 数据</h3>
+            <p>没有公共账户，没有项目方中转服务器。</p>
+            <ul>
+              <li>历史、收藏、笔记、设置和 Key 保存在当前设备</li>
+              <li>查询使用使用者自己的 DeepSeek Key</li>
+              <li>PWA 静态外壳可离线打开，API 请求不进入缓存</li>
+              <li>Android 壳关闭系统自动备份</li>
+              <li>JSON 备份不包含 API Key</li>
+              <li>模型与词源内容可能出错，重要结论应另行核验</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="fact-strip" aria-label="Linguist 8.2.0 公开验证数据">
+          <div><strong>5</strong><span>在用语言</span></div>
+          <div><strong>40</strong><span>单词卡</span></div>
+          <div><strong>9</strong><span>句子卡</span></div>
+          <div><strong>4</strong><span>文件卡</span></div>
+          <div><strong>809</strong><span>自动测试</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="install section-light" id="install">
+      <div class="shell">
+        <div class="section-heading">
+          <p class="kicker">Available everywhere</p>
+          <h2>选择你的设备。<br>数据由你掌握。</h2>
+          <p>网页、Android 和 Windows 均为 8.2.0。安装方式与之前保持一致。</p>
+        </div>
+
+        <div class="platform-grid">
+          <article class="platform">
+            <span class="platform-index">Web / PWA</span>
+            <h3>iPhone · iPad · 桌面浏览器</h3>
+            <ol>
+              <li>打开网页版；iPhone 使用 Safari。</li>
+              <li>点“分享” → “添加到主屏幕”。</li>
+              <li>桌面浏览器可使用地址栏安装图标。</li>
+            </ol>
+            <a href="app/">打开网页版 <span>↗</span></a>
+          </article>
+
+          <article class="platform">
+            <span class="platform-index">Android · 8.2.0</span>
+            <h3>Android 6.0+</h3>
+            <ol>
+              <li>下载通用 APK，约 645 KiB。</li>
+              <li>允许当前文件管理器安装未知应用。</li>
+              <li>可覆盖升级 6.5.0，并保留本地数据。</li>
+            </ol>
+            <a href="https://github.com/PineappleZY/linguist/releases/download/v8.2.0/Linguist-8.2.0.apk">下载 APK <span>↓</span></a>
+          </article>
+
+          <article class="platform">
+            <span class="platform-index">Windows · 8.2.0</span>
+            <h3>Windows x64 安装器</h3>
+            <ol>
+              <li>下载约 107 MiB 的安装程序。</li>
+              <li>选择安装位置，创建桌面快捷方式。</li>
+              <li>SmartScreen 提示时选择“更多信息 → 仍要运行”。</li>
+            </ol>
+            <a href="https://github.com/PineappleZY/linguist/releases/download/v8.2.0/Linguist-8.2.0-Setup.exe">下载 Windows 版 <span>↓</span></a>
+          </article>
+
+          <article class="platform" id="harmonyos">
+            <span class="platform-index">HarmonyOS</span>
+            <h3>鸿蒙 NEXT 与兼容安卓版本</h3>
+            <ol>
+              <li>NEXT 使用系统浏览器打开网页版。</li>
+              <li>在浏览器菜单中选择“添加到桌面”。</li>
+              <li>兼容 Android 的旧版鸿蒙可使用 8.2 APK。</li>
+            </ol>
+            <a href="app/">在鸿蒙浏览器中打开 <span>↗</span></a>
+          </article>
+        </div>
+
+        <div class="download-strip">
+          <p><strong>需要自托管或离线分享？</strong> 下载 8.2.0 单文件 HTML 或完整 PWA ZIP。</p>
+          <div>
+            <a href="https://github.com/PineappleZY/linguist/releases/download/v8.2.0/linguist_8.2.0.html">单文件 HTML</a>
+            <a href="https://github.com/PineappleZY/linguist/releases/download/v8.2.0/Linguist-8.2.0-web.zip">PWA ZIP</a>
+            <a href="https://github.com/PineappleZY/linguist/releases/download/v8.2.0/Linguist-8.2.0-SHA256SUMS.txt">SHA-256</a>
+          </div>
+        </div>
+
+        <p class="privacy-note">
+          每个使用者都需要在 Profile 中填写自己的 DeepSeek API Key。安装和网页版都不会附带公共 Key，也不会共享历史与收藏。
         </p>
       </div>
-      <div class="platforms">
-        <article class="platform platform-web">
-          <span class="platform-tag">WEB / PWA</span>
-          <h3>iPhone · iPad · 桌面</h3>
-          <ol>
-            <li>打开网页版；iPhone 使用 Safari。</li>
-            <li>点“分享” → “添加到主屏幕”。</li>
-            <li>桌面浏览器可点地址栏右侧的安装图标。</li>
-          </ol>
-          <a class="platform-link" href="app/">打开网页版 <span>↗</span></a>
-        </article>
-        <article class="platform platform-android">
-          <span class="platform-tag">ANDROID · 8.2 APK</span>
-          <h3>Android 6.0+</h3>
-          <ol>
-            <li>下载约 645 KiB 通用 APK，版本 8.2.0。</li>
-            <li>允许当前文件管理器“安装未知应用”。</li>
-            <li>可直接覆盖 6.5.0，本地数据会保留。</li>
-          </ol>
-          <a class="platform-link" href="https://github.com/PineappleZY/linguist/releases/download/v8.2.0/Linguist-8.2.0.apk">下载 Android 8.2 APK <span>↓</span></a>
-        </article>
-        <article class="platform platform-harmony" id="harmonyos">
-          <span class="platform-tag">HARMONYOS · WEB</span>
-          <h3>鸿蒙 NEXT</h3>
-          <ol>
-            <li>使用系统浏览器打开 8.2 网页版。</li>
-            <li>在浏览器菜单中选择“添加到桌面”。</li>
-            <li>NEXT 不直接运行 APK；兼容安卓的旧版鸿蒙可用 8.2 APK。</li>
-          </ol>
-          <a class="platform-link" href="app/">在鸿蒙浏览器中打开 <span>↗</span></a>
-        </article>
-        <article class="platform platform-windows">
-          <span class="platform-tag">WINDOWS · 8.2 X64</span>
-          <h3>Windows 10 / 11</h3>
-          <ol>
-            <li>下载约 107 MiB 的 Windows 安装器。</li>
-            <li>选择安装位置并创建桌面快捷方式。</li>
-            <li>SmartScreen 提示时选择“仍要运行”。</li>
-          </ol>
-          <a class="platform-link" href="https://github.com/PineappleZY/linguist/releases/download/v8.2.0/Linguist-8.2.0-Setup.exe">下载 Windows 8.2 <span>↓</span></a>
-        </article>
+    </section>
+
+    <section class="feedback section-dark" id="feedback">
+      <div class="shell feedback-grid">
+        <div>
+          <p class="kicker">Feedback</p>
+          <h2>发现错误，<br>或有一个想法？</h2>
+          <p>欢迎反馈功能建议、界面问题、词源疑点和使用体验。你的实际使用场景会直接影响下一轮改进。</p>
+        </div>
+        <div class="feedback-card">
+          <span>意见反馈邮箱</span>
+          <a href="mailto:yvesjacob@163.com?subject=Linguist%208.2%20%E6%84%8F%E8%A7%81%E5%8F%8D%E9%A6%88">yvesjacob@163.com</a>
+          <p>邮件中可附：设备与系统、Linguist 版本、操作步骤、预期结果、实际现象与截图。</p>
+          <small>请勿发送 DeepSeek API Key、账户余额或其他敏感信息。</small>
+        </div>
       </div>
-      <p class="notice">
-        网页版、Android 和 Windows 均已升级到 8.2。每个使用者都需要在 Profile 中填写自己的 DeepSeek API Key。
-      </p>
     </section>
   </main>
 
-  <footer class="shell footer">
-    <span>Linguist · 以词根为纲的智能辞典</span>
-    <div class="footer-links">
-      <a href="app/">网页应用</a>
-      <a href="https://github.com/PineappleZY/linguist/releases/download/v8.2.0/Linguist-8.2.0.apk">Android 8.2 APK</a>
-      <a href="https://github.com/PineappleZY/linguist/releases/download/v8.2.0/Linguist-8.2.0-Setup.exe">Windows 8.2 Setup</a>
-      <a href="feature-map/feature-map.html">功能图谱</a>
-      <a href="https://github.com/PineappleZY/linguist">源码</a>
-      <a href="https://github.com/PineappleZY/linguist/blob/main/LICENSE">MIT License</a>
+  <footer class="site-footer">
+    <div class="shell footer-grid">
+      <div class="footer-brand">
+        <img src="app/icons/icon-192.png" alt="">
+        <div><strong>Linguist</strong><span>以词根为纲的智能辞典</span></div>
+      </div>
+      <div class="footer-links">
+        <a href="app/">网页版</a>
+        <a href="feature-map/feature-map.html">功能图谱</a>
+        <a href="https://github.com/PineappleZY/linguist">GitHub</a>
+        <a href="mailto:yvesjacob@163.com?subject=Linguist%208.2%20%E6%84%8F%E8%A7%81%E5%8F%8D%E9%A6%88">yvesjacob@163.com</a>
+      </div>
+      <p>© 2026 Linguist · MIT License · 8.2.0</p>
     </div>
   </footer>
 </body>
