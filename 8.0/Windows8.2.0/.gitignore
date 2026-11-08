@@ -1,0 +1,4 @@
+node_modules/
+release/
+Linguist-*-Setup.exe
+app/*.html
